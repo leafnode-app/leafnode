@@ -1,0 +1,73 @@
+defmodule LeafNode do
+  @moduledoc """
+    The LeafNode module provides functions for working with nodes in a process.
+    The module contains constants for various keys that are used to access and manipulate node data.
+    The module includes functions for generating and updating the test data associated with a node, and for generating a result log for a node's output.
+    There are also functions for identifying whether a given node is an entry node, and for processing the result of an exit node.
+    Finally, the module provides a function for initializing the input for the process's entry node.
+
+    Overall, the LeafNode module provides a set of useful functions for managing and manipulating nodes in a process, and can be used to build complex workflows in Elixir.
+  """
+
+  # Constants
+  @id "id"
+  @name "name"
+  @input "input"
+  @exit_node "exit_node"
+  @input_node "input_node"
+  @result_output "result_output"
+
+  @doc """
+    Generates the return result that will be used as the struct for the data in processes
+  """
+  # TODO: This needs to change to a struct and be updated acordingly
+  def generate_result_log(node, %{ "data" => data }) do
+    node_result = %{
+      "id" => node[@id],
+      "name" => node[@name],
+      "input" => node[@input],
+      "result_output" => %{
+        "data" => data
+      }
+    }
+
+    result = if is_entry_node?(node) do
+      Map.put(node_result, "exit_node", node[@exit_node])
+    else
+      node_result
+    end
+
+    result
+  end
+
+  @doc """
+    Is the current node the entry node?
+  """
+  # TODO: This needs to be more unique to know if its an entry node
+  def is_entry_node?(node) do
+    Map.has_key?(node, @exit_node)
+  end
+
+  @doc """
+    Take the result of the exit node that was setup and selected by the entry node to be returned
+  """
+  def process_exit_node(nodes) do
+    entry_node = nodes[@input_node]
+    result = entry_node[@exit_node]
+    result_data = if nodes[result] !== nil, do: nodes[result], else: %{}
+    Map.get(result_data, @result_output, %{
+      "data" => %{
+        "message" => "No exit node configured or found."
+      }
+    })
+  end
+
+  @doc """
+    Takes the input sent to be executed on the process and passes it to an etry node that.
+    The entry node is the entry point of the processes and decides on the result of the entire process.
+    The entry-node can also be referenced and used across all nodes for its initial value
+  """
+  def init_entry_node_input(entry_node, input) do
+    Map.put(entry_node, @input, input)
+  end
+end

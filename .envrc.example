@@ -1,0 +1,13 @@
+# LeafNode User
+export ROOT_USER=
+export ROOT_PASS=
+
+# data dir
+export APP_DATA=
+
+# Open AI
+export OPEN_AI=
+export OPEN_AI_MODEL=
+
+# Port
+export PORT=

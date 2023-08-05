@@ -46,7 +46,7 @@ defmodule LeafNode.Core.Documents do
           id: document.id,
           name: Map.get(data, :name, document.name),
           result: Map.get(data, :result, document.result),
-          data: [Map.get(data, :data, document.data)]
+          data: Map.get(data, :data, document.data)
         }
         Dets.insert(table, id, updated_document)
         if return_value do

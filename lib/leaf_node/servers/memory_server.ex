@@ -67,8 +67,14 @@ defmodule LeafNode.Servers.MemoryServer do
   @doc """
     Fetch from memory
   """
-  def handle_call(:get_document, _from, state) do
-    Logger.info("Server: LeafNode.Servers.MemoryServer. Event: get_document")
-    {:reply, :ok, state}
+  def handle_call({:get_document, id}, _from, state) do
+    {status, data} = LeafNode.Core.Ets.get_by_key(:documents, id)
+    case status do
+      :ok ->
+        Logger.info("Server: LeafNode.Servers.MemoryServer. Event: get_document")
+        {:reply, data, state}
+      _ ->
+        {:reply, data, state}
+    end
   end
 end

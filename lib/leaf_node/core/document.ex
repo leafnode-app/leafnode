@@ -17,10 +17,10 @@ defmodule LeafNode.Core.Documents do
     id = UUID.uuid4()
     document =
       %Document{
-        id: Map.get(data, "id", id),
-        name: Map.get(data, "name", id),
-        result: Map.get(data, "result", true),
-        data: Map.get(data, "data", [%Paragraph{id: UUID.uuid4()}]),
+        id: Map.get(data, :id, id),
+        name: Map.get(data, :name, id),
+        result: Map.get(data, :result, true),
+        data: Map.get(data, :data, [%Paragraph{id: UUID.uuid4()}]),
       }
 
     result = Dets.insert(table, Map.get(data, "id", id), document)
@@ -44,12 +44,16 @@ defmodule LeafNode.Core.Documents do
       :ok ->
         updated_document = %Document{
           id: document.id,
-          name: Map.get(data, "name", document.name),
-          result: Map.get(data, "result", document.result),
-          data: Map.get(data, "data", document.data)
+          name: Map.get(data, :name, document.name),
+          result: Map.get(data, :result, document.result),
+          data: [Map.get(data, :data, document.data)]
         }
         Dets.insert(table, id, updated_document)
-        {:ok, "Successfully updated document"}
+        if return_value do
+          {:ok, "Successfully updated document", updated_document}
+        else
+          {:ok, "Successfully updated document"}
+        end
       _ -> {:error, "There was a problem editing the document"}
     end
   end

@@ -52,16 +52,27 @@ defmodule LeafNode.Servers.DiskServer do
   @doc """
     Update document & request update to memory too
   """
-  def handle_call(:update_document, _from, state) do
+  def handle_call({:update_document, data}, _from, state) do
     Logger.info("Server: LeafNode.Servers.DiskServer. Event: update_document")
+    {status, resp, document} = Documents.edit_document(data.id, data, :documents, true)
+
+    if status === :ok do
+      GenServer.call(LeafNode.Servers.MemoryServer, {:update_document, document})
+    end
+
     {:reply, :ok, state}
   end
 
   @doc """
     Delete document & request update to memory too
   """
-  def handle_call(:delete_document, _from, state) do
+  def handle_call({:delete_document, id}, _from, state) do
     Logger.info("Server: LeafNode.Servers.DiskServer. Event: delete_document")
+    {status, resp} = Documents.delete_document(id, :documents)
+
+    if status === :ok do
+      GenServer.call(LeafNode.Servers.MemoryServer, {:delete_document, id})
+    end
     {:reply, :ok, state}
   end
 end

@@ -45,7 +45,8 @@ defmodule LeafNode.Servers.MemoryServer do
   @doc """
     Remove from memory
   """
-  def handle_call({:delete_document, data}, _from, state) do
+  def handle_call({:delete_document, id}, _from, state) do
+    LeafNode.Core.Ets.delete_by_key(:documents, id)
     Logger.info("Server: LeafNode.Servers.MemoryServer. Event: delete_document")
     {:reply, :ok, state}
   end
@@ -54,6 +55,11 @@ defmodule LeafNode.Servers.MemoryServer do
     Update in memory
   """
   def handle_call({:update_document, data}, _from, state) do
+    # we need to remove the old data first with ETS
+    if LeafNode.Core.Ets.delete_by_key(:documents, data.id) do
+      # inset the new updated version of the key that was removd
+      LeafNode.Core.Ets.insert(:documents, data.id, data)
+    end
     Logger.info("Server: LeafNode.Servers.MemoryServer. Event: update_document")
     {:reply, :ok, state}
   end

@@ -23,7 +23,7 @@ defmodule LeafNode.Application do
       # Start the Endpoint (http/https)
       LeafNodeWeb.Endpoint,
       # Jobs and processes for data interaction
-      {LeafNode.Servers.DataSyncServer, %{ interval: 20_000}},
+      {LeafNode.Servers.DataSyncServer, %{ interval: 60_000}},
       LeafNode.Servers.MemoryServer,
       LeafNode.Servers.DiskServer
     ]

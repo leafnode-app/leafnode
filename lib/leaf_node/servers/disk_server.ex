@@ -108,6 +108,7 @@ defmodule LeafNode.Servers.DiskServer do
         { status, resp } = LeafNode.Core.Gpt.prompt(item.data)
         case status do
           :ok -> resp
+          # TODO: Add fallback result funciton if timeout is reached and mabe a better response message?
           _ -> Logger.error("There was an error: #{resp}. Module: LeafNode.Servers.DiskServer. Function: generate_pseudo_code")
         end
       end)

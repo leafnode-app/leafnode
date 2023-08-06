@@ -72,9 +72,9 @@ defmodule LeafNode.Servers.MemoryServer do
     case status do
       :ok ->
         Logger.info("Server: LeafNode.Servers.MemoryServer. Event: get_document")
-        {:reply, data, state}
+        {:reply, {status, data}, state}
       _ ->
-        {:reply, data, state}
+        {:reply, {status, data}, state}
     end
   end
 end

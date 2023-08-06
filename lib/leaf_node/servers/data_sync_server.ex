@@ -7,6 +7,7 @@ defmodule LeafNode.Servers.DataSyncServer do
   use GenServer
   require Logger
 
+  @timeout 10_000
   @doc """
     Start the server
   """
@@ -17,6 +18,7 @@ defmodule LeafNode.Servers.DataSyncServer do
   @doc """
     Initialize the scheduler process
   """
+  # TODO: Initialize and dont wait for the send after as the system wont be in sync initially
   def init(state) do
     initial_state = %{}
     schedule_work(state.interval)
@@ -27,8 +29,8 @@ defmodule LeafNode.Servers.DataSyncServer do
     Handle the process event scheduler
   """
   def handle_info(:work, state) do
-    {mem_status, mem_resp} = GenServer.call(LeafNode.Servers.MemoryServer, :get_hash)
-    {disk_status, disk_resp} = GenServer.call(LeafNode.Servers.DiskServer, :get_hash)
+    {mem_status, mem_resp} = GenServer.call(LeafNode.Servers.MemoryServer, :get_hash, @timeout)
+    {disk_status, disk_resp} = GenServer.call(LeafNode.Servers.DiskServer, :get_hash, @timeout)
 
     case disk_status do
       :ok ->

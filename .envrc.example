@@ -7,7 +7,7 @@ export APP_DATA=
 
 # Open AI
 export OPEN_AI=
-export OPEN_AI_MODEL=
+export OPEN_AI_MODEL=gpt-3.5-turbo
 
 # Port
-export PORT=
+export PORT=5000

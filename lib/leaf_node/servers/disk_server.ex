@@ -19,7 +19,7 @@ defmodule LeafNode.Servers.DiskServer do
   end
 
   @doc """
-    Get the hash of the current data in memory for the documents
+    Get the hash of the current data in memory for ALL the documents
   """
   def handle_call(:get_hash, _from, state) do
     {status, data} = LeafNode.Core.Dets.get_all(:documents)
@@ -32,8 +32,6 @@ defmodule LeafNode.Servers.DiskServer do
     {:reply, resp, state}
   end
 
-  #TODO: Reading data needs to be done against the MemoryServer
-
   @doc """
     Create document & request update to memory too
   """
@@ -44,23 +42,37 @@ defmodule LeafNode.Servers.DiskServer do
     # success create we update memory
     if status === :ok do
       GenServer.call(LeafNode.Servers.MemoryServer, {:create_document, document})
+      {:reply, {status, document}, state}
+    else
+      {:reply, {status, resp}, state}
     end
-
-    {:reply, :ok, state}
   end
 
   @doc """
     Update document & request update to memory too
   """
-  def handle_call({:update_document, data}, _from, state) do
+  def handle_call({:update_document, doc}, _from, state) do
     Logger.info("Server: LeafNode.Servers.DiskServer. Event: update_document")
-    {status, resp, document} = Documents.edit_document(data.id, data, :documents, true)
+
+    # TODO: we could rely on the client to generate per pargraph but for v1 we do it on any save
+    {status, stored_doc} = GenServer.call(LeafNode.Servers.MemoryServer, {:get_document, doc.id})
+
+    updated_doc = if status === :ok do
+      if has_document_data_changed(doc, stored_doc) do
+        generate_pseudo_code(doc)
+      else
+        doc
+      end
+    end
+
+    {status, resp, document} = Documents.edit_document(doc.id, updated_doc, :documents, true)
 
     if status === :ok do
       GenServer.call(LeafNode.Servers.MemoryServer, {:update_document, document})
+      {:reply, {status, document}, state}
+    else
+      {:reply, {status, resp}, state}
     end
-
-    {:reply, :ok, state}
   end
 
   @doc """
@@ -73,6 +85,34 @@ defmodule LeafNode.Servers.DiskServer do
     if status === :ok do
       GenServer.call(LeafNode.Servers.MemoryServer, {:delete_document, id})
     end
-    {:reply, :ok, state}
+    {:reply, {status, resp}, state}
+  end
+
+  # private functions
+
+  # Compare and has the paragraph data to check if the document paragraph data has changed
+  defp has_document_data_changed(new_document, old_document) do
+    if new_document.id === old_document.id do
+      :erlang.phash2(new_document.data) !== :erlang.phash2(old_document.data)
+    else
+      false
+    end
+  end
+
+  # Generate pseudo code and return document with code
+  defp generate_pseudo_code(document) do
+    # TODO: Look at how we can dynamically increase timeout based on paragraps.
+    # TODO: This call counld be parallel but we want to keep order, so we might need to increase timeout based on paragraph length
+    data = Enum.map(document.data, fn item ->
+      Map.update!(item, :pseudo_code, fn value ->
+        { status, resp } = LeafNode.Core.Gpt.prompt(item.data)
+        case status do
+          :ok -> resp
+          _ -> Logger.error("There was an error: #{resp}. Module: LeafNode.Servers.DiskServer. Function: generate_pseudo_code")
+        end
+      end)
+    end)
+    # add the new data to the document
+    Map.put(document, :data, data)
   end
 end

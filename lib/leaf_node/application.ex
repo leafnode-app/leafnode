@@ -74,6 +74,10 @@ defmodule LeafNode.Application do
     if LeafNode.Core.Ets.table_exists?(documents) == false do
       LeafNode.Core.Ets.create_table(documents, [:set, :named_table, :public])
     end
+
+    # here we need to move or copy the data from dets into memory
+    # TODO: Check race conditions if needed
+    LeafNode.Core.Dets.copy_to_ets(documents)
   end
 
   @doc """

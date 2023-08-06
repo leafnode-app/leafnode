@@ -61,7 +61,7 @@ defmodule LeafNode.Core.Gpt.Prompt do
     The prompt function that we can call to get teh prompt
   """
   def query(input) do
-    "Given the function specifications and a paragraph of text, immediately return the first identified function call from the text in the format 'function:[parameters]'. If no function call is identified, return 'result:[false]'.
+    "Given the function specifications and a paragraph of text, immediately return the first identified function call from the text in the format 'function(param1, param2, ...)'. If no function call is identified, return 'value(false)'.
 
     Function specifications:
 

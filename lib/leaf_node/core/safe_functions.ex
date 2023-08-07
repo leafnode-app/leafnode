@@ -42,88 +42,87 @@ defmodule LeafNode.Core.SafeFunctions do
   @doc """
     Add two values together
   """
-  def add({_, a}, {_, b}) do
-    IO.inspect(a)
-    IO.inspect(b)
+  def add(a, b, _execution_history) do
     {:ok, a + b}
   end
 
   @doc """
     Minus two values from eachother
   """
-  def subtract(a, b) do
-    a - b
+  def subtract(a, b, _execution_history) do
+    {:ok, a - b}
   end
 
   @doc """
     Multiply two values together
   """
-  def multiply(a, b) do
-    a * b
+  def multiply(a, b, _execution_history) do
+    {:ok, a * b}
   end
 
   @doc """
     Divide a value against another
   """
-  def divide(a, b) do
-    a / b
+  def divide(a, b, _execution_history) do
+    {:ok, a / b}
   end
 
   @doc """
     Return the passed value
   """
-  def value(item) do
-    item
+  def value(item, _execution_history) do
+    {:ok, item}
   end
 
   @doc """
     Reference or get data from another paragraph
   """
-  def ref(id) do
+  def ref(id, execution_history) do
     # TODO: Get the result of a prev executed function by the id of the paragraph
-    {:ok, 10}
+    IO.inspect(execution_history)
+    {:ok, id}
   end
 
   @doc """
     Get a value from a map
   """
-  def get_map_val(map, value) do
-    Map.get(map, value)
+  def get_map_val(map, value, _execution_history) do
+    {:ok, Map.get(map, value)}
   end
 
   @doc """
     Check if one value equals another
   """
-  def equals(a, b) do
-    a === b
+  def equals(a, b, _execution_history) do
+    {:ok, a === b}
   end
 
   @doc """
     Check if one value is not equal to another
   """
-  def not_equals(a, b) do
-    a !== b
+  def not_equals(a, b, _execution_history) do
+    {:ok, a !== b}
   end
 
   @doc """
     Check if one value is less than another
   """
-  def less_than(a, b) do
-    a < b
+  def less_than(a, b, _execution_history) do
+    {:ok, a < b}
   end
 
   @doc """
     Check if one value is greater than another
   """
-  def greater_than(a, b) do
-    a > b
+  def greater_than(a, b, _execution_history) do
+    {:ok, a > b}
   end
 
   @doc """
     Get the input value passed
   """
-  def input(input) do
+  def input(input, _execution_history) do
     # TODO: at runtime we need to pass the input that is passed with execution
-    input
+    {:ok, input}
   end
 end

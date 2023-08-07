@@ -10,7 +10,7 @@ defmodule LeafNode.Servers.ExecutionServer do
   """
   def start_link(args \\ %{}) do
     # we dont give a constant name so we can run multiple instances of this
-    GenServer.start_link(__MODULE__, args)
+    GenServer.start_link(__MODULE__, args, name: __MODULE__)
   end
 
   @doc """
@@ -54,16 +54,14 @@ defmodule LeafNode.Servers.ExecutionServer do
   @doc """
     We evaluate the psuedo code and the result can be returned of that code
   """
-  defp evaluate_pseudocode(code, _accumulated_data) do
-    { status, eval_result } = LeafNode.Core.Code.execute(code)
+  defp evaluate_pseudocode(code, accumulated_data) do
+    { status, eval_result } = LeafNode.Core.Code.execute(code, accumulated_data)
 
     case status do
       :ok ->
-        Logger.info("Here we return the code evaluated against whitelist: #{eval_result}")
-        eval_result
+        {:ok, eval_result}
       _ ->
-        Logger.error("There was an error executing or evaluating pseudo code")
-        "Error evaluating pseudo code: #{code}"
+        {:ok, "Error evaluating pseudo code: #{code}"}
     end
   end
 end

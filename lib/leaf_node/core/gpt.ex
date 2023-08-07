@@ -61,7 +61,8 @@ defmodule LeafNode.Core.Gpt.Prompt do
     The prompt function that we can call to get teh prompt
   """
   def query(input) do
-    "Given the function specifications and a paragraph of text, immediately return the first identified function call from the text in the format 'function(param1, param2, ...)'. If no function call is identified, return 'value(false)'.
+    "Given the function specifications and a paragraph of text, identify and return the first function call from the text in the format 'function(param1, param2, ...)'. If no function call is identified, return 'value(false)'.
+    Functions can call other paragraphs' results using the ref() function, which references the ID of the paragraph whose result is being called. If the paragraph contains a comparison or question about numbers, interpret it using comparison functions. If it mentions returning a specific string value, use the 'value()' function with the string properly escaped.
 
     Function specifications:
 
@@ -71,7 +72,6 @@ defmodule LeafNode.Core.Gpt.Prompt do
     @spec divide(number, number) :: number
     @spec value(boolean | string | number) :: boolean | string | number
     @spec ref(binary) :: term()
-    @spec get_map_val(map, binary) :: term()
     @spec equals(term(), term()) :: boolean
     @spec not_equals(term(), term()) :: boolean
     @spec less_than(number, number) :: boolean

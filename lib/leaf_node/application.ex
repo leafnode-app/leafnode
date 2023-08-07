@@ -25,7 +25,9 @@ defmodule LeafNode.Application do
       # Jobs and processes for data interaction
       {LeafNode.Servers.DataSyncServer, %{ interval: 60_000}},
       LeafNode.Servers.MemoryServer,
-      LeafNode.Servers.DiskServer
+      LeafNode.Servers.DiskServer,
+      # TODO: DELETE THIS - TESTING EXECUTION
+      LeafNode.Servers.ExecutionServer
     ]
 
     # init the demo processes on startup

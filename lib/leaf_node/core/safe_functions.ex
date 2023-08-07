@@ -25,7 +25,6 @@ defmodule LeafNode.Core.SafeFunctions do
     "divide",
     "value",
     "ref",
-    "get_map_val",
     "equals",
     "not_equals",
     "less_than",
@@ -43,8 +42,10 @@ defmodule LeafNode.Core.SafeFunctions do
   @doc """
     Add two values together
   """
-  def add(a, b) do
-    a + b
+  def add({_, a}, {_, b}) do
+    IO.inspect(a)
+    IO.inspect(b)
+    {:ok, a + b}
   end
 
   @doc """
@@ -78,8 +79,9 @@ defmodule LeafNode.Core.SafeFunctions do
   @doc """
     Reference or get data from another paragraph
   """
-  def ref(id, data) do
+  def ref(id) do
     # TODO: Get the result of a prev executed function by the id of the paragraph
+    {:ok, 10}
   end
 
   @doc """

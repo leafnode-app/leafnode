@@ -7,45 +7,39 @@ defmodule LeafNode.Core.Code do
   require Logger
 
   @doc """
-    Check if we are permitted to use the function
+    We execute the function that was passed based on permission
   """
-  def check_ast_permission(func) do
-    case Code.string_to_quoted!(func) do
-      {func, _, _params} ->
-        func_str = Atom.to_string(func)
-        if Enum.member?(LeafNode.Core.SafeFunctions.allowed_functions(), func_str) do
-          {:ok, true}
-        else
-          {:ok, false}
+  def execute(func_string) do
+    case Code.string_to_quoted(func_string) do
+      {:ok, ast} ->
+        case evaluate_ast(ast) do
+          {:ok, result} -> {:ok, result}
+          {:error, reason} ->
+            Logger.error("Error executing function: #{reason}")
+            {:error, "Error executing function"}
         end
-      _ ->
-        {:error, "There was an error quoting the passed function"}
+      {:error, reason} ->
+        Logger.error("Unable to parse function string: #{inspect(reason)}")
+        {:error, "Unable to parse function string"}
     end
   end
 
   @doc """
-    We execute the function that was passed based on permission
+    Check if we are permitted to use the function
   """
-  def execute(func) do
-    {status, result} = check_ast_permission(func)
+  defp evaluate_ast({func_atom, _, args}) when is_atom(func_atom) do
+    func_string = Atom.to_string(func_atom)
+    allowed_functions = LeafNode.Core.SafeFunctions.allowed_functions()
 
-    case status do
-      :ok ->
-        if result do
-          # Prepend the module name to the function string
-          func_with_module = "LeafNode.Core.SafeFunctions.#{func}"
-          IO.inspect(func_with_module)
-
-          {eval_result, _binding} = Code.eval_string(func_with_module)
-          {:ok, eval_result}
-        else
-          Logger.error("Unable to execute function, make sure the function exists and is whitelisted")
-          {:error, "Error executing function"}
-        end
-      _ ->
-        Logger.error("There was an error executing the passed function")
-        {:error, "There was an error executing the function"}
+    if Enum.member?(allowed_functions, func_string) do
+      evaluated_args = Enum.map(args, &evaluate_ast/1)
+      apply(LeafNode.Core.SafeFunctions, func_atom, evaluated_args)
+    else
+      {:error, "Function #{func_string} is not allowed"}
     end
   end
 
+  defp evaluate_ast(value) do
+    {:ok, value}
+  end
 end

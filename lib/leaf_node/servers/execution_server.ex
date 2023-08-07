@@ -17,38 +17,22 @@ defmodule LeafNode.Servers.ExecutionServer do
     Initialize the state of the server
   """
   def init(state) do
-    state
+    {:ok, state}
   end
 
   @doc """
     Here we listen for the execution of the document
   """
-  def handle_call({:exeute, document_id}, _form, state) do
-    {status, document} = LeafNode.Core.Ets.get_by_key(:documents, id)
-
+  def handle_call({:execute, document_id}, _form, state) do
+    {status, document} = LeafNode.Core.Ets.get_by_key(:documents, document_id)
     case status do
       :ok ->
         Logger.info("Here we start the execition logic")
         {_status, result} = start_execution(document)
-        {:reply, result, state}
+        {:stop, :normal, result, state}
       _ ->
-        {:reply, "There was an error executing the document", state}
+        {:stop, :normal, "There was an error executing the document", state}
     end
-  end
-
-  @doc """
-    Return the state after the execution
-  """
-  def handle_call(:get_state, _from, state) do
-    {:reply, state, state}
-  end
-
-  @doc """
-    Stop the current server instance
-  """
-  def handle_call(:stop, _from, state) do
-    GenServer.stop(self, :normal)
-    {:reply, :ok, state}
   end
 
   # Helper methods
@@ -57,8 +41,29 @@ defmodule LeafNode.Servers.ExecutionServer do
     We need to go through the relevant document to execute the code and store result
   """
   defp start_execution(document) do
-    #TODO: Start executing document paragraphs
-    #TODO: Be mindful of the document result settings, break if referencing a paragraph func
+    # get the functions
+    accumulated_data = Enum.reduce(document.data, %{}, fn paragraph, accumulated_data ->
+      result = evaluate_pseudocode(paragraph.pseudo_code, accumulated_data)
+      Map.put(accumulated_data, paragraph.id, result)
+    end)
+
+    IO.inspect(accumulated_data)
     {:ok, document}
+  end
+
+  @doc """
+    We evaluate the psuedo code and the result can be returned of that code
+  """
+  defp evaluate_pseudocode(code, _accumulated_data) do
+    { status, eval_result } = LeafNode.Core.Code.execute(code)
+
+    case status do
+      :ok ->
+        Logger.info("Here we return the code evaluated against whitelist: #{eval_result}")
+        eval_result
+      _ ->
+        Logger.error("There was an error executing or evaluating pseudo code")
+        "Error evaluating pseudo code: #{code}"
+    end
   end
 end

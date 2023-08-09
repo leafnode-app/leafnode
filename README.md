@@ -10,8 +10,8 @@ Text to Code document based API execution. Allows for external calls and human t
 - [x] Module for code generation and check whitelist
 - [x] Execute document functions
 - [x] Setup execution server
-- [ ] Execution server implementation
-- [ ] Finish up safe functions
+- [x] Execution server implementation
+- [x] Finish up safe functions (WIP)
 - [ ] Controllers
     - [ ] Documents
         - [ ] GET, UPDATE, DELETE, CREATE

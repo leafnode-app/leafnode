@@ -62,7 +62,7 @@ defmodule LeafNode.Core.Gpt.Prompt do
   """
   def query(input) do
     "Given the function specifications and a paragraph of text, identify and return the first function call from the text in the format 'function(param1, param2, ...)'. If no function call is identified, return 'value(false)'.
-    Functions can call other paragraphs' results using the ref() function, which references the ID of the paragraph whose result is being called. If the paragraph contains a comparison or question about numbers, interpret it using comparison functions. If it mentions returning a specific string value, use the 'value()' function with the string properly escaped.
+    Functions can call other paragraphs' results using the ref() function, which references the ID of the paragraph whose result is being called. If the paragraph contains a comparison or question about numbers, interpret it using comparison functions. If it mentions returning a specific string value, use the 'value()' function with the string enclosed in double quotes (\"string\").
 
     Function specifications:
 

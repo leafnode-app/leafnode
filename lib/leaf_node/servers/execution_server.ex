@@ -4,6 +4,7 @@ defmodule LeafNode.Servers.ExecutionServer do
   """
   use GenServer
   require Logger
+  alias LeafNode.Agents.ExecutionHistoryAgent, as: ExecutionHistoryAgent
 
   @doc """
     State the server with base argument data
@@ -24,6 +25,12 @@ defmodule LeafNode.Servers.ExecutionServer do
     Here we listen for the execution of the document
   """
   def handle_call({:execute, document_id}, _form, state) do
+    # start the agent server for this document -  make sure its started
+    Task.async(fn ->
+      ExecutionHistoryAgent.start_link(document_id)
+    end)
+
+    # get the document in memory if it exists
     {status, document} = LeafNode.Core.Ets.get_by_key(:documents, document_id)
     case status do
       :ok ->
@@ -33,35 +40,23 @@ defmodule LeafNode.Servers.ExecutionServer do
       _ ->
         {:stop, :normal, "There was an error executing the document", state}
     end
-  end
 
-  # Helper methods
+    #TODO: Do we need to stop the agent server? It is linked so exepct it to die out once this does
+  end
 
   @doc """
     We need to go through the relevant document to execute the code and store result
   """
   defp start_execution(document) do
-    # get the functions
-    accumulated_data = Enum.reduce(document.data, %{}, fn paragraph, accumulated_data ->
-      result = evaluate_pseudocode(paragraph.pseudo_code, accumulated_data)
-      Map.put(accumulated_data, paragraph.id, result)
+    # get the functions - and attempt excute
+    Enum.each(document.data, fn paragraph ->
+      LeafNode.Core.Code.execute(paragraph.pseudo_code, document.id, paragraph.id)
     end)
 
-    IO.inspect(accumulated_data)
-    {:ok, document}
-  end
-
-  @doc """
-    We evaluate the psuedo code and the result can be returned of that code
-  """
-  defp evaluate_pseudocode(code, accumulated_data) do
-    { status, eval_result } = LeafNode.Core.Code.execute(code, accumulated_data)
-
-    case status do
-      :ok ->
-        {:ok, eval_result}
-      _ ->
-        {:ok, "Error evaluating pseudo code: #{code}"}
-    end
+    # We need to return the history?
+    {:ok, %{
+      "document" => document,
+      "results" => ExecutionHistoryAgent.get_all(document.id)
+    }}
   end
 end

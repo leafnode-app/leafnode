@@ -98,7 +98,8 @@ defmodule LeafNodeWeb.Api.DocumentController do
     # Start the server if not already running
     LeafNode.Servers.ExecutionServer.start_link(id)
 
-    {status, %{ "document" => document, "results" => paragraph_execution_results}} = GenServer.call(String.to_atom("execution_process_" <> id), {:execute, id, payload})
+    {status, %{ "document" => document, "results" => paragraph_execution_results}} =
+      GenServer.call(String.to_atom("execution_process_" <> id), {:execute, id, payload})
 
     document_result = Map.get(document, :result)
     result = %{

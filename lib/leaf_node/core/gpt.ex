@@ -34,7 +34,10 @@ defmodule LeafNode.Core.Gpt.Prompt do
   """
   def query(input) do
     "Given the function specifications and a paragraph of text, identify and return the first function call from the text in the format 'function(param1, param2, ...)'. If no function call is identified, return 'value(false)'.
-    Functions can call other paragraphs' results using the ref() function, which references the ID of the paragraph whose result is being called. If the paragraph contains a comparison or question about numbers, interpret it using comparison functions. If it mentions returning a specific string value, use the 'value()' function with the string enclosed in double quotes (\"string\").
+    Functions can call other paragraphs' results using the ref() function, which references the ID of the paragraph whose result is being called. If the paragraph contains a comparison or question about numbers, interpret it using comparison functions.
+    If it mentions returning a specific string value, use the 'value()' function with the string enclosed in double quotes (\"string\").
+    If it mentions input, we just return the input() function as the result.
+    Taking from input or any map should result in using get_map_val(map, location.goes.here) e.g location will be drilled points like this.is.a.location as a param
 
     Function specifications:
 
@@ -43,6 +46,7 @@ defmodule LeafNode.Core.Gpt.Prompt do
     @spec multiply(number, number) :: number
     @spec divide(number, number) :: number
     @spec value(boolean | string | number) :: boolean | string | number
+    @spec get_map_val(map(), location) :: boolean | string | number
     @spec ref(binary) :: term()
     @spec equals(term(), term()) :: boolean
     @spec not_equals(term(), term()) :: boolean

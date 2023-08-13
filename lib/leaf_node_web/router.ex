@@ -33,8 +33,8 @@ defmodule LeafNodeWeb.Router do
     # pipe_through :validate_access_key
 
     post "/create", DocumentController, :create_document
-    post "/delete/:id", DocumentController, :delete_document
     post "/execute/:id", DocumentController, :execute_document
+    delete "/:id", DocumentController, :delete_document
     put "/:id", DocumentController, :update_document
     get "/", DocumentController, :get_documents
     get "/list", DocumentController, :get_documents_list

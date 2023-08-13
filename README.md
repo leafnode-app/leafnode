@@ -20,14 +20,16 @@ Text to Code document based API execution. Allows for external calls and human t
     - [x] Generate pseudo code that then gets executed
 - [x] Calls to GenServers initially need to be dynamic timeout based on 5 * paragraph items
 - [x] Remove use for to_atom dynamically as this grows and doesnt get cleaned up
+- [x] Input selection from document paragraphs
 - [ ] Allow to generate code per Text/Paragraph block (endpoint execute block)
 - [ ] Stop execution once result is found for document selected execution
 - [ ] Authorization and how the UI will tie up to the document and how you can create documents
+- [ ] Dynamic tom generation cleanup and find another solution for
 
 ## Missing Important Pieces
-- [ ] Postman collection for the endpoints
-- [ ] Docker and containerizing the FE/BE and Database
+- [x] Postman collection for the endpoints
 - [ ] Postgres w/ Ecto setup (removal of DETs but keep ETS)
+- [ ] Docker and containerizing the FE/BE and Database - folder structure all under one project
 - [ ] UI (React)
 
 ## Later

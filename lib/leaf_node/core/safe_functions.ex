@@ -29,7 +29,8 @@ defmodule LeafNode.Core.SafeFunctions do
     "not_equals",
     "less_than",
     "greater_than",
-    "input"
+    "input",
+    "get_map_val"
   ]
 
   @doc """
@@ -43,7 +44,7 @@ defmodule LeafNode.Core.SafeFunctions do
     Add two values together
   """
   def add(item) do
-    %{ "meta_data" => _meta_data, "params" => params} = item
+    %{ "payload" => _ ,"meta_data" => _meta_data, "params" => params} = item
     result = try do
       Enum.reduce(params, fn (idx, acc) ->
         idx + acc
@@ -60,7 +61,7 @@ defmodule LeafNode.Core.SafeFunctions do
     Minus two values from eachother
   """
   def subtract(item) do
-    %{ "meta_data" => _meta_data, "params" => params} = item
+    %{ "payload" => _ ,"meta_data" => _meta_data, "params" => params} = item
     result = try do
       Enum.at(params, 0) - Enum.at(params, 1)
     catch
@@ -75,7 +76,7 @@ defmodule LeafNode.Core.SafeFunctions do
     Multiply two values together
   """
   def multiply(item) do
-    %{ "meta_data" => _meta_data, "params" => params} = item
+    %{ "payload" => _ ,"meta_data" => _meta_data, "params" => params} = item
     result = try do
       Enum.at(params, 0) * Enum.at(params, 1)
     catch
@@ -91,7 +92,7 @@ defmodule LeafNode.Core.SafeFunctions do
     Divide a value against another
   """
   def divide(item) do
-    %{ "meta_data" => _meta_data, "params" => params} = item
+    %{ "payload" => _ ,"meta_data" => _meta_data, "params" => params} = item
     result = try do
       Enum.at(params, 0) / Enum.at(params, 1)
     catch
@@ -106,7 +107,7 @@ defmodule LeafNode.Core.SafeFunctions do
     Return the passed value
   """
   def value(item) do
-    %{ "meta_data" => _meta_data, "params" => params} = item
+    %{ "payload" => _ ,"meta_data" => _meta_data, "params" => params} = item
     {:ok, Enum.at(params, 0)}
   end
 
@@ -127,15 +128,17 @@ defmodule LeafNode.Core.SafeFunctions do
     Get a value from a map
   """
   def get_map_val(item) do
-    raise "Not implemented for fn -> get_map_val"
-    # Map.get(map, value)
+    %{ "payload" => _ ,"meta_data" => _meta_data, "params" => params} = item
+    payload_input = Enum.at(params, 0)
+    location_param = Enum.at(params, 1)
+    {:ok, Kernel.get_in(payload_input, String.split(location_param, "."))}
   end
 
   @doc """
     Check if one value equals another
   """
   def equals(item) do
-    %{ "meta_data" => _meta_data, "params" => params} = item
+    %{ "payload" => _ ,"meta_data" => _meta_data, "params" => params} = item
     {:ok, Enum.at(params, 0) === Enum.at(params, 1)}
   end
 
@@ -143,7 +146,7 @@ defmodule LeafNode.Core.SafeFunctions do
     Check if one value is not equal to another
   """
   def not_equals(item) do
-    %{ "meta_data" => _meta_data, "params" => params} = item
+    %{ "payload" => _ ,"meta_data" => _meta_data, "params" => params} = item
     {:ok, Enum.at(params, 0) !== Enum.at(params, 1)}
   end
 
@@ -151,7 +154,7 @@ defmodule LeafNode.Core.SafeFunctions do
     Check if one value is less than another
   """
   def less_than(item) do
-    %{ "meta_data" => _meta_data, "params" => params} = item
+    %{ "payload" => _ ,"meta_data" => _meta_data, "params" => params} = item
     {:ok, Enum.at(params, 0) < Enum.at(params, 1)}
   end
 
@@ -159,7 +162,7 @@ defmodule LeafNode.Core.SafeFunctions do
     Check if one value is greater than another
   """
   def greater_than(item) do
-    %{ "meta_data" => _meta_data, "params" => params} = item
+    %{ "payload" => _ ,"meta_data" => _meta_data, "params" => params} = item
     {:ok, Enum.at(params, 0) > Enum.at(params, 1)}
   end
 
@@ -167,8 +170,7 @@ defmodule LeafNode.Core.SafeFunctions do
     Get the input value passed
   """
   def input(item) do
-    raise "Not implemented for fn -> input"
-    # TODO: at runtime we need to pass the input that is passed with execution
-    # {:ok, input}
+    %{ "payload" => payload ,"meta_data" => _meta_data, "params" => _params} = item
+    {:ok, payload}
   end
 end

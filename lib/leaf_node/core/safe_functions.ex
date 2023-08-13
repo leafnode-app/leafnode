@@ -116,10 +116,9 @@ defmodule LeafNode.Core.SafeFunctions do
   def ref(item) do
     %{ "meta_data" => meta_data, "params" => params} = item
 
-    {_status, result} = LeafNode.Agents.ExecutionHistoryAgent.get_by_key(
-      Map.get(meta_data, "document_id"),
-      Enum.at(params, 0)
-    )
+    {_status, result} =
+      GenServer.call(
+        String.to_atom("history_" <> Map.get(meta_data, "document_id")), {:get_by_key, Enum.at(params, 0)})
 
     {:ok, result}
   end

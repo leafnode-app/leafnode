@@ -5,7 +5,6 @@ defmodule LeafNode.Core.Code do
   """
 
   require Logger
-  alias LeafNode.Agents.ExecutionHistoryAgent, as: ExecutionHistoryAgent
   @doc """
     We execute the function that was passed based on permission
   """
@@ -16,7 +15,7 @@ defmodule LeafNode.Core.Code do
         case evaluate_ast(ast, document_id, paragraph_id) do
           {:ok, result} ->
             # We assume the server is up - we can start up later if needed
-            ExecutionHistoryAgent.set_new_key(document_id, paragraph_id, result)
+            GenServer.call(String.to_atom("history_" <> document_id), {:set_history, paragraph_id, result})
             # return for execution purposes but we dont need this
             {:ok, result}
           {:error, reason} ->

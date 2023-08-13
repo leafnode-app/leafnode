@@ -3,8 +3,6 @@ defmodule LeafNode.Core.Documents do
     Methods around the Documents and persistence/data management
   """
   alias LeafNode.Utils.Helpers
-  alias LeafNode.Structs.Document, as: Document
-  alias LeafNode.Structs.Paragraph, as: Paragraph
   alias LeafNode.Core.Dets, as: Dets
 
   # Config Table
@@ -16,11 +14,12 @@ defmodule LeafNode.Core.Documents do
   def create_document(data \\ %{}, table \\ @table, return_value \\ false) do
     id = UUID.uuid4()
     document =
-      %Document{
-        id: Map.get(data, :id, id),
+      %{
+        id: id,
         name: Map.get(data, :name, id),
         result: Map.get(data, :result, true),
-        data: Map.get(data, :data, [%Paragraph{id: UUID.uuid4()}]),
+        # TODO: This should be some struct or defined from a schema
+        data: Map.get(data, :data, [%{id: UUID.uuid4(), pseudo_code: nil, data: nil}]),
       }
 
     result = Dets.insert(table, Map.get(data, "id", id), document)
@@ -42,10 +41,11 @@ defmodule LeafNode.Core.Documents do
     {status, document} = Dets.get_by_key(table, id)
     case status do
       :ok ->
-        updated_document = %Document{
+        updated_document = %{
           id: document.id,
           name: Map.get(data, :name, document.name),
           result: Map.get(data, :result, document.result),
+          # TODO: We need to have separate functions to generate and add paragraphs
           data: Map.get(data, :data, document.data)
         }
         Dets.insert(table, id, updated_document)

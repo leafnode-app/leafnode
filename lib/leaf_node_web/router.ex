@@ -2,7 +2,7 @@ defmodule LeafNodeWeb.Router do
   # Web
   alias Web.PageController
   # API
-  alias LeafNodeWeb.Api.DocumentController
+  alias LeafNodeWeb.Api.{DocumentController}
 
   use LeafNodeWeb, :router
 
@@ -26,9 +26,19 @@ defmodule LeafNodeWeb.Router do
     plug LeafNodeWeb.Plugs.AccessKeyAuth
   end
 
-  scope "/api/document" do
+  scope "/api/v1/documents" do
     pipe_through :api
-    pipe_through :validate_access_key
+    # TODO: add the access key validation here
+    # TODO: Separate the execution code and crud operations/transactions for documents
+    # pipe_through :validate_access_key
+
+    post "/create", DocumentController, :create_document
+    post "/delete/:id", DocumentController, :delete_document
+    post "/execute/:id", DocumentController, :execute_document
+    put "/:id", DocumentController, :update_document
+    get "/", DocumentController, :get_documents
+    get "/list", DocumentController, :get_documents_list
+    get "/:id", DocumentController, :get_document_by_id
   end
 
   # ---- API ---- #

@@ -5,113 +5,110 @@ defmodule LeafNodeWeb.Api.DocumentController do
   use LeafNodeWeb, :controller
 
   import Plug.Conn
+  require Logger
   alias LeafNode.Utils.Helpers, as: Helpers
-  alias LeafNode.Execute.Process, as: Execute
-  alias LeafNode.Core.Process, as: Process
-
-
-  # The swagger tags
-  @tags ["Processes"]
-
-  # Constants
-  @id "process_id"
-  @output "output"
-
-  # response codes
-  @success_code 200
-  @error_code 400
 
   @doc """
-    Get all processes
+    Get all documents keys as a list
   """
-  def get_processes(conn, _params) do
-    {status, resp} = Process.list_processes()
+  def get_documents_list(conn, _params) do
+    {status, resp} = GenServer.call(LeafNode.Servers.MemoryServer, :get_all_documents)
+
     case status do
       :ok ->
-        result = Enum.map(resp, fn {key, _value} -> key end)
-        return(conn, @success_code, Helpers.http_resp(@success_code, true, result))
-      _ -> return(conn, @error_code, Helpers.http_resp(@error_code, false, resp))
+        result =
+          Enum.map(resp, fn {key, _val} -> key end)
+
+        return(conn, 200, Helpers.http_resp(200, true, result))
+      _ -> return(conn, 404, Helpers.http_resp(404, false, %{}))
     end
   end
 
   @doc """
-    Get all processes by id and return the response to the requester if exists or a relevant error response
+    Get all documents
   """
-  def get_process(conn, params) do
-    {status, resp} = Process.get_process(Map.get(params, @id, nil))
+  def get_documents(conn, _params) do
+    {status, resp} = GenServer.call(LeafNode.Servers.MemoryServer, :get_all_documents)
+
+    case status do
+      :ok -> return(conn, 200, Helpers.http_resp(200, true, resp))
+      _ -> return(conn, 404, Helpers.http_resp(404, false, %{}))
+    end
+  end
+
+  @doc """
+    Get document by id
+  """
+  def get_document_by_id(conn, %{ "id" => id}) do
+    {status, resp} = GenServer.call(LeafNode.Servers.MemoryServer, {:get_document, id})
+    case status do
+      :ok -> return(conn, 200, Helpers.http_resp(200, true, resp))
+      _ -> return(conn, 404, Helpers.http_resp(404, false, %{}))
+    end
+  end
+
+  @spec update_document(Plug.Conn.t(), map) :: Plug.Conn.t()
+  @doc """
+    Update document by id
+  """
+  def update_document(conn, params) do
+    data = Enum.into(params, %{}, fn {k, v} ->
+      {String.to_atom(k), v}
+    end)
+    # raise "error"
+    data_count = length(Map.get(params, "data", []))
+    {status, resp} =
+      GenServer.call(LeafNode.Servers.DiskServer, {:update_document, data.id, data}, data_count * 5000)
+    case status do
+      :ok -> return(conn, 200, Helpers.http_resp(200, true, resp))
+      _ -> return(conn, 404, Helpers.http_resp(404, false, %{}))
+    end
+  end
+
+ @doc """
+    Create document
+  """
+  def create_document(conn, _params) do
+    # TODO: we need to create before adding, cant create with data, generated data only
+    {status, resp} = GenServer.call(LeafNode.Servers.DiskServer, :create_document)
     case status do
       :ok ->
-        return(conn, @success_code, Helpers.http_resp(@success_code, true, resp))
-      _ ->
-        return(conn, @error_code, Helpers.http_resp(@error_code, false, %{}))
+        return(conn, 200, Helpers.http_resp(200, true, resp))
+      _ -> return(conn, 404, Helpers.http_resp(404, false, %{}))
     end
   end
 
-  @doc """
-    Execute a given process with a payload and only returns entire execution output
+ @doc """
+    Delete document
   """
-  def execute(conn, params) do
-    { status, exec_resp } = init_execution_data(params, Map.get(conn.assigns, :execution_access, false))
-    status = if status === :error, do:  400, else: 200
-    result_flag = if status === 200, do: true, else: false
-    return(conn, status,
-      Helpers.http_resp(status, result_flag, Map.get(exec_resp, @output)))
-  end
-
-  @doc """
-    Executes but returns the logs of all child nodes that ran and their results through process execution
-  """
-  def execute_verbose(conn, params) do
-    { status, exec_resp } = init_execution_data(params, true)
-    status = if status === :error, do:  400, else: 200
-    result_flag = if status ===  200, do: true, else: false
-    return(conn, status,
-      Helpers.http_resp(status, result_flag, exec_resp))
-  end
-
-  @doc """
-    Create a new process - The entry point that will create a new one with passed details
-  """
-  # Generates id and we need to pass the entire object if we want create
-  # We add an entry node to the application by default
-  # entry node needs to be added from the client
-  def create(conn, params) do
-    {status, resp} = Process.create_process(params)
+  def delete_document(conn, params) do
+    {status, resp} = GenServer.call(LeafNode.Servers.DiskServer, {:delete_document, Map.get(params, "id")})
     case status do
-      :ok -> return(conn, @success_code, Helpers.http_resp(@success_code, true, resp))
-      _ -> return(conn, @error_code, Helpers.http_resp(@error_code, false, resp))
+      :ok -> return(conn, 200, Helpers.http_resp(200, true, resp))
+      _ -> return(conn, 404, Helpers.http_resp(404, false, %{}))
     end
   end
 
-  @doc """
-    Delete or remove a process from the system
+ @doc """
+    Execute document
   """
-  def delete(conn, params) do
-    {status, resp} = Process.delete_process(Map.get(params, @id, nil))
+  def execute_document(conn, params) do
+    id = Map.get(params, "id")
+    payload = Map.drop(params, ["id"])
+    # Start the server if not already running
+    LeafNode.Servers.ExecutionServer.start_link(id)
+
+    {status, %{ "document" => document, "results" => paragraph_execution_results}} = GenServer.call(String.to_atom("execution_process_" <> id), {:execute, id, payload})
+
+    document_result = Map.get(document, :result)
+    result = %{
+      "document_result" => Map.get(paragraph_execution_results, document_result, document_result),
+      "paragraph_results" => paragraph_execution_results
+    }
     case status do
-      :ok -> return(conn, @success_code, Helpers.http_resp(@success_code, true, resp))
-      _ -> return(conn, @error_code, Helpers.http_resp(@error_code, false, resp))
+      :ok -> return(conn, 200, Helpers.http_resp(200, true, result))
+      _ -> return(conn, 404, Helpers.http_resp(404, false, %{}))
     end
-  end
-
-  @doc """
-    Update a process by id - Note this takes the entire process to update
-  """
-  def update(conn, params) do
-    data = Map.drop(params, [@id])
-    {status, resp} = Process.edit_process(Map.get(params, @id, nil), data)
-
-    case status do
-      :ok -> return(conn, @success_code, Helpers.http_resp(@success_code, true, resp))
-      _ -> return(conn, @error_code, Helpers.http_resp(@error_code, false, resp))
-    end
-  end
-
-  # Prepare initial data and payload to be passed to be executed if relevant
-  defp init_execution_data(params, bypass) do
-    process_id = Map.get(params, @id)
-    payload = Map.drop(params, [@id])
-    Execute.init_execute_process(process_id, payload, bypass)
   end
 
   # JSON returned response helper method for the controller functions

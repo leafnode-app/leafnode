@@ -30,34 +30,6 @@ defmodule LeafNode.Core.Gpt.Prompt do
   """
 
   @doc """
-    This is a section with example test data that we can set and run against documents
-  """
-  def prompt_test_data do
-    %{
-      "math_operations" => [
-        "When you look at the financial report, it becomes evident that we should add the total revenue of 5000 to the additional income of 300.",
-        "To calculate the profit margin, we have to subtract the expenses of 1200 from the total sales of 6500.",
-        "To get an understanding of growth potential, we need to multiply the average monthly sales figure of 100 by the growth rate factor of 3.5.",
-        "To find out the average monthly expense, take the yearly expense of 12000 and divide it by 12."
-      ],
-
-      "value_and_reference_checks" => [
-        "The policy clearly mentions that the user's age should be greater than 18.",
-        "According to the previous document, the agreed price was 500, but in the recent amendment, there is a ref to a paragraph which indicates an increase.",
-        "The system has a default setting where the value is set to true, which means the user accepted the terms and conditions.",
-        "From the input data provided, it's important to get the map value with the key 'user_status' to check for subscription validity."
-      ],
-
-      "conditional_checks" => [
-        "The performance metrics are quite revealing; if the conversion rate is less than 5%, then we need to revamp our marketing strategy.",
-        "The feedback from the beta users was generally positive, but there were a few who mentioned that the UI is not user-friendly. In this case, we should ensure that the satisfaction rate is not equal to 100%.",
-        "For the rewards program, it's mentioned that if the user's total purchase equals 1000, they qualify for a gold membership.",
-        "The contract stipulates that the delivery should be made if the stock in hand is greater than the order quantity."
-      ]
-    }
-  end
-
-  @doc """
     The prompt function that we can call to get teh prompt
   """
   def query(input) do

@@ -51,21 +51,21 @@ defmodule LeafNode.Servers.DiskServer do
   @doc """
     Update document & request update to memory too
   """
-  def handle_call({:update_document, doc}, _from, state) do
+  def handle_call({:update_document, id, document}, _from, state) do
     Logger.info("Server: LeafNode.Servers.DiskServer. Event: update_document")
 
     # TODO: we could rely on the client to generate per pargraph but for v1 we do it on any save
-    {status, stored_doc} = GenServer.call(LeafNode.Servers.MemoryServer, {:get_document, doc.id})
-
+    {status, stored_doc} = GenServer.call(LeafNode.Servers.MemoryServer, {:get_document, id})
     updated_doc = if status === :ok do
-      if has_document_data_changed(doc, stored_doc) do
-        generate_pseudo_code(doc)
+      if has_document_data_changed(document, stored_doc) do
+        generate_pseudo_code(document)
       else
-        doc
+        IO.inspect(:normal)
+        document
       end
     end
 
-    {status, resp, document} = Documents.edit_document(doc.id, updated_doc, :documents, true)
+    {status, resp, document} = Documents.edit_document(id, updated_doc, :documents, true)
 
     if status === :ok do
       GenServer.call(LeafNode.Servers.MemoryServer, {:update_document, document})
@@ -92,7 +92,7 @@ defmodule LeafNode.Servers.DiskServer do
 
   # Compare and has the paragraph data to check if the document paragraph data has changed
   defp has_document_data_changed(new_document, old_document) do
-    if new_document.id === old_document.id do
+    if Map.get(new_document, "id") === Map.get(old_document, "id") do
       :erlang.phash2(new_document.data) !== :erlang.phash2(old_document.data)
     else
       false
@@ -104,8 +104,8 @@ defmodule LeafNode.Servers.DiskServer do
     # TODO: Look at how we can dynamically increase timeout based on paragraps.
     # TODO: This call counld be parallel but we want to keep order, so we might need to increase timeout based on paragraph length
     data = Enum.map(document.data, fn item ->
-      Map.update!(item, :pseudo_code, fn value ->
-        { status, resp } = LeafNode.Core.Gpt.prompt(item.data)
+      Map.update!(item, "pseudo_code", fn _value ->
+        { status, resp } = LeafNode.Core.Gpt.prompt(Map.get(item, "data"))
         case status do
           :ok -> resp
           # TODO: Add fallback result funciton if timeout is reached and mabe a better response message?

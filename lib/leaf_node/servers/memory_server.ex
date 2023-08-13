@@ -6,7 +6,6 @@ defmodule LeafNode.Servers.MemoryServer do
   """
   use GenServer
   require Logger
-  alias LeafNode.Core.Documents, as: Documents
 
   def start_link(args \\ %{}) do
     GenServer.start_link(__MODULE__, args, name: __MODULE__)
@@ -72,6 +71,20 @@ defmodule LeafNode.Servers.MemoryServer do
     case status do
       :ok ->
         Logger.info("Server: LeafNode.Servers.MemoryServer. Event: get_document")
+        {:reply, {status, data}, state}
+      _ ->
+        {:reply, {status, data}, state}
+    end
+  end
+
+  @doc """
+    Fetch all from memory
+  """
+  def handle_call(:get_all_documents, _from, state) do
+    {status, data} = LeafNode.Core.Ets.get_all(:documents)
+    case status do
+      :ok ->
+        Logger.info("Server: LeafNode.Servers.MemoryServer. Event: get_all_documents")
         {:reply, {status, data}, state}
       _ ->
         {:reply, {status, data}, state}

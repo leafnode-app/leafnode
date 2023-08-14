@@ -64,24 +64,6 @@ defmodule LeafNode.Core.Gpt do
   """
   require Logger
 
-  # API key
-  @env "OPEN_AI"
-  @api_key System.get_env(@env)
-  @model System.get_env("OPEN_AI_MODEL")
-
-  @url "https://api.openai.com/v1/chat/completions"
-  # body
-  @body %{
-    "max_tokens" => 500,
-    "temperature" => 0,
-    "model" => @model
-  }
-  # header
-  @headers [
-    {"Content-type", "application/json"},
-    {"Authorization", "Bearer " <> to_string(@api_key)}
-  ]
-
   @timeout 20000
 
   @doc """
@@ -95,8 +77,13 @@ defmodule LeafNode.Core.Gpt do
     prompt = LeafNode.Core.Gpt.Prompt.query(msg)
     # check the status - this is help make sure we dont execute test payloads
     Logger.info("Started AI workflow generation")
-    if !is_nil(System.get_env(@env)) do
-      body_payload = Map.put(@body, "messages",
+    if !is_nil(System.get_env("OPEN_AI")) do
+      body_payload = Map.put(
+        %{
+          "max_tokens" => 500,
+          "temperature" => 0,
+          "model" => System.get_env("OPEN_AI_MODEL")
+        }, "messages",
         [
           %{
             "role" => "system",
@@ -105,7 +92,15 @@ defmodule LeafNode.Core.Gpt do
         ]
       )
 
-      {status, resp} = HTTPoison.post(@url, Jason.encode!(body_payload), @headers, recv_timeout: @timeout)
+      {status, resp} = HTTPoison.post(
+        "https://api.openai.com/v1/chat/completions",
+        Jason.encode!(body_payload),
+        [
+          {"Content-type", "application/json"},
+          {"Authorization", "Bearer #{System.get_env("OPEN_AI")}"}
+        ],
+        recv_timeout: 2000
+      )
       IO.inspect("status")
       IO.inspect(status)
       IO.inspect("=====")
@@ -113,7 +108,7 @@ defmodule LeafNode.Core.Gpt do
       IO.inspect(resp)
       IO.inspect("=====")
       IO.inspect("url")
-      IO.inspect(@url)
+      IO.inspect("https://api.openai.com/v1/chat/completions")
       IO.inspect("=====")
       IO.inspect("Jason.encode!(body_payload)")
       IO.inspect(Jason.encode!(body_payload))

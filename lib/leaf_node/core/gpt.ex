@@ -91,13 +91,8 @@ defmodule LeafNode.Core.Gpt do
   """
   # TODO: Meta programming can be used here to generate the functions
   def prompt(msg) do
-    IO.inspect("msg")
-    IO.inspect(msg)
+
     prompt = LeafNode.Core.Gpt.Prompt.query(msg)
-    IO.inspect("prompt")
-    IO.inspect(prompt)
-    IO.inspect("ENV VAR")
-    IO.inspect(System.get_env(@env))
     # check the status - this is help make sure we dont execute test payloads
     Logger.info("Started AI workflow generation")
     if !is_nil(System.get_env(@env)) do
@@ -111,6 +106,17 @@ defmodule LeafNode.Core.Gpt do
       )
 
       {status, resp} = HTTPoison.post(@url, Jason.encode!(body_payload), @headers, recv_timeout: @timeout)
+      IO.inspect("status")
+      IO.inspect(status)
+      IO.inspect("=====")
+      IO.inspect("resp")
+      IO.inspect(resp)
+      IO.inspect("=====")
+      IO.inspect("url")
+      IO.inspect(@url)
+      IO.inspect("=====")
+      IO.inspect("Jason.encode!(body_payload)")
+      IO.inspect(Jason.encode!(body_payload))
       case status do
         :ok -> handle_response(resp)
         :error -> {:error, "There was an error: #{resp}"}

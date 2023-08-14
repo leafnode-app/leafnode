@@ -95,6 +95,8 @@ defmodule LeafNodeWeb.Api.DocumentController do
   def execute_document(conn, params) do
     id = Map.get(params, "id")
     payload = Map.drop(params, ["id"])
+    IO.inspect("params -- DATA")
+    IO.inspect(params)
     # Start the server if not already running
     LeafNode.Servers.ExecutionServer.start_link(id)
 

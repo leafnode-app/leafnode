@@ -96,6 +96,8 @@ defmodule LeafNode.Core.Gpt do
     prompt = LeafNode.Core.Gpt.Prompt.query(msg)
     IO.inspect("prompt")
     IO.inspect(prompt)
+    IO.inspect("ENV VAR")
+    IO.inspect(System.get_env(@env))
     # check the status - this is help make sure we dont execute test payloads
     Logger.info("Started AI workflow generation")
     if !is_nil(System.get_env(@env)) do

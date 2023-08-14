@@ -91,7 +91,11 @@ defmodule LeafNode.Core.Gpt do
   """
   # TODO: Meta programming can be used here to generate the functions
   def prompt(msg) do
+    IO.inspect("msg")
+    IO.inspect(msg)
     prompt = LeafNode.Core.Gpt.Prompt.query(msg)
+    IO.inspect("prompt")
+    IO.inspect(prompt)
     # check the status - this is help make sure we dont execute test payloads
     Logger.info("Started AI workflow generation")
     if !is_nil(System.get_env(@env)) do

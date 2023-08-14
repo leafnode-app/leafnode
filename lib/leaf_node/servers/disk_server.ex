@@ -103,19 +103,10 @@ defmodule LeafNode.Servers.DiskServer do
   defp generate_pseudo_code(document) do
     # TODO: Look at how we can dynamically increase timeout based on paragraps.
     # TODO: This call counld be parallel but we want to keep order, so we might need to increase timeout based on paragraph length
-    IO.inspect("document - start")
-    IO.inspect(document)
-    IO.inspect("document - end")
     data = Enum.map(document.data, fn item ->
-      IO.inspect("item - start")
-      IO.inspect(item)
-      IO.inspect("item - end")
       Map.update!(item, "pseudo_code", fn _value ->
+        # TODO: IF there is a error, we need to make sure the response is same {status, rest} format
         { status, resp } = LeafNode.Core.Gpt.prompt(Map.get(item, "data"))
-        IO.inspect("status, resp - start")
-        IO.inspect(status)
-        IO.inspect(resp)
-        IO.inspect("status, resp - end")
         case status do
           :ok -> resp
           # TODO: Add fallback result funciton if timeout is reached and mabe a better response message?

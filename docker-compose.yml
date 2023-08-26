@@ -1,6 +1,7 @@
 version: '3'
 services:
   api:
+    restart: always
     build: 
       context: ./
       dockerfile: ./docker/API/Dockerfile

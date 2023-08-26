@@ -2,6 +2,7 @@ version: '3'
 services:
   api:
     restart: always
+    image: toreanjoel/leafnode:latest
     build: 
       context: ./
       dockerfile: ./docker/API/Dockerfile

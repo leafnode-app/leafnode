@@ -1,5 +1,5 @@
 # Use an official Elixir runtime as a parent image
-FROM elixir:latest
+FROM --platform=linux/amd64 elixir:latest
 
 # Install inotify-tools
 RUN apt-get update && apt-get install -y inotify-tools

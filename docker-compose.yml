@@ -6,6 +6,7 @@ services:
     build: 
       context: ./
       dockerfile: ./docker/API/Dockerfile
+      platform: linux/arm64
     environment:
       - PORT=5000
       - APP_DATA=DATA

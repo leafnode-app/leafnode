@@ -16,13 +16,17 @@ jobs:
         name: Set up Docker
         run: sudo apt-get update && sudo apt-get install -y docker-compose
       -
+        name: Setup QEMU
+        uses: docker/setup-qemu-action@v1
+      -
+        name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      -
         name: Login to Docker Hub
         run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
       -
         name: Build and push Docker Compose services
-        run: docker-compose -f docker-compose.yml build && docker-compose -f docker-compose.yml push
-        with:
-          context: .
-          platforms: linux/amd64,linux/arm64
-          push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/leafnode:latest
+        run: |
+          docker buildx create --use
+          docker-compose -f docker-compose.yml build --platform linux/arm64
+          docker-compose -f docker-compose.yml push

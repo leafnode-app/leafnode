@@ -8,7 +8,7 @@ RUN apt-get update && apt-get install -y inotify-tools
 WORKDIR /app
 
 # Install dependencies
-COPY ./../../mix.exs ./../../mix.lock ./
+COPY ./mix.exs ./mix.lock ./
 RUN mix local.hex --force
 RUN mix local.rebar --force
 RUN mix deps.get

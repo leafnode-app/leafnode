@@ -14,8 +14,7 @@ defmodule LeafNode.Application do
       # Start the Telemetry supervisor
       LeafNodeWeb.Telemetry,
       # Start the Ecto repository
-      # ---- ECTO -----
-      # LeafNode.Repo,
+      LeafNode.Repo,
       # Start the PubSub system
       {Phoenix.PubSub, name: LeafNode.PubSub},
       # Start Finch

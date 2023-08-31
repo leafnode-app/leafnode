@@ -7,9 +7,8 @@
 # General application configuration
 import Config
 
-# ---- ECTO -----
-# config :leaf_node,
-#   ecto_repos: [LeafNode.Repo]
+config :leaf_node,
+  ecto_repos: [LeafNode.Repo]
 
 # Configures the endpoint
 config :leaf_node, LeafNodeWeb.Endpoint,

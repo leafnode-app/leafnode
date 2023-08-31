@@ -32,7 +32,26 @@ Text to Code document based API execution. Allows for external calls and human t
 - [ ] Docker and containerizing the FE/BE and Database - folder structure all under one project
 - [ ] UI (React)
 
-## Later
-- Access tokens generation for documents to execute
-- UX/UX - https://www.blocknotejs.org/
+## Postgres Migration
+1. Generate a migration file for document creation
+
+## Example document payload structure
+```
+    # document example
+    # The general document itself and a result value that points to ID of text, text blocks come in a list for a document
+    %{
+        id: string;
+        name: string;
+        result: boolean | string;
+        data: Text[];
+    }
+
+    # Text examples
+    # Th is a definition of a text block, we use this to represent text and code from text
+    %{
+        id: string;
+        pseudo_code: nil | string;
+        data: nil | string;
+    }
+```
 

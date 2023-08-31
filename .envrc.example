@@ -5,6 +5,12 @@ export ROOT_PASS=
 # data dir
 export APP_DATA=
 
+# pgsql creds and location
+export DB_HOSTNAME=
+export DB_NAME=
+export DB_USER=
+export DB_PASS=
+
 # Open AI
 export OPEN_AI=
 export OPEN_AI_MODEL=gpt-3.5-turbo

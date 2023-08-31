@@ -1,15 +1,13 @@
 import Config
 
-# ---- ECTO -----
-# # Configure your database
-# config :leaf_node, LeafNode.Repo,
-#   username: "postgres",
-#   password: "",
-#   hostname: "localhost",
-#   database: "postgres",
-#   stacktrace: true,
-#   show_sensitive_data_on_connection_error: true,
-#   pool_size: 10
+config :leaf_node, LeafNode.Repo,
+  username: System.get_env("DB_USER"),
+  password: System.get_env("DB_PASS"),
+  hostname: System.get_env("DB_HOSTNAME"),
+  database: System.get_env("DB_NAME"),
+  stacktrace: true,
+  show_sensitive_data_on_connection_error: true,
+  pool_size: 10
 
 # For development, we disable any cache and enable
 # debugging and code reloading.

@@ -21,37 +21,27 @@ Text to Code document based API execution. Allows for external calls and human t
 - [x] Calls to GenServers initially need to be dynamic timeout based on 5 * paragraph items
 - [x] Remove use for to_atom dynamically as this grows and doesnt get cleaned up
 - [x] Input selection from document paragraphs
-- [ ] Allow to generate code per Text/Paragraph block (endpoint execute block)
-- [ ] Stop execution once result is found for document selected execution
-- [ ] Authorization and how the UI will tie up to the document and how you can create documents
-- [ ] Dynamic tom generation cleanup and find another solution for
+- [x] Use document module for helper functions (move repo functions for documents to do crud operations)
+- [x] Remove the servers for disk and memory and disk sync
+- [x] create text blocks per document - API
+- [ ] Deleting documents should remove associated texts
+- [ ] Update document response to return list of texts by id (render by order)
+- [ ] Function to get all texts (not lists by ids)
+- [ ] Look into ways to move texts orders around?
+- [ ] Execute document stored in repo
+- [ ] Remove old tests/files that we dont need or old code
+- [ ] Update all comments and generate ex_docs
+- [ ] Update postman documentation
+- [ ] Fix Deployment to registry auto
+- [ ] Deploy to VM
+
 
 ## Missing Important Pieces
 - [x] Postman collection for the endpoints
-- [ ] Postgres w/ Ecto setup (removal of DETs but keep ETS)
+- [x] Postgres w/ Ecto setup (removal of DETs but keep ETS)
 - [ ] Docker and containerizing the FE/BE and Database - folder structure all under one project
 - [ ] UI (React)
 
 ## Postgres Migration
 1. Generate a migration file for document creation
-
-## Example document payload structure
-```
-    # document example
-    # The general document itself and a result value that points to ID of text, text blocks come in a list for a document
-    %{
-        id: string;
-        name: string;
-        result: boolean | string;
-        data: Text[];
-    }
-
-    # Text examples
-    # Th is a definition of a text block, we use this to represent text and code from text
-    %{
-        id: string;
-        pseudo_code: nil | string;
-        data: nil | string;
-    }
-```
 

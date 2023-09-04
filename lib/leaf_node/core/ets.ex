@@ -4,17 +4,6 @@ defmodule LeafNode.Core.Ets do
     It also has a method for checking whether a table exists. The module returns JSON formatted data.
   """
 
-  @tables %{
-    "documents" => :documents
-  }
-
-  @doc """
-    Return system tables that have been made
-  """
-  def get_system_tables do
-    @tables
-  end
-
   @doc """
     Create a new table
 

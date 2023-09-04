@@ -2,69 +2,72 @@ defmodule LeafNode.Core.Documents do
   @moduledoc """
     Methods around the Documents and persistence/data management
   """
-  alias LeafNode.Utils.Helpers
-  alias LeafNode.Core.Dets, as: Dets
-
-  # Config Table
-  @table :documents
+  import Ecto.Query, only: [from: 2]
+  alias LeafNode.Repo, as: LeafNodeRepo
 
   @doc """
     Create a document - genreate an id and pass payload to be persisted
   """
-  def create_document(data \\ %{}, table \\ @table, return_value \\ false) do
-    id = UUID.uuid4()
-    document =
-      %{
-        id: id,
-        name: Map.get(data, :name, id),
-        result: Map.get(data, :result, true),
-        # TODO: This should be some struct or defined from a schema
-        data: Map.get(data, :data, [%{id: UUID.uuid4(), pseudo_code: nil, data: nil}]),
-      }
+  def create_document() do
+    changeset = LeafNodeWeb.Models.Document.changeset(%LeafNodeWeb.Models.Document{result: "false"}, %{})
 
-    result = Dets.insert(table, Map.get(data, "id", id), document)
-    case result do
-      :ok ->
-        if return_value do
-          {:ok, "Successfully created document", document}
-        else
-          {:ok, "Successfully created document"}
-        end
-      _ -> {:error, "There was an error creating document"}
+    case LeafNodeRepo.insert(changeset) do
+      {:ok, _} -> {:ok, "Successfully created document"}
+      {:error, _} -> {:error, "There was a problem creating document"}
     end
   end
 
   @doc """
     Edit a document by id and the new details passed of the update we persist
   """
-  def edit_document(id, data \\ %{}, table \\ @table, return_value \\ false) do
-    {status, document} = Dets.get_by_key(table, id)
-    case status do
-      :ok ->
-        updated_document = %{
-          id: document.id,
-          name: Map.get(data, :name, document.name),
-          result: Map.get(data, :result, document.result),
-          # TODO: We need to have separate functions to generate and add paragraphs
-          data: Map.get(data, :data, document.data)
-        }
-        Dets.insert(table, id, updated_document)
-        if return_value do
-          {:ok, "Successfully updated document", updated_document}
-        else
-          {:ok, "Successfully updated document"}
+  def edit_document(data) do
+    result = try do
+      struct = LeafNodeRepo.get!(LeafNodeWeb.Models.Document, Map.get(data, "id", nil))
+      {:ok, struct}
+    rescue
+      _e ->
+        {:error, "There was an error trying to get the document #{"id"}"}
+    end
+
+    # we have a struct that we got something
+    case result do
+      {:ok, struct} ->
+        # here we try to delete the document
+        updated_struct = Ecto.Changeset.change(struct, [
+          name: Map.get(data, "name", struct.name),
+          description: Map.get(data, "description", struct.description),
+          result: Map.get(data, "result", struct.result),
+        ])
+        # we need to add or update the document texts here
+        case LeafNodeRepo.update(updated_struct) do
+          {:ok, _} -> {:ok, "Successfully updated document"}
+          {:error, _e} ->
+            {:error, "There was a problem updating document"}
         end
-      _ -> {:error, "There was a problem editing the document"}
+      _ -> {:error, "Unable to find document"}
     end
   end
 
   @doc """
     Recmove a document by id
   """
-  def delete_document(id, table \\ @table) do
-    case Dets.delete(table, id) do
-      :ok -> {:ok, "Successfully removed document"}
-      _ -> {:error, "There was a problem removing document"}
+  def delete_document(id) do
+    result = try do
+      struct = LeafNodeRepo.get!(LeafNodeWeb.Models.Document, id)
+      {:ok, struct}
+    rescue
+      _e ->
+        {:error, "There was an error trying to get the document #{id}"}
+    end
+
+    case result do
+      {:ok, struct} ->
+        # here we try to delete the document
+        case LeafNodeRepo.delete(struct) do
+          {:ok, _} -> {:ok, "Successfully deleted document"}
+          {:error, _} -> {:error, "There was a problem deleting document"}
+        end
+      _ -> {:error, "Unable to find document"}
     end
   end
 
@@ -72,31 +75,41 @@ defmodule LeafNode.Core.Documents do
     Return a list of all documents saved in the system
     Note: This is saved in DETS
   """
-  def list_documents(table \\ @table) do
-    { status, documents } = Dets.get_all(table)
+  def list_documents() do
+    query = from d in LeafNodeWeb.Models.Document,
+     select: %{
+      id: d.id,
+      name: d.name,
+      description: d.description,
+      result: d.result
+    }
 
-    case status do
-      :ok ->
-        {:ok,
-          Enum.map(documents,
-            fn {_key, document} ->
-              Map.from_struct(document)
-            end
-          )
-          |> Helpers.list_to_map(%{}, :id)
-        }
-      _ -> {:error, "Unable to retrieve documents"}
+    if Kernel.length(LeafNodeRepo.all(query)) > 0 do
+      {:ok, LeafNodeRepo.all(query)}
+    else
+      {:error, "There was an error getting the current document"}
     end
   end
 
   @doc """
     Get the details of a document by id
   """
-  def get_document(id, table \\ @table) do
-    {status, document} = Dets.get_by_key(table, id)
+  def get_document(id) do
+    result = try do
+      d = LeafNodeRepo.get!(LeafNodeWeb.Models.Document, id)
+      {:ok, %{
+        id: d.id,
+        name: d.name,
+        description: d.description,
+        result: d.result
+      }}
+    rescue
+      _e ->
+        {:error, "There was an error trying to get the document #{id}"}
+    end
 
-    case status do
-      :ok -> {:ok, Map.from_struct(document)}
+    case result do
+      {:ok, data} -> {:ok, data}
       _ -> {:error, "There was an error getting the current document"}
     end
   end

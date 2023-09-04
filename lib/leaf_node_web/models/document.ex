@@ -9,9 +9,6 @@ defmodule LeafNodeWeb.Models.Document do
     field :description, :string
     field :result, :string
 
-    # one-to-many relationship of this document to texts
-    # has_many :texts, LeafNodeWeb.Models.Text
-
     timestamps(type: :utc_datetime)
   end
 

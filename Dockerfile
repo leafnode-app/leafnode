@@ -18,4 +18,6 @@ COPY . .
 
 # Compile the project
 RUN mix compile
+RUN mix ecto.create
+RUN mix ecto.migrate
 CMD ["iex","-S", "mix", "phx.server"]

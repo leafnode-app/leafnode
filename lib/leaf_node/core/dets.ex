@@ -2,13 +2,6 @@ defmodule LeafNode.Core.Dets do
   @moduledoc """
     Disk storage helper functions
   """
-  @tables %{
-    "documents" => :documents,
-  }
-
-  def get_system_tables() do
-    @tables
-  end
 
   @doc """
     Open or create a new table, this will default to 3min of flushing and closing from inactivity

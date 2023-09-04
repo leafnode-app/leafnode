@@ -37,8 +37,3 @@ npm-debug.log
 
 # DS store files from mac
 .DS_Store
-
-# Misc
-Nodes.md
-*.dets
-/DATA

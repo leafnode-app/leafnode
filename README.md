@@ -37,6 +37,8 @@ Text to Code document based API execution. Allows for external calls and human t
 - [ ] Logging, research what to use (grafana?) - We need to check the pricing of VMs and performance degregation
 - [ ] Uptime kuma and status
 - [ ] notification service - https://ntfy.sh/
+- [ ] setup or use .env / .envrc to use in docker compose (remove dummy variables)
+- [ ] auto deploy and job to auto pull and run on vm
 
 
 ## Missing Important Pieces

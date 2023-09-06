@@ -44,9 +44,6 @@ Text to Code document based API execution. Allows for external calls and human t
 ## Missing Important Pieces
 - [x] Postman collection for the endpoints
 - [x] Postgres w/ Ecto setup (removal of DETs but keep ETS)
-- [ ] Docker and containerizing the FE/BE and Database - folder structure all under one project
-- [ ] UI (React)
-
-## Postgres Migration
-1. Generate a migration file for document creation
+- [x] Docker and containerizing the FE/BE and Database - folder structure all under one project
+- [ ] UI / web app
 

@@ -1,6 +1,8 @@
 version: '3'
 services:
   db:
+    container_name: leafnode_db
+    restart: always
     image: postgres
     ports:
       - 5432:5432
@@ -9,8 +11,9 @@ services:
     environment:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_USER=postgres
-      - POSTGRES_DB=leafnode_db_test
+      - POSTGRES_DB=leafnode_db
   api:
+    container_name: leafnode_api
     restart: always
     image: toreanjoel/leafnode:latest
     build: 
@@ -18,10 +21,11 @@ services:
       dockerfile: ./Dockerfile
     environment:
       - PORT=5000
-      - DB_HOSTNAME=localhost
-      - DB_NAME=leafnode_db_test
+      - DB_HOSTNAME="db"
+      - DB_NAME=leafnode_db
       - DB_USER=postgres
       - DB_PASS=postgres
+      - DB_PORT=5432
       - APP_DATA=DATA
     ports:
       - "3000:5000"

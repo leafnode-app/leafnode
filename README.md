@@ -34,6 +34,9 @@ Text to Code document based API execution. Allows for external calls and human t
 - [ ] Update postman documentation
 - [ ] Fix Deployment to registry auto
 - [ ] Deploy to VM
+- [ ] Logging, research what to use (grafana?) - We need to check the pricing of VMs and performance degregation
+- [ ] Uptime kuma and status
+- [ ] notification service - https://ntfy.sh/
 
 
 ## Missing Important Pieces

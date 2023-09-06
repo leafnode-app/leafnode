@@ -17,7 +17,9 @@ RUN mix deps.get
 COPY . .
 
 # Compile the project
-RUN mix compile
-RUN mix ecto.create
-RUN mix ecto.migrate
-CMD ["iex","-S", "mix", "phx.server"]
+# RUN mix compile
+# RUN mix ecto.create
+# RUN mix ecto.migrate
+# RUN mix run priv/repo/seeds.exs
+# CMD ["iex","-S", "mix", "phx.server"]
+CMD ["/app/entrypoint.sh"]

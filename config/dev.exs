@@ -1,10 +1,12 @@
 import Config
 
 config :leaf_node, LeafNode.Repo,
+hostname: System.get_env("DB_HOSTNAME"),
+  database: System.get_env("DB_NAME"),
   username: System.get_env("DB_USER"),
   password: System.get_env("DB_PASS"),
-  hostname: System.get_env("DB_HOSTNAME"),
-  database: System.get_env("DB_NAME"),
+  port: String.to_integer(System.get_env("DB_PORT") || "5432"), # needs to be a number
+  socket_options: [:inet6], # for ipv6 support connecting
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10

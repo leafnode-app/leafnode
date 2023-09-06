@@ -10,6 +10,7 @@ export DB_HOSTNAME=
 export DB_NAME=
 export DB_USER=
 export DB_PASS=
+export DB_PORT=
 
 # Open AI
 export OPEN_AI=

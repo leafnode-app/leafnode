@@ -27,7 +27,7 @@ Text to Code document based API execution. Allows for external calls and human t
 - [x] Fix connecting app to postgres in conteiner (network issues)
 - [x] Prod build on images for ENV
 - [x] Separate env files (DB, APP, LOCAL) for development along with using in compose (APP, DB)
-- [ ] Deleting documents should remove associated texts
+- [x] Deleting documents should remove associated texts - soft delete - flag is_deleted, we keep texts for training (need to mention to users)
 - [ ] Update document response to return list of texts by id (render by order)
 - [ ] Function to get all texts by document (not lists by ids)
 - [ ] Execute document stored in repo
@@ -38,6 +38,7 @@ Text to Code document based API execution. Allows for external calls and human t
 - [ ] Fix Deployment to registry auto (git workflow builds)
 - [ ] Deploy to VM
 - [ ] Auto Backup documents (off the VM or hosted machine if needed - maybe to .md?)
+- [ ] validation to the text and document models and changesets
 - [ ] Logging, research what to use (grafana?) - We need to check the pricing of VMs and performance degregation
 - [ ] Uptime kuma and status
 - [ ] notification service - https://ntfy.sh/

@@ -94,7 +94,8 @@ defmodule LeafNode.Core.Text do
         id: t.id,
         pseudo_code: t.pseudo_code,
         data: t.data,
-        document_id: t.document_id
+        document_id: t.document_id,
+        order: t.order,
     }
 
     if Kernel.length(LeafNodeRepo.all(query)) > 0 do

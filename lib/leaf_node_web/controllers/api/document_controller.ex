@@ -38,7 +38,16 @@ defmodule LeafNodeWeb.Api.DocumentController do
   def get_document_by_id(conn, %{ "id" => id}) do
     case LeafNode.Core.Documents.get_document(id) do
       {:ok, data} ->
-        return(conn, 200, Helpers.http_resp(200, true, data))
+        # We return only the id - less data over the wire, more info can be queried with the ids of the text
+        # Will allow for lazy loading data on client side down the line if needed on larger documents
+        {status, texts} = LeafNode.Core.Text.list_texts(id)
+        text_data = case status do
+          :ok -> Enum.map(texts, fn item -> item.id end)
+          _ -> []
+        end
+        doc_with_texts = Map.put(data, :texts, text_data)
+
+        return(conn, 200, Helpers.http_resp(200, true, doc_with_texts))
       {:error, err} ->
         return(conn, 404, Helpers.http_resp(404, false, err))
     end

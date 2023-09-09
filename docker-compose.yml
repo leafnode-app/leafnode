@@ -15,6 +15,7 @@ services:
   app:
     container_name: leafnode_app
     restart: always
+    platform: linux/arm64
     image: toreanjoel/leafnode:latest
     build: 
       context: ./

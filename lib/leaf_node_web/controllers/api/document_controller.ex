@@ -74,6 +74,15 @@ defmodule LeafNodeWeb.Api.DocumentController do
   def delete_document(conn, %{ "id" => id}) do
     case LeafNode.Core.Documents.delete_document(id) do
       {:ok, data} ->
+        # attempt to delete associated texts (soft delete) - This needs som cases to make sure failures are logged
+        {_, result} = LeafNode.Core.Text.list_texts(id)
+        Enum.each(result, fn text ->
+          LeafNode.Core.Text.edit_text(%{
+            "id" => text.id,
+            "is_deleted" => "true"
+          })
+        end)
+        # TODO: keep texts as we use this for training later
         return(conn, 200, Helpers.http_resp(200, true, data))
       {:error, err} ->
         return(conn, 404, Helpers.http_resp(404, false, err))
@@ -86,8 +95,6 @@ defmodule LeafNodeWeb.Api.DocumentController do
   def execute_document(conn, params) do
     id = Map.get(params, "id")
     payload = Map.drop(params, ["id"])
-    IO.inspect("params -- DATA")
-    IO.inspect(params)
     # Start the server if not already running
     LeafNode.Servers.ExecutionServer.start_link(id)
 

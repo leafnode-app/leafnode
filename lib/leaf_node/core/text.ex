@@ -48,6 +48,7 @@ defmodule LeafNode.Core.Text do
           data: Map.get(data, "data", struct.data),
           document_id: Map.get(data, "document_id", struct.document_id),
           order: Map.get(data, "order", struct.order),
+          # TODO: do we need to change reset the pseudo code on edit? UI can show the old code
           pseudo_code: Map.get(data, "pseudo_code", struct.pseudo_code),
           is_deleted: Map.get(data, "is_deleted", struct.is_deleted)
         ])

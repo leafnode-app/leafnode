@@ -60,7 +60,11 @@ defmodule LeafNodeWeb.Api.TextController do
     Delete document text
   """
   def delete_text(conn, %{ "id" => id}) do
-    case LeafNode.Core.Text.delete_text(id) do
+    # TODO: use the function to delete: LeafNode.Core.Text.delete_text(id) - we soft delete text
+    case LeafNode.Core.Text.edit_text(%{
+        "id" => id,
+        "is_deleted" => "true"
+      }) do
       {:ok, data} ->
         return(conn, 200, Helpers.http_resp(200, true, data))
       {:error, err} ->

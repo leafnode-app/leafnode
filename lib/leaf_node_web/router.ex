@@ -34,6 +34,7 @@ defmodule LeafNodeWeb.Router do
 
     post "/create", DocumentController, :create_document
     post "/execute/:id", DocumentController, :execute_document
+    post "/execute_verbose/:id", DocumentController, :execute_document_verbose
     delete "/:id", DocumentController, :delete_document
     put "/:id", DocumentController, :update_document
     get "/", DocumentController, :get_documents

@@ -29,11 +29,15 @@ Text to Code document based API execution. Allows for external calls and human t
 - [x] Separate env files (DB, APP, LOCAL) for development along with using in compose (APP, DB)
 - [x] Deleting documents should remove associated texts - soft delete - flag is_deleted, we keep texts for training (need to mention to users)
 - [x] Update document response to return list of texts by id (render by order)
-- [ ] Execute document stored in repo
+- [x] setup or use .env / .envrc to use in docker compose (remove dummy variables)
+- [x] multiple compose files for each env? https://danielwachtel.com/devops/dockerizing-a-phoenix-app-with-a-postgresql-database
+- [x] Update postman documentation
+- [x] Execute document stored in repo
+- [ ] Table to have a copy of all texts regardless of deleted (we can then remove texts from text table and training data on the other)
 
 - [ ] Remove old tests/files that we dont need or old code
+- [ ] ETS to hash and store an executed document in memory for 1 day, if different input, change data, clear data otherwise
 - [ ] Update all comments and generate ex_docs
-- [ ] Update postman documentation
 - [ ] Fix Deployment to registry auto (git workflow builds)
 - [ ] Deploy to VM
 - [ ] Auto Backup documents (off the VM or hosted machine if needed - maybe to .md?)
@@ -41,9 +45,7 @@ Text to Code document based API execution. Allows for external calls and human t
 - [ ] Logging, research what to use (grafana?) - We need to check the pricing of VMs and performance degregation
 - [ ] Uptime kuma and status
 - [ ] notification service - https://ntfy.sh/
-- [ ] setup or use .env / .envrc to use in docker compose (remove dummy variables)
 - [ ] auto deploy and job to auto pull and run on vm
-- [ ] multiple compose files for each env? https://danielwachtel.com/devops/dockerizing-a-phoenix-app-with-a-postgresql-database
 
 
 ## Missing Important Pieces

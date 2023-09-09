@@ -111,10 +111,38 @@ defmodule LeafNodeWeb.Api.DocumentController do
       GenServer.call(String.to_atom("execution_process_" <> id), {:execute, id, payload})
 
     document_result = Map.get(document, :result)
+
+    # TODO: We can look at the an optional run with logs returned - we dont otherwise and rely on document result
+    result = %{
+      "document_result" => Map.get(paragraph_execution_results, document_result, document_result)
+    }
+
+    case status do
+      :ok -> return(conn, 200, Helpers.http_resp(200, true, result))
+      _ -> return(conn, 404, Helpers.http_resp(404, false, %{}))
+    end
+  end
+
+@doc """
+    Execute document - verbose - we return logs around each of the text blocks that ran
+  """
+  def execute_document_verbose(conn, params) do
+    id = Map.get(params, "id")
+    payload = Map.drop(params, ["id"])
+    # Start the server if not already running
+    LeafNode.Servers.ExecutionServer.start_link(id)
+
+    {status, %{ "document" => document, "results" => paragraph_execution_results}} =
+      GenServer.call(String.to_atom("execution_process_" <> id), {:execute, id, payload})
+
+    document_result = Map.get(document, :result)
+
+    # TODO: We can look at the an optional run with logs returned - we dont otherwise and rely on document result
     result = %{
       "document_result" => Map.get(paragraph_execution_results, document_result, document_result),
       "paragraph_results" => paragraph_execution_results
     }
+
     case status do
       :ok -> return(conn, 200, Helpers.http_resp(200, true, result))
       _ -> return(conn, 404, Helpers.http_resp(404, false, %{}))

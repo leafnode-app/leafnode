@@ -36,11 +36,19 @@ defmodule LeafNode.Servers.ExecutionServer do
     ExecutionHistoryServer.start_link(document_id)
 
     # get the document in memory if it exists
-    {status, document} = LeafNode.Core.Ets.get_by_key(:documents, document_id)
+    {status, document} = LeafNode.Core.Documents.get_document(document_id)
+
     case status do
       :ok ->
-        Logger.info("Here we start the execition logic")
-        {status, result} = start_execution(document, payload)
+        # Here we get all the details of texts that has psuedo code associated with it
+        {status, texts} = LeafNode.Core.Text.list_texts(document_id)
+        text_data = case status do
+          :ok -> Enum.filter(texts, fn item -> !is_nil(item.pseudo_code) end)
+          _ -> []
+        end
+        doc_with_texts = Map.put(document, :texts, text_data)
+
+        {status, result} = start_execution(doc_with_texts, payload)
         # Stop the history server instance here
         GenServer.stop(String.to_atom("history_" <> document_id), :normal)
         {:stop, :normal, {status, result}, state}
@@ -49,7 +57,6 @@ defmodule LeafNode.Servers.ExecutionServer do
         GenServer.stop(String.to_atom("history_" <> document_id), :normal)
         {:stop, :normal, {:error, "There was an error executing the document"}, state}
     end
-    #TODO: Do we need to stop the agent server? It is linked so exepct it to die out once this does
   end
 
   @doc """
@@ -59,11 +66,9 @@ defmodule LeafNode.Servers.ExecutionServer do
     # Flush the execution history before updating the data
     GenServer.call(String.to_atom("history_" <> document.id), :flush_history)
     # get the functions - and attempt excute
-    Enum.each(document.data, fn paragraph ->
-      paragraph_id = Map.get(paragraph, "id")
-      pseudo_code = Map.get(paragraph, "pseudo_code")
-      # TODO: We need to consider making less params to send
-      LeafNode.Core.Code.execute(pseudo_code, document.id, paragraph_id, payload)
+    Enum.each(document.texts, fn text ->
+      pseudo_code = text.pseudo_code
+      LeafNode.Core.Code.execute(pseudo_code, document.id, text.id, payload)
     end)
 
     {:ok, %{

@@ -8,13 +8,14 @@ defmodule LeafNode.Core.Code do
   @doc """
     We execute the function that was passed based on permission
   """
-  def execute(func_string, document_id, paragraph_id, payload) do
+  # TODO: Too many inputs here!
+  def execute(func_string, document_id, text_id, payload) do
     case Code.string_to_quoted(func_string) do
       {:ok, ast} ->
-        case evaluate_ast(ast, document_id, paragraph_id, payload) do
+        case evaluate_ast(ast, document_id, text_id, payload) do
           {:ok, result} ->
             # We assume the server is up - we can start up later if needed
-            GenServer.call(String.to_atom("history_" <> document_id), {:set_history, paragraph_id, result})
+            GenServer.call(String.to_atom("history_" <> document_id), {:set_history, text_id, result})
             # return for execution purposes but we dont need this
             {:ok, result}
           {:error, reason} ->
@@ -30,13 +31,13 @@ defmodule LeafNode.Core.Code do
   @doc """
     Check if we are permitted to use the function
   """
-  defp evaluate_ast({func_atom, _, args}, document_id, paragraph_id, payload) when is_atom(func_atom) do
+  defp evaluate_ast({func_atom, _, args}, document_id, text_id, payload) when is_atom(func_atom) do
     func_string = Atom.to_string(func_atom)
     allowed_functions = LeafNode.Core.SafeFunctions.allowed_functions()
     if Enum.member?(allowed_functions, func_string) do
       # we need to get the value from the keyword list, the result
       evaluated_args = Enum.map(args, fn item ->
-        case evaluate_ast(item, document_id, paragraph_id, payload) do
+        case evaluate_ast(item, document_id, text_id, payload) do
           {_, value} -> value
           [_: value] -> value
         end
@@ -48,7 +49,7 @@ defmodule LeafNode.Core.Code do
         "params" => evaluated_args,
         "meta_data" => %{
           "document_id" => document_id,
-          "paragraph_id" => paragraph_id,
+          "text_id" => text_id,
           "type" => func_string
         }
       }
@@ -59,7 +60,7 @@ defmodule LeafNode.Core.Code do
   end
 
   # the base and last value that will be executed to the safe functions
-  defp evaluate_ast(value, _document_id, _paragraph_id, _payload) do
+  defp evaluate_ast(value, _document_id, _text_id, _payload) do
     {:ok, value}
   end
 end

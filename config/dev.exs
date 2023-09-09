@@ -1,7 +1,7 @@
 import Config
 
 config :leaf_node, LeafNode.Repo,
-hostname: System.get_env("DB_HOSTNAME"),
+  hostname: System.get_env("DB_HOSTNAME"),
   database: System.get_env("DB_NAME"),
   username: System.get_env("DB_USER"),
   password: System.get_env("DB_PASS"),

@@ -1,8 +1,13 @@
 # Use an official Elixir runtime as a parent image
 FROM --platform=linux/arm64 arm64v8/elixir:latest
 
+#TODO: Postgress tools so we can listen on ready to put in script that builds and migrates
+
 # Install inotify-tools
 RUN apt-get update && apt-get install -y inotify-tools
+
+# Set environment to production
+ENV MIX_ENV prod
 
 # Set the working directory
 WORKDIR /app
@@ -16,10 +21,4 @@ RUN mix deps.get
 # Copy the current directory contents into the container
 COPY . .
 
-# Compile the project
-# RUN mix compile
-# RUN mix ecto.create
-# RUN mix ecto.migrate
-# RUN mix run priv/repo/seeds.exs
-# CMD ["iex","-S", "mix", "phx.server"]
 CMD ["/app/entrypoint.sh"]

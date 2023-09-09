@@ -24,21 +24,26 @@ Text to Code document based API execution. Allows for external calls and human t
 - [x] Use document module for helper functions (move repo functions for documents to do crud operations)
 - [x] Remove the servers for disk and memory and disk sync
 - [x] create text blocks per document - API
+- [x] Fix connecting app to postgres in conteiner (network issues)
+- [x] Prod build on images for ENV
+- [x] Separate env files (DB, APP, LOCAL) for development along with using in compose (APP, DB)
 - [ ] Deleting documents should remove associated texts
 - [ ] Update document response to return list of texts by id (render by order)
-- [ ] Function to get all texts (not lists by ids)
-- [ ] Look into ways to move texts orders around?
+- [ ] Function to get all texts by document (not lists by ids)
 - [ ] Execute document stored in repo
+
 - [ ] Remove old tests/files that we dont need or old code
 - [ ] Update all comments and generate ex_docs
 - [ ] Update postman documentation
-- [ ] Fix Deployment to registry auto
+- [ ] Fix Deployment to registry auto (git workflow builds)
 - [ ] Deploy to VM
+- [ ] Auto Backup documents (off the VM or hosted machine if needed - maybe to .md?)
 - [ ] Logging, research what to use (grafana?) - We need to check the pricing of VMs and performance degregation
 - [ ] Uptime kuma and status
 - [ ] notification service - https://ntfy.sh/
 - [ ] setup or use .env / .envrc to use in docker compose (remove dummy variables)
 - [ ] auto deploy and job to auto pull and run on vm
+- [ ] multiple compose files for each env? https://danielwachtel.com/devops/dockerizing-a-phoenix-app-with-a-postgresql-database
 
 
 ## Missing Important Pieces

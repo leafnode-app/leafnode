@@ -33,7 +33,7 @@ npm-debug.log
 /assets/node_modules/
 
 # Ignore .env files
-.envrc
+*.env
 
 # DS store files from mac
 .DS_Store

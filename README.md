@@ -38,6 +38,7 @@ Text to Code document based API execution. Allows for external calls and human t
 - [ ] Remove old tests/files that we dont need or old code
 - [ ] ETS to hash and store an executed document in memory for 1 day, if different input, change data, clear data otherwise
 - [ ] Update all comments and generate ex_docs
+- [ ] Tests before commit and test during branches
 - [ ] Fix Deployment to registry auto (git workflow builds)
 - [ ] Deploy to VM
 - [ ] Auto Backup documents (off the VM or hosted machine if needed - maybe to .md?)

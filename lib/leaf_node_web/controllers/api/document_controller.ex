@@ -164,7 +164,7 @@ defmodule LeafNodeWeb.Api.DocumentController do
   defp check_boolean_result(value) do
     case value do
       "true" -> true
-      "false" -> false,
+      "false" -> false
       _ -> value
     end
   end

@@ -28,8 +28,7 @@ Text to Code document based API execution. Allows for external calls and human t
 - [x] Prod build on images for ENV
 - [x] Separate env files (DB, APP, LOCAL) for development along with using in compose (APP, DB)
 - [x] Deleting documents should remove associated texts - soft delete - flag is_deleted, we keep texts for training (need to mention to users)
-- [ ] Update document response to return list of texts by id (render by order)
-- [ ] Function to get all texts by document (not lists by ids)
+- [x] Update document response to return list of texts by id (render by order)
 - [ ] Execute document stored in repo
 
 - [ ] Remove old tests/files that we dont need or old code

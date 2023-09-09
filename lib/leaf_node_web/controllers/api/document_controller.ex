@@ -114,7 +114,9 @@ defmodule LeafNodeWeb.Api.DocumentController do
 
     # TODO: We can look at the an optional run with logs returned - we dont otherwise and rely on document result
     result = %{
-      "document_result" => Map.get(paragraph_execution_results, document_result, document_result)
+      "document_result" => check_boolean_result(
+        Map.get(paragraph_execution_results, document_result, document_result)
+      )
     }
 
     case status do
@@ -139,7 +141,9 @@ defmodule LeafNodeWeb.Api.DocumentController do
 
     # TODO: We can look at the an optional run with logs returned - we dont otherwise and rely on document result
     result = %{
-      "document_result" => Map.get(paragraph_execution_results, document_result, document_result),
+      "document_result" => check_boolean_result(
+        Map.get(paragraph_execution_results, document_result, document_result)
+      ),
       "paragraph_results" => paragraph_execution_results
     }
 
@@ -154,5 +158,14 @@ defmodule LeafNodeWeb.Api.DocumentController do
     conn
       |> put_resp_content_type("application/json")
       |> send_resp(status, Jason.encode!(data))
+  end
+
+  # here we check if the value can be a boolean, we then change the type to the correct boolean one
+  defp check_boolean_result(value) do
+    case value do
+      "true" -> true
+      "false" -> false,
+      _ -> value
+    end
   end
 end

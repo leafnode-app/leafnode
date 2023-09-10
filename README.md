@@ -60,6 +60,7 @@ Text to Code document based API execution. Allows for external calls and human t
 - [x] Postgres w/ Ecto setup (removal of DETs but keep ETS)
 - [x] Docker and containerizing the FE/BE and Database - folder structure all under one project
 - [ ] UI / web app
+- [ ] tally.so - doc design for creating docs
 
 ## Next parts
 - [ ] User table (env user first - root user, then later registering and usage)

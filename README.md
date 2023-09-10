@@ -47,7 +47,13 @@ Text to Code document based API execution. Allows for external calls and human t
 - [ ] Uptime kuma and status
 - [ ] notification service - https://ntfy.sh/
 - [ ] auto deploy and job to auto pull and run on vm
+- [ ] Some demos, examples (2-3)
 
+## Functions to potentially add
+- [ ] HTTP function (GET/POST)
+    - HTTP headers might not be needed as this is a security concern and might require clever configs
+- [ ] String operations (lowercase, uppercase)
+- [ ] Some form of notification?
 
 ## Missing Important Pieces
 - [x] Postman collection for the endpoints
@@ -55,3 +61,10 @@ Text to Code document based API execution. Allows for external calls and human t
 - [x] Docker and containerizing the FE/BE and Database - folder structure all under one project
 - [ ] UI / web app
 
+## Next parts
+- [ ] User table (env user first - root user, then later registering and usage)
+- [ ] Access keys
+- [ ] Masking Urls
+- [ ] Configs/Constnts? - accessible through doc that you can save
+
+We need to rethink about the tables and accociations of these

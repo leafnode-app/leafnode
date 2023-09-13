@@ -61,6 +61,7 @@ Text to Code document based API execution. Allows for external calls and human t
 - [x] Docker and containerizing the FE/BE and Database - folder structure all under one project
 - [ ] UI / web app
 - [ ] tally.so - doc design for creating docs
+- [ ] https://cruip.com/3-examples-of-brilliant-vertical-timelines-with-tailwind-css/#:~:text=To%20create%20the%20vertical%20line,last%20element%20of%20the%20timeline.
 
 ## Next parts
 - [ ] User table (env user first - root user, then later registering and usage)

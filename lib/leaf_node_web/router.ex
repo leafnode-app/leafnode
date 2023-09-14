@@ -1,7 +1,6 @@
 defmodule LeafNodeWeb.Router do
-  # Web
-  # alias Web.PageController
   # API
+  alias LeafNodeWeb.Web
   alias LeafNodeWeb.Api.{DocumentController, TextController}
 
   use LeafNodeWeb, :router
@@ -24,6 +23,16 @@ defmodule LeafNodeWeb.Router do
   pipeline :validate_access_key do
     # TODO: THIS NEEDS TO COME FROM ENV VARIABLE - Bearer token creation
     plug LeafNodeWeb.Plugs.AccessKeyAuth
+  end
+
+  # Browser pages
+  scope "/", Web do
+    pipe_through :browser
+
+    get "/", PageStaticController, :documents
+    get "/document/:id", PageStaticController, :document
+    # get "/access_keys", PageStaticController, :access_keys
+    # get "/masking", PageStaticController, :masking
   end
 
   scope "/api/v1/documents" do

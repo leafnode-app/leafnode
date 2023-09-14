@@ -1,0 +1,93 @@
+<!-- Flash messages -->
+<.flash_group flash={@flash} />
+
+<!-- Header -->
+<div class="mb-4">
+  <h1 class="text-2xl font-semibold mb-1">Document Name</h1>
+  <h6 class="text-lg text-gray-400">Description</h6>
+  <div class="mt-2">
+    <!-- Primary Button -->
+    <button class="bg-blue-700 hover:bg-blue-600 py-2 px-4 text-sm rounded transition duration-200 ease-in-out">
+      Execute
+    </button>
+    <!-- Secondary Button -->
+    <button class="bg-gray-700 hover:bg-gray-600 py-2 px-4 text-sm rounded transition duration-200 ease-in-out">
+      Settings
+    </button>
+  </div>
+</div>
+
+<!-- Vertical Timeline -->
+<div class="relative">
+  <div class="absolute top-0 h-full w-0.5 bg-gray-500"></div>
+
+  <ul class="space-y-4">
+    <!-- Timeline Item 1 -->
+    <li class="bg-gray-700 p-4 ml-5 rounded-lg flex">
+      <div class="rounded-full bg-gray-500 h-6 w-6 mt-2"></div>
+      <div class="flex-1 ml-4">
+        <div class="flex justify-between">
+          <div class="text-gray-400 text-xs mb-2">ID: 12345</div>
+          <input type="checkbox" class="form-checkbox h-4 w-4 text-blue-600">
+        </div>
+        <textarea class="bg-gray-600 rounded p-2 w-full text-white outline-none" placeholder="Add your text here"></textarea>
+        <div class="flex justify-end space-x-2 mt-2">
+          <!-- Primary Button -->
+          <button class="bg-blue-700 hover:bg-blue-600 text-white py-1 px-3 rounded text-sm transition duration-200 ease-in-out">
+            Save
+          </button>
+          <!-- Secondary Button -->
+          <button class="bg-gray-600 hover:bg-gray-500 text-white py-1 px-3 rounded text-sm transition duration-200 ease-in-out">
+            Generate Code
+          </button>
+          <!-- Destructive Button -->
+          <button class="bg-red-700 hover:bg-red-600 text-white py-1 px-3 rounded text-sm transition duration-200 ease-in-out">
+            Delete
+          </button>
+        </div>
+        <div class="bg-gray-800 p-2 rounded mt-5">
+          <!-- Pseudo Code -->
+          <pre class="text-gray-300 text-sm">console.log("Hello, world!");</pre>
+        </div>
+      </div>
+    </li>
+
+    <li class="bg-gray-700 p-4 ml-5 rounded-lg flex">
+      <div class="rounded-full bg-gray-500 h-6 w-6 mt-2"></div>
+      <div class="flex-1 ml-4">
+        <div class="flex justify-between">
+          <div class="text-gray-400 text-xs mb-2">ID: 54321</div>
+          <input type="checkbox" class="form-checkbox h-4 w-4 text-blue-600">
+        </div>
+        <textarea class="bg-gray-600 rounded p-2 w-full text-white outline-none" placeholder="Add your text here"></textarea>
+        <div class="flex justify-end space-x-2 mt-2">
+          <!-- Primary Button -->
+          <button class="bg-blue-700 hover:bg-blue-600 text-white py-1 px-3 rounded text-sm transition duration-200 ease-in-out">
+            Save
+          </button>
+          <!-- Secondary Button -->
+          <button class="bg-gray-600 hover:bg-gray-500 text-white py-1 px-3 rounded text-sm transition duration-200 ease-in-out">
+            Generate Code
+          </button>
+          <!-- Destructive Button -->
+          <button class="bg-red-700 hover:bg-red-600 text-white py-1 px-3 rounded text-sm transition duration-200 ease-in-out">
+            Delete
+          </button>
+        </div>
+        <%!-- <div class="bg-gray-800 p-2 rounded mt-5">
+          <!-- Pseudo Code -->
+          <pre class="text-gray-300 text-sm">console.log("Hello, world!");</pre>
+        </div> --%>
+      </div>
+    </li>
+
+    <!-- Add New Timeline Item -->
+    <li class="flex items-start space-x-4 ml-5">
+      <div class="rounded-full bg-gray-500 h-6 w-6 mt-1.5"></div>
+      <!-- Secondary Button -->
+      <button class="bg-gray-700 hover:bg-gray-600 py-2 px-4 rounded-lg transition duration-200 ease-in-out flex-1 text-center">
+        Add new timeline item
+      </button>
+    </li>
+  </ul>
+</div>

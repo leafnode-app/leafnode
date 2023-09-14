@@ -1,32 +1,41 @@
-<header class="px-4 sm:px-6 lg:px-8">
-  <div class="flex items-center justify-between border-b border-zinc-100 py-3 text-sm">
-    <div class="flex items-center gap-4">
-      <a href="/">
-        <img src={~p"/images/logo.svg"} width="36" />
-      </a>
-      <p class="bg-brand/5 text-brand rounded-full px-2 font-medium leading-6">
-        v<%= Application.spec(:phoenix, :vsn) %>
-      </p>
-    </div>
-    <div class="flex items-center gap-4 font-semibold leading-6 text-zinc-900">
-      <a href="https://twitter.com/elixirphoenix" class="hover:text-zinc-700">
-        @elixirphoenix
-      </a>
-      <a href="https://github.com/phoenixframework/phoenix" class="hover:text-zinc-700">
-        GitHub
-      </a>
-      <a
-        href="https://hexdocs.pm/phoenix/overview.html"
-        class="rounded-lg bg-zinc-100 px-2 py-1 hover:bg-zinc-200/80"
-      >
-        Get Started <span aria-hidden="true">&rarr;</span>
+<!-- Flash messages -->
+<.flash_group flash={@flash} />
+
+<!-- Main container -->
+<div class="flex h-screen bg-gray-900 font-sans text-gray-100">
+
+  <!-- Sidebar -->
+  <aside class="bg-gray-800 w-64 min-h-screen p-4 fixed">
+    <!-- Logo section -->
+    <div class="flex items-center mb-8">
+      <a href="/" class="text-lg font-semibold tracking-widest">
+        <%!-- <img src="/images/logo.svg" width="36" /> --%>
+        LOGO
       </a>
     </div>
-  </div>
-</header>
-<main class="px-4 py-20 sm:px-6 lg:px-8">
-  <div class="mx-auto max-w-2xl">
-    <.flash_group flash={@flash} />
-    <%= @inner_content %>
-  </div>
-</main>
+
+    <!-- Navigation -->
+    <ul class="space-y-4">
+      <li>
+        <a class="hover:bg-gray-700 block py-2 px-4 rounded transition duration-200 ease-in-out" href="/">Documents</a>
+      </li>
+      <li>
+        <a class="text-gray-500 cursor-not-allowed block py-2 px-4 rounded">Access Keys</a>
+      </li>
+      <li>
+        <a class="text-gray-500 cursor-not-allowed block py-2 px-4 rounded">Masking</a>
+      </li>
+    </ul>
+  </aside>
+
+  <!-- Content Pane -->
+  <main class="ml-64 bg-gray-900 flex-1 p-8 min-h-screen overflow-y-auto">
+    <div class="max-w-5xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+      <!-- Card -->
+      <div class="bg-gray-800 p-8 rounded-lg shadow-md text-gray-100">
+        <%= @inner_content %>
+      </div>
+    </div>
+  </main>
+
+</div>

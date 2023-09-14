@@ -1,8 +1,6 @@
 # Use an official Elixir runtime as a parent image
 FROM --platform=linux/arm64 arm64v8/elixir:latest
 
-#TODO: Postgress tools so we can listen on ready to put in script that builds and migrates
-
 # Install inotify-tools
 RUN apt-get update && apt-get install -y inotify-tools
 
@@ -21,4 +19,10 @@ RUN mix deps.get
 # Copy the current directory contents into the container
 COPY . .
 
+# Build Assets
+RUN mix assets.setup
+RUN mix assets.build
+RUN mix assets.deploy
+
+# Define the entrypoint script
 CMD ["/app/entrypoint.sh"]

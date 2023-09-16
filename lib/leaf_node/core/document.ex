@@ -11,8 +11,13 @@ defmodule LeafNode.Core.Documents do
   def create_document() do
     changeset = LeafNodeWeb.Models.Document.changeset(%LeafNodeWeb.Models.Document{result: "false"}, %{})
 
-    case LeafNodeRepo.insert(changeset) do
-      {:ok, _} -> {:ok, "Successfully created document"}
+    case {_, result} = LeafNodeRepo.insert(changeset) do
+      {:ok, _} ->
+        {:ok,
+          %{
+            id: Map.get(result, :id)
+          }
+        }
       {:error, _} -> {:error, "There was a problem creating document"}
     end
   end

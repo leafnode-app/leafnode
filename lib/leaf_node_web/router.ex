@@ -3,7 +3,9 @@ defmodule LeafNodeWeb.Router do
   alias LeafNodeWeb.Web
   alias LeafNodeWeb.Api.{DocumentController, TextController}
 
-  use LeafNodeWeb, :router
+  use Phoenix.Router
+  import Phoenix.LiveView.Router
+  # use LeafNodeWeb, :router
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -29,10 +31,12 @@ defmodule LeafNodeWeb.Router do
   scope "/", Web do
     pipe_through :browser
 
-    get "/", PageStaticController, :documents
+    live "/", Live.Documents, :documents
     get "/document/:id", PageStaticController, :document
     # get "/access_keys", PageStaticController, :access_keys
     # get "/masking", PageStaticController, :masking
+    # TODO: test the live views ere
+    live "/live", Live.TestLive
   end
 
   scope "/api/v1/documents" do

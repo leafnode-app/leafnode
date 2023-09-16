@@ -51,6 +51,8 @@ Text to Code document based API execution. Allows for external calls and human t
 - [ ] Uptime kuma and status
 - [ ] notification service - https://ntfy.sh/
 - [ ] auto deploy and job to auto pull and run on vm
+- [ ] Easy way to copy IDs of text
+- [ ] Getting the url of document easily (to get if you want to use externally)
 - [ ] Some demos, examples (2-3)
 
 ## Functions to potentially add
@@ -64,8 +66,7 @@ Text to Code document based API execution. Allows for external calls and human t
 - [x] Postgres w/ Ecto setup (removal of DETs but keep ETS)
 - [x] Docker and containerizing the FE/BE and Database - folder structure all under one project
 - [x] UI / web app
-- [ ] tally.so - doc design for creating docs
-- [ ] https://cruip.com/3-examples-of-brilliant-vertical-timelines-with-tailwind-css/#:~:text=To%20create%20the%20vertical%20line,last%20element%20of%20the%20timeline.
+- [ ] fine tune dataset
 
 ## Next parts
 - [ ] User table (env user first - root user, then later registering and usage)

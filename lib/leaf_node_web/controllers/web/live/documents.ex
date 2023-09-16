@@ -20,8 +20,8 @@ defmodule LeafNodeWeb.Web.Live.Documents do
       <% else %>
         <ul class="space-y-4">
           <%= for document <- @documents do %>
-            <li>
-              <a class="block bg-gray-700 hover:bg-gray-600 transition duration-200 ease-in-out p-4 rounded-lg">
+            <li phx-click="document_edit" phx-value-id={document.id} >
+              <a class="cursor:pointer block bg-gray-700 hover:bg-gray-600 transition duration-200 ease-in-out p-4 rounded-lg">
                 <div class="flex justify-between items-center">
                   <div>
                     <h2 class="text-lg font-semibold text-white">
@@ -35,10 +35,10 @@ defmodule LeafNodeWeb.Web.Live.Documents do
                     </p>
                   </div>
                   <div class="space-x-2">
-                    <!-- Primary Button -->
+                    <%!-- <!-- Primary Button -->
                     <button phx-click="document_edit" phx-value-id={document.id} class="bg-blue-700 hover:bg-blue-600 text-white py-1 px-3 rounded text-sm transition duration-200 ease-in-out">
                       Edit
-                    </button>
+                    </button> --%>
                     <!-- Destructive Button -->
                     <button phx-click="document_delete" phx-value-id={document.id} class="bg-red-700 hover:bg-red-600 text-white py-1 px-3 rounded text-sm transition duration-200 ease-in-out">
                       Delete

@@ -3,7 +3,6 @@ defmodule LeafNodeWeb.Web.Live.Document do
 
   # Render function
   def render(assigns) do
-    # TODO: We need to move the layout to accept props
     ~H"""
       <!-- Header -->
       <div class="mb-4">
@@ -33,11 +32,10 @@ defmodule LeafNodeWeb.Web.Live.Document do
         <ul class="space-y-4">
           <%= for text_block <- @texts do %>
             <li class="bg-gray-700 p-4 ml-5 rounded-lg flex">
-              <div class="rounded-full bg-gray-500 h-6 w-6 mt-2"></div>
+              <div class={"rounded-full h-6 w-6 mt-2 #{if @document.result === text_block.id, do: "bg-blue-300", else: "bg-gray-500"}"}></div>
               <div class="flex-1 ml-4">
                 <div class="flex justify-between">
                   <div class="text-gray-400 text-xs mb-2"><%= text_block.id %> </div>
-                  <input value="test" type="checkbox" class="form-checkbox h-4 w-4 text-blue-600">
                 </div>
                 <form id={"form-#{text_block.id}"}>
                   <input
@@ -56,7 +54,7 @@ defmodule LeafNodeWeb.Web.Live.Document do
                     phx-click="generate_text_code"
                     phx-value-id={text_block.id}
                     class="bg-gray-600 hover:bg-gray-500 text-white py-1 px-3 rounded text-sm transition duration-200 ease-in-out">
-                    Generate Code
+                      Generate Code
                   </button>
                   <!-- Destructive Button -->
                   <button
@@ -70,6 +68,18 @@ defmodule LeafNodeWeb.Web.Live.Document do
                   <div class="bg-gray-800 p-2 rounded mt-5">
                     <!-- Pseudo Code -->
                     <pre class="text-gray-300 text-sm"><%= text_block.pseudo_code %></pre>
+                  </div>
+                  <div class="py-3 text-sm">
+                    <form id={"form-set-result-#{text_block.id}"}>
+                      <input
+                        phx-change="set_document_result"
+                        name={"document-result-toggle-#{text_block.id}"}
+                        phx-value-id={text_block.id}
+                        checked={@document.result === text_block.id}
+                        type="checkbox" class="mx-2 form-checkbox h-4 w-4 text-blue-600"
+                      >
+                      Set as document result
+                    </form>
                   </div>
                 <% end %>
               </div>
@@ -94,6 +104,7 @@ defmodule LeafNodeWeb.Web.Live.Document do
     Init func that is run on init of the view
   """
   def mount(%{ "id" => id}, _session, socket) do
+    # Phoenix.PubSub.subscribe(LeafNode.PubSub, "doc-channel-#{id}")
     # get the document initial data and the texts
     document = case LeafNode.Core.Documents.get_document(id) do
       {:ok, data} ->
@@ -108,6 +119,7 @@ defmodule LeafNodeWeb.Web.Live.Document do
       assign(socket, :id, id)
       |> assign(:document, document)
       |> assign(:texts, get_document_texts(id))
+      |> assign(:loading, nil)
     {:ok, socket}
   end
 
@@ -145,6 +157,54 @@ defmodule LeafNodeWeb.Web.Live.Document do
     {:noreply, assign(socket, :texts, texts)}
   end
 
+  def handle_event("set_document_result", params, socket) do
+    %{ "_target" => [item]} = params
+
+    # we will not get data on a false value, so we make a fallback for a false state match
+    result_toggle_check = try do
+      %{ "_target" => _, ^item => state} = params
+      %{ "item" => item, "status" => state}
+    rescue _e ->
+      %{ "item" => item, "status" => "false" }
+    end
+
+    # compare the status of checkbox with a default on false set
+    %{ "item" => item, "status" => status} = result_toggle_check
+
+    # create relevant payload based on false but compare if selected result - false (turn off)
+    result = if status === "false" do
+      Map.get(socket.assigns, "result") === item
+      "false"
+    else
+      String.split(item, "document-result-toggle-") |> Enum.at(1)
+    end
+
+    # payload for document update
+    payload = %{
+      "id" => socket.assigns.id,
+      "result" => result
+    }
+
+    document = case LeafNode.Core.Documents.edit_document(payload) do
+      {:ok, _data} ->
+        case LeafNode.Core.Documents.get_document(socket.assigns.id) do
+          {:ok, data} ->
+            data
+          {:error, err} ->
+            IO.inspect("There was a problem getting the document: #{socket.assigns.id} with error: #{err}")
+            %{}
+          end
+      {:error, err} ->
+        IO.inspect("There was a problem getting the document: #{socket.assigns.id} with error: #{err}")
+        %{}
+    end
+
+    # # we add the id to the socket so we have the data for later if needed
+    socket = assign(socket, :document, document)
+
+    {:noreply, socket}
+  end
+
   def handle_event("delete_text_block", %{ "id" => id, "value" => _}, socket) do
     texts = case LeafNode.Core.Text.edit_text(%{
         "id" => id,
@@ -161,7 +221,9 @@ defmodule LeafNodeWeb.Web.Live.Document do
   end
 
   def handle_event("generate_text_code", %{ "id" => id}, socket) do
-    IO.inspect("Generate code for text block")
+    # start loader
+    # Phoenix.PubSub.broadcast(LeafNode.PubSub, "doc-channel-#{socket.assigns.id}", {:loading, id})
+
     texts = case LeafNode.Core.Text.generate_code(id) do
       {:ok, _data} ->
         get_document_texts(socket.assigns.id)
@@ -169,6 +231,7 @@ defmodule LeafNodeWeb.Web.Live.Document do
         IO.inspect("Error get the geting texts for the document: #{id} with the error #{err}")
         get_document_texts(socket.assigns.id)
     end
+    # Phoenix.PubSub.broadcast(LeafNode.PubSub, "doc-channel-#{socket.assigns.id}", {:loading, nil})
     {:noreply, assign(socket, :texts, texts)}
   end
 
@@ -191,8 +254,12 @@ defmodule LeafNodeWeb.Web.Live.Document do
         get_document_texts(id)
     end
 
-    IO.inspect(texts)
     {:noreply, assign(socket, :texts, texts)}
+  end
+
+  # handle info is used to manage events on channels
+  def handle_info({:loading, text_block_id}, socket) do
+    {:noreply, assign(socket, loading: text_block_id)}
   end
 
 

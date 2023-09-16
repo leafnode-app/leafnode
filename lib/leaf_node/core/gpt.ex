@@ -101,17 +101,6 @@ defmodule LeafNode.Core.Gpt do
         ],
         recv_timeout: 2000
       )
-      IO.inspect("status")
-      IO.inspect(status)
-      IO.inspect("=====")
-      IO.inspect("resp")
-      IO.inspect(resp)
-      IO.inspect("=====")
-      IO.inspect("url")
-      IO.inspect("https://api.openai.com/v1/chat/completions")
-      IO.inspect("=====")
-      IO.inspect("Jason.encode!(body_payload)")
-      IO.inspect(Jason.encode!(body_payload))
       case status do
         :ok -> handle_response(resp)
         :error -> {:error, "There was an error: #{resp}"}

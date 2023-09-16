@@ -33,8 +33,12 @@ Text to Code document based API execution. Allows for external calls and human t
 - [x] multiple compose files for each env? https://danielwachtel.com/devops/dockerizing-a-phoenix-app-with-a-postgresql-database
 - [x] Update postman documentation
 - [x] Execute document stored in repo
-- [ ] Table to have a copy of all texts regardless of deleted (we can then remove texts from text table and training data on the other)
+- [ ] Settings for the document edit
+- [x] Chose result of document
+- [ ] UX feedback? i.e generating code, etc
+- [ ] Execute document to test with payload
 
+- [ ] Table to have a copy of all texts regardless of deleted (we can then remove texts from text table and training data on the other)
 - [ ] Remove old tests/files that we dont need or old code
 - [ ] ETS to hash and store an executed document in memory for 1 day, if different input, change data, clear data otherwise
 - [ ] Update all comments and generate ex_docs
@@ -59,7 +63,7 @@ Text to Code document based API execution. Allows for external calls and human t
 - [x] Postman collection for the endpoints
 - [x] Postgres w/ Ecto setup (removal of DETs but keep ETS)
 - [x] Docker and containerizing the FE/BE and Database - folder structure all under one project
-- [ ] UI / web app
+- [x] UI / web app
 - [ ] tally.so - doc design for creating docs
 - [ ] https://cruip.com/3-examples-of-brilliant-vertical-timelines-with-tailwind-css/#:~:text=To%20create%20the%20vertical%20line,last%20element%20of%20the%20timeline.
 

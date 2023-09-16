@@ -90,13 +90,14 @@ defmodule LeafNode.Core.Text do
   """
   def list_texts(id) do
     query = from t in LeafNodeWeb.Models.Text,
-      where: t.document_id == ^id,
+      where: t.document_id == ^id and t.is_deleted != "true",
+      order_by: [asc: t.order],
       select: %{
         id: t.id,
         pseudo_code: t.pseudo_code,
         data: t.data,
         document_id: t.document_id,
-        order: t.order,
+        order: t.order
     }
 
     if Kernel.length(LeafNodeRepo.all(query)) > 0 do

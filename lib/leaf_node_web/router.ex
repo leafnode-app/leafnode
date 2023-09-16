@@ -31,10 +31,8 @@ defmodule LeafNodeWeb.Router do
   scope "/", Web do
     pipe_through :browser
 
-    live "/", Live.Documents, :documents
-    get "/document/:id", PageStaticController, :document
-    # get "/access_keys", PageStaticController, :access_keys
-    # get "/masking", PageStaticController, :masking
+    live "/", Live.Documents
+    live "/document/:id", Live.Document
     # TODO: test the live views ere
     live "/live", Live.TestLive
   end

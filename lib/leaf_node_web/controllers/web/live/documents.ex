@@ -15,7 +15,6 @@ defmodule LeafNodeWeb.Web.Live.Documents do
           Create
         </button>
       </div>
-
       <%= if is_nil(@documents) or Kernel.length(@documents) < 1 do %>
         <p> There are no documents, create a new one to get started</p>
       <% else %>
@@ -69,7 +68,8 @@ defmodule LeafNodeWeb.Web.Live.Documents do
   def handle_event("document_create", _unsigned_params, socket) do
     socket = case LeafNode.Core.Documents.create_document() do
       {:ok, data} ->
-        push_redirect(socket, to: "/document/#{data.id}")
+        socket = put_flash(socket, :info, "Successfully created document")
+        redirect(socket, to: "/document/#{data.id}")
       {:error, _err} ->
         socket
     end
@@ -78,7 +78,7 @@ defmodule LeafNodeWeb.Web.Live.Documents do
   end
 
   def handle_event("document_edit", %{ "id" => id, "value" => _}, socket) do
-    socket = push_redirect(socket, to: "/document/#{id}")
+    socket = push_navigate(socket, to: "/document/#{id}")
     {:noreply, socket}
   end
 
@@ -105,7 +105,10 @@ defmodule LeafNodeWeb.Web.Live.Documents do
       {:error, err} ->
         err
     end
-    {:noreply, assign(socket, :documents, documents)}
+
+    socket = put_flash(socket, :info, "Successfully remvoved document")
+    socket = assign(socket, :documents, documents)
+    {:noreply, socket}
   end
 
   # helper functions to manage the reuse of certain calls

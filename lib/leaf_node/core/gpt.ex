@@ -33,28 +33,30 @@ defmodule LeafNode.Core.Gpt.Prompt do
     The prompt function that we can call to get teh prompt
   """
   def query(input) do
-    "Given the function specifications and a paragraph of text, identify and return the first function call from the text in the format 'function(param1, param2, ...)'. If no function call is identified, return 'value(false)'.
-    Functions can call other paragraphs' results using the ref() function, which references the ID of the paragraph whose result is being called. If the paragraph contains a comparison or question about numbers, interpret it using comparison functions.
-    If it mentions returning a specific string value, use the 'value()' function with the string enclosed in double quotes (\"string\").
-    If it mentions input, we just return the input() function as the result.
-    Taking from input or any map should result in using get_map_val(map, location.goes.here) e.g location will be drilled points like this.is.a.location as a param
+    "Identify and return only the first function call from a given paragraph of text. The function call should be in the format 'function(param1, param2, [conditional])'. The '[conditional]' is an optional boolean parameter that controls the execution of the function. If no function call is identified, return 'value(false)'.
 
-    Function specifications:
+    Conditions and References:
+    - If the paragraph mentions a condition to check, like 'but check if ref(id)', include that condition as a third, optional argument in the function call. The third argument is a boolean.
+    - Functions can refer to other text results using the ref() function, which references the ID of the paragraph whose result is being called.
+    - For retrieving values from a map, phrases like 'inside the input', 'from the document map', or 'under the keys' should be interpreted as 'get_map_val(input(), \"key.goes.here\", [conditional])' or 'get_map_val(ref(ID), \"key.goes.here\", [conditional])' depending on the context.
+    - Phrases like 'get the input' should directly translate to 'input()'.
 
-    @spec add(number, number) :: number
-    @spec subtract(number, number) :: number
-    @spec multiply(number, number) :: number
-    @spec divide(number, number) :: number
-    @spec value(boolean | string | number) :: boolean | string | number
-    @spec get_map_val(map(), location) :: boolean | string | number
-    @spec ref(binary) :: term()
-    @spec equals(term(), term()) :: boolean
-    @spec not_equals(term(), term()) :: boolean
-    @spec less_than(number, number) :: boolean
-    @spec greater_than(number, number) :: boolean
-    @spec input() :: map()
+    Function Specifications:
+    - @spec add(number, number) :: number
+    - @spec subtract(number, number) :: number
+    - @spec multiply(number, number) :: number
+    - @spec divide(number, number) :: number
+    - @spec value(boolean | string | number) :: boolean | string | number
+    - @spec get_map_val(map(), location) :: boolean | string | number
+    - @spec ref(binary) :: term()
+    - @spec equals(term(), term()) :: boolean
+    - @spec not_equals(term(), term()) :: boolean
+    - @spec less_than(number, number) :: boolean
+    - @spec greater_than(number, number) :: boolean
+    - @spec input() :: map()
+    - @spec send_slack_message(string, string) :: string
 
-    Input paragraph: #{input}"
+    Input: #{input}"
   end
 end
 
@@ -99,7 +101,7 @@ defmodule LeafNode.Core.Gpt do
           {"Content-type", "application/json"},
           {"Authorization", "Bearer #{System.get_env("OPEN_AI")}"}
         ],
-        recv_timeout: 2000
+        recv_timeout: 15000
       )
       case status do
         :ok -> handle_response(resp)

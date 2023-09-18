@@ -33,10 +33,13 @@ Text to Code document based API execution. Allows for external calls and human t
 - [x] multiple compose files for each env? https://danielwachtel.com/devops/dockerizing-a-phoenix-app-with-a-postgresql-database
 - [x] Update postman documentation
 - [x] Execute document stored in repo
-- [ ] Settings for the document edit
 - [x] Chose result of document
+- [ ] if statements on each function - can be expressed - add the boolean? to the prompt input arity
+- [ ] string interpolation in value?
+- [ ] Settings for the document edit
 - [ ] UX feedback? i.e generating code, etc
 - [ ] Execute document to test with payload
+- [ ] Generated code hash vs text hash column (so we can let the user user if they need to regenerate)
 
 - [ ] Table to have a copy of all texts regardless of deleted (we can then remove texts from text table and training data on the other)
 - [ ] Remove old tests/files that we dont need or old code

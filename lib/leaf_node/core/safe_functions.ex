@@ -1,20 +1,6 @@
 defmodule LeafNode.Core.SafeFunctions do
   @moduledoc """
     The functions available to execute that are allowed from a client interaction through a LLM
-
-    @spec add(number, number) :: number
-    @spec subtract(number, number) :: number
-    @spec multiply(number, number) :: number
-    @spec divide(number, number) :: number
-    @spec value(boolean | string | number) :: boolean | string | number
-    @spec ref(binary) :: term()
-    @spec get_map_val(map, binary) :: term()
-    @spec equals(term(), term()) :: boolean
-    @spec not_equals(term(), term()) :: boolean
-    @spec less_than(number, number) :: boolean
-    @spec greater_than(number, number) :: boolean
-    @spec input() :: map()
-
   """
 
   # whitelist functions we allow to execute
@@ -30,10 +16,8 @@ defmodule LeafNode.Core.SafeFunctions do
     "less_than",
     "greater_than",
     "input",
-    "get_map_val"
-    # If statements
-    # if else statements
-    # http get/post - non auth header approach
+    "get_map_val",
+    "send_slack_message"
   ]
 
   @doc """
@@ -48,6 +32,7 @@ defmodule LeafNode.Core.SafeFunctions do
   """
   def add(item) do
     %{ "payload" => _ ,"meta_data" => _meta_data, "params" => params} = item
+
     result = try do
       Enum.reduce(params, fn (idx, acc) ->
         idx + acc
@@ -87,7 +72,6 @@ defmodule LeafNode.Core.SafeFunctions do
         "There was an error multiplying values. Confirm values are numbers and/or correctly referenced"
     end
 
-    IO.inspect(result)
     {:ok, result}
   end
 
@@ -120,9 +104,17 @@ defmodule LeafNode.Core.SafeFunctions do
   def ref(item) do
     %{ "meta_data" => meta_data, "params" => params} = item
 
+    doc_id = Map.get(meta_data, "document_id")
+
+    result = try do
     {_status, result} =
       GenServer.call(
         String.to_atom("history_" <> Map.get(meta_data, "document_id")), {:get_by_key, Enum.at(params, 0)})
+      result
+    catch
+      _type, _reason ->
+      "There was a problem getting the data referencing the text block: #{doc_id}"
+    end
 
     {:ok, result}
   end
@@ -175,5 +167,40 @@ defmodule LeafNode.Core.SafeFunctions do
   def input(item) do
     %{ "payload" => payload ,"meta_data" => _meta_data, "params" => _params} = item
     {:ok, payload}
+  end
+
+  @doc """
+    Send to slack channel
+  """
+  def send_slack_message(item) do
+    %{ "payload" => _payload ,"meta_data" => _meta_data, "params" => params} = item
+
+    result = try do
+      # Payload for slack text
+      payload = %{
+        "text" => to_string(Enum.at(params, 0))
+      }
+
+      # request to post messages to slack: #sim-transactions-test
+      {status, resp} = HTTPoison.post(
+        System.get_env("SLACK_WEBHOOK_URL"),
+        Jason.encode!(payload),
+        [
+          {"Content-type", "application/json"},
+        ],
+        recv_timeout: 10000
+      )
+
+      # check the status
+      case status do
+        :ok -> true
+        :error -> {:error, "There was an error: #{resp}"}
+      end
+    catch
+      _type, _reason ->
+        "There was an error sending a message to Slack"
+    end
+
+    {:ok, result}
   end
 end

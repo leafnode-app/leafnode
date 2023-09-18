@@ -31,6 +31,9 @@ defmodule LeafNode.Core.SafeFunctions do
     "greater_than",
     "input",
     "get_map_val"
+    # If statements
+    # if else statements
+    # http get/post - non auth header approach
   ]
 
   @doc """

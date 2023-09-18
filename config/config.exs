@@ -12,7 +12,7 @@ config :leaf_node,
 
 # Configures the endpoint
 config :leaf_node, LeafNodeWeb.Endpoint,
-  url: [host: "localhost"],
+  url: [host: System.get_env("PHX_HOST")],
   render_errors: [
     formats: [html: LeafNodeWeb.ErrorHTML, json: LeafNodeWeb.ErrorJSON],
     layout: false

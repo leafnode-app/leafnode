@@ -74,4 +74,10 @@ Text to Code document based API execution. Allows for external calls and human t
 - [ ] Masking Urls
 - [ ] Configs/Constnts? - accessible through doc that you can save
 
+## TODO - for sannit
+- check the realse functions to build docker prod
+- run through the code
+- add tests
+- add comments and doc testing
+
 We need to rethink about the tables and accociations of these

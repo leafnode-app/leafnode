@@ -40,6 +40,7 @@ defmodule LeafNode.Core.Gpt.Prompt do
     - Functions can refer to other text results using the ref() function, which references the ID of the paragraph whose result is being called.
     - For retrieving values from a map, phrases like 'inside the input', 'from the document map', or 'under the keys' should be interpreted as 'get_map_val(input(), \"key.goes.here\", [conditional])' or 'get_map_val(ref(ID), \"key.goes.here\", [conditional])' depending on the context.
     - Phrases like 'get the input' should directly translate to 'input()'.
+    - If a Ref is inferred, always make sure the value that is passed, is a \"string\" - never pass anything else as the input type needs to be a string to this function
 
     Function Specifications:
     - @spec add(number, number) :: number
@@ -48,7 +49,7 @@ defmodule LeafNode.Core.Gpt.Prompt do
     - @spec divide(number, number) :: number
     - @spec value(boolean | string | number) :: boolean | string | number
     - @spec get_map_val(map(), location) :: boolean | string | number
-    - @spec ref(binary) :: term()
+    - @spec ref(string) :: term()
     - @spec equals(term(), term()) :: boolean
     - @spec not_equals(term(), term()) :: boolean
     - @spec less_than(number, number) :: boolean

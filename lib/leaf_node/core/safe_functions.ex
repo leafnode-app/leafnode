@@ -30,9 +30,8 @@ defmodule LeafNode.Core.SafeFunctions do
   @doc """
     Add two values together
   """
-  def add(item) do
-    %{ "payload" => _ ,"meta_data" => _meta_data, "params" => params} = item
-
+  # TODO: Make sure to look at the types here that both are NUMBERS
+  def add(%{ "payload" => _ ,"meta_data" => _meta_data, "params" => params}) when length(params) == 2 do
     result = try do
       Enum.reduce(params, fn (idx, acc) ->
         idx + acc
@@ -45,11 +44,14 @@ defmodule LeafNode.Core.SafeFunctions do
     {:ok, result}
   end
 
+  # This is a fallback catch all if the above fails
+  def add(_), do: {:ok, "There was a problem. Verify the input data being passed to the funciton that it matches 2 params"}
+
   @doc """
     Minus two values from eachother
   """
-  def subtract(item) do
-    %{ "payload" => _ ,"meta_data" => _meta_data, "params" => params} = item
+  # TODO: Make sure to look at the types here that both are NUMBERS
+  def subtract(%{ "payload" => _ ,"meta_data" => _meta_data, "params" => params}) when length(params) === 2 do
     result = try do
       Enum.at(params, 0) - Enum.at(params, 1)
     catch
@@ -60,11 +62,14 @@ defmodule LeafNode.Core.SafeFunctions do
     {:ok, result}
   end
 
+  # This is a fallback catch all if the above fails
+  def subtract(_), do: {:ok, "There was a problem. Verify the input data being passed to the funciton that it matches 2 params"}
+
   @doc """
     Multiply two values together
   """
-  def multiply(item) do
-    %{ "payload" => _ ,"meta_data" => _meta_data, "params" => params} = item
+  # TODO: Make sure to look at the types here that both are NUMBERS
+  def multiply(%{ "payload" => _ ,"meta_data" => _meta_data, "params" => params}) when length(params) === 2 do
     result = try do
       Enum.at(params, 0) * Enum.at(params, 1)
     catch
@@ -75,11 +80,14 @@ defmodule LeafNode.Core.SafeFunctions do
     {:ok, result}
   end
 
+  # This is a fallback catch all if the above fails
+  def multiply(_), do: {:ok, "There was a problem. Verify the input data being passed to the funciton that it matches 2 params"}
+
   @doc """
     Divide a value against another
   """
-  def divide(item) do
-    %{ "payload" => _ ,"meta_data" => _meta_data, "params" => params} = item
+  # TODO: Make sure to look at the types here that both are NUMBERS
+  def divide(%{ "payload" => _ ,"meta_data" => _meta_data, "params" => params}) when length(params) === 2 do
     result = try do
       Enum.at(params, 0) / Enum.at(params, 1)
     catch
@@ -90,19 +98,25 @@ defmodule LeafNode.Core.SafeFunctions do
     {:ok, result}
   end
 
+  # This is a fallback catch all if the above fails
+  def divide(_), do: {:ok, "There was a problem. Verify the input data being passed to the funciton that it matches 2 params"}
+
   @doc """
     Return the passed value
   """
-  def value(item) do
-    %{ "payload" => _ ,"meta_data" => _meta_data, "params" => params} = item
+  # TODO: Make sure to look at the types here is either STRING | BOOLEAN | NUMBER
+  def value(%{ "payload" => _ ,"meta_data" => _meta_data, "params" => params}) when length(params) === 1 do
     {:ok, Enum.at(params, 0)}
   end
+
+  # This is a fallback catch all if the above fails
+  def value(_), do: {:ok, "There was a problem. Verify the input data being passed to the funciton that it matches 1 param"}
 
   @doc """
     Reference or get data from another paragraph
   """
-  def ref(item) do
-    %{ "meta_data" => meta_data, "params" => params} = item
+  # TODO: Make sure to look at the types here is a STRING
+  def ref(%{ "payload" => _ ,"meta_data" => meta_data, "params" => params}) when length(params) === 1 do
 
     doc_id = Map.get(meta_data, "document_id")
 
@@ -119,62 +133,81 @@ defmodule LeafNode.Core.SafeFunctions do
     {:ok, result}
   end
 
+  # This is a fallback catch all if the above fails
+  def ref(_), do: {:ok, "There was a problem. Verify the input data being passed to the funciton that it matches 1 param"}
+
   @doc """
     Get a value from a map
   """
-  def get_map_val(item) do
-    %{ "payload" => _ ,"meta_data" => _meta_data, "params" => params} = item
+  # TODO: Make sure to look at the types here is a MAP and a STRING
+  def get_map_val(%{ "payload" => _ ,"meta_data" => _meta_data, "params" => params}) when length(params) === 2 do
     payload_input = Enum.at(params, 0)
     location_param = Enum.at(params, 1)
     {:ok, Kernel.get_in(payload_input, String.split(location_param, "."))}
   end
 
+  # This is a fallback catch all if the above fails
+  def get_map_val(_), do: {:ok, "There was a problem. Verify the input data being passed to the funciton that it matches 2 params"}
+
   @doc """
     Check if one value equals another
   """
-  def equals(item) do
-    %{ "payload" => _ ,"meta_data" => _meta_data, "params" => params} = item
+  # TODO: Make sure to look at the types here that both NEED TO BE A PRIMITIVE OR A REF
+  def equals(%{ "payload" => _ ,"meta_data" => _meta_data, "params" => params}) when length(params) === 2 do
     {:ok, Enum.at(params, 0) === Enum.at(params, 1)}
   end
+
+  # This is a fallback catch all if the above fails
+  def equals(_), do: {:ok, "There was a problem. Verify the input data being passed to the funciton that it matches 2 params"}
 
   @doc """
     Check if one value is not equal to another
   """
-  def not_equals(item) do
-    %{ "payload" => _ ,"meta_data" => _meta_data, "params" => params} = item
+  # TODO: Make sure to look at the types here that both NEED TO BE A PRIMITIVE OR A REF
+  def not_equals(%{ "payload" => _ ,"meta_data" => _meta_data, "params" => params}) when length(params) === 2 do
     {:ok, Enum.at(params, 0) !== Enum.at(params, 1)}
   end
+
+  # This is a fallback catch all if the above fails
+  def not_equals(_), do: {:ok, "There was a problem. Verify the input data being passed to the funciton that it matches 2 params"}
 
   @doc """
     Check if one value is less than another
   """
-  def less_than(item) do
-    %{ "payload" => _ ,"meta_data" => _meta_data, "params" => params} = item
+  # TODO: Make sure to look at the types here that both NEED TO BE NUMBERS
+  def less_than(%{ "payload" => _ ,"meta_data" => _meta_data, "params" => params}) when length(params) === 2 do
     {:ok, Enum.at(params, 0) < Enum.at(params, 1)}
   end
+
+  # This is a fallback catch all if the above fails
+  def less_than(_), do: {:ok, "There was a problem. Verify the input data being passed to the funciton that it matches 2 params"}
 
   @doc """
     Check if one value is greater than another
   """
-  def greater_than(item) do
-    %{ "payload" => _ ,"meta_data" => _meta_data, "params" => params} = item
+  def greater_than(%{ "payload" => _ ,"meta_data" => _meta_data, "params" => params}) when length(params) === 2 do
     {:ok, Enum.at(params, 0) > Enum.at(params, 1)}
   end
+
+  # This is a fallback catch all if the above fails
+  def greater_than(_), do: {:ok, "There was a problem. Verify the input data being passed to the funciton that it matches 2 params"}
 
   @doc """
     Get the input value passed
   """
-  def input(item) do
-    %{ "payload" => payload ,"meta_data" => _meta_data, "params" => _params} = item
+  # TODO: Make sure to look at the types here are a MAP
+  def input(%{ "payload" => payload ,"meta_data" => _meta_data, "params" => params}) when length(params) === 1 do
     {:ok, payload}
   end
+
+  # This is a fallback catch all if the above fails
+  def input(_), do: {:ok, "There was a problem. Verify the input data being passed to the funciton that it matches 1 param"}
 
   @doc """
     Send to slack channel
   """
-  def send_slack_message(item) do
-    %{ "payload" => _payload ,"meta_data" => _meta_data, "params" => params} = item
-
+  # TODO: Make sure to look at the types here that IS A STRING
+  def send_slack_message(%{ "payload" => _payload ,"meta_data" => _meta_data, "params" => params}) when length(params) === 1 do
     result = try do
       # Payload for slack text
       payload = %{
@@ -203,4 +236,10 @@ defmodule LeafNode.Core.SafeFunctions do
 
     {:ok, result}
   end
+
+  # This is a fallback catch all if the above fails
+  def send_slack_message(_), do: {:ok, "There was a problem. Verify the input data being passed to the funciton that it matches 1 param"}
 end
+
+#TODO: Consider moving the functions in separate modules
+#TODO: Another function guard for extra param being a boolean

@@ -4,7 +4,7 @@
 Text to Code document based API execution. Allows for external calls and human text execution
 
 
-## TODO
+## Phase 1
 - [x] Init the memory data to sync with persitence data on startup
 - [x] Update prompt result format change -> fun(item1, item2)
 - [x] Module for code generation and check whitelist
@@ -34,13 +34,16 @@ Text to Code document based API execution. Allows for external calls and human t
 - [x] Update postman documentation
 - [x] Execute document stored in repo
 - [x] Chose result of document
+- [ ] Input params - strict type checking to each function - dont crash system
 - [ ] if statements on each function - can be expressed - add the boolean? to the prompt input arity
+- [ ] Investigate Training
+
+## Phase 2
 - [ ] string interpolation in value?
 - [ ] Settings for the document edit
 - [ ] UX feedback? i.e generating code, etc
 - [ ] Execute document to test with payload
 - [ ] Generated code hash vs text hash column (so we can let the user user if they need to regenerate)
-
 - [ ] Table to have a copy of all texts regardless of deleted (we can then remove texts from text table and training data on the other)
 - [ ] Remove old tests/files that we dont need or old code
 - [ ] ETS to hash and store an executed document in memory for 1 day, if different input, change data, clear data otherwise

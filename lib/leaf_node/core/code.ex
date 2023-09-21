@@ -53,6 +53,8 @@ defmodule LeafNode.Core.Code do
           "type" => func_string
         }
       }
+      # TODO: Look at how we can dynamically use the functions modules?
+      # We want to avoid making atoms, so this might have the safe functions module first
       apply(LeafNode.Core.SafeFunctions, func_atom, [input])
     else
       {:error, "Function #{func_string} is not allowed"}

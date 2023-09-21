@@ -2,6 +2,20 @@ defmodule LeafNode.Core.SafeFunctions do
   @moduledoc """
     The functions available to execute that are allowed from a client interaction through a LLM
   """
+  alias LeafNode.Core.Functions.Add, as: Add
+  alias LeafNode.Core.Functions.Divide, as: Divide
+  alias LeafNode.Core.Functions.Equals, as: Equals
+  alias LeafNode.Core.Functions.GetMapVal, as: GetMapVal
+  alias LeafNode.Core.Functions.GreaterThan, as: GreaterThan
+  alias LeafNode.Core.Functions.Input, as: Input
+  alias LeafNode.Core.Functions.JoinString, as: JoinString
+  alias LeafNode.Core.Functions.LessThan, as: LessThan
+  alias LeafNode.Core.Functions.Multiply, as: Multiply
+  alias LeafNode.Core.Functions.NotEquals, as: NotEquals
+  alias LeafNode.Core.Functions.Ref, as: Ref
+  alias LeafNode.Core.Functions.SendSlackMessage, as: SendSlackMessage
+  alias LeafNode.Core.Functions.Subtract, as: Subtract
+  alias LeafNode.Core.Functions.Value, as: Value
 
   # whitelist functions we allow to execute
   @whitelist [
@@ -26,6 +40,42 @@ defmodule LeafNode.Core.SafeFunctions do
   """
   def allowed_functions() do
     @whitelist
+  end
+
+  # TODO: Here we add the modules that will be executed or attempted with a case
+  def execute(%{ "payload" => _ ,"meta_data" => meta_data, "params" => params} = data) do
+    case meta_data["func_string"] do
+      "add" ->
+        LeafNode.Core.Functions.Add.compute(params)
+      "subtract" ->
+        LeafNode.Core.Functions.Subtract.compute(params)
+      "multiply" ->
+        LeafNode.Core.Functions.Multiply.compute(params)
+      "divide" ->
+        LeafNode.Core.Functions.Divide.compute(params)
+      "value" ->
+        LeafNode.Core.Functions.Value.compute(params)
+      "ref" ->
+        LeafNode.Core.Functions.Ref.compute(params)
+      "equals" ->
+        LeafNode.Core.Functions.Equals.compute(params)
+      "not_equals" ->
+        LeafNode.Core.Functions.NotEquals.compute(params)
+      "less_than" ->
+        LeafNode.Core.Functions.LessThan.compute(params)
+      "greater_than" ->
+        LeafNode.Core.Functions.GreaterThan.compute(params)
+      "input" ->
+        LeafNode.Core.Functions.Input.compute(params)
+      "get_map_val" ->
+        LeafNode.Core.Functions.GetMapVal.compute(params)
+      "send_slack_message" ->
+        LeafNode.Core.Functions.SendSlackMessage.compute(params)
+      "join_string" ->
+        LeafNode.Core.Functions.JoinString.compute(params)
+      _ ->
+        "Function does not exist"
+    end
   end
 
   @doc """

@@ -2,20 +2,6 @@ defmodule LeafNode.Core.SafeFunctions do
   @moduledoc """
     The functions available to execute that are allowed from a client interaction through a LLM
   """
-  alias LeafNode.Core.Functions.Add, as: Add
-  alias LeafNode.Core.Functions.Divide, as: Divide
-  alias LeafNode.Core.Functions.Equals, as: Equals
-  alias LeafNode.Core.Functions.GetMapVal, as: GetMapVal
-  alias LeafNode.Core.Functions.GreaterThan, as: GreaterThan
-  alias LeafNode.Core.Functions.Input, as: Input
-  alias LeafNode.Core.Functions.JoinString, as: JoinString
-  alias LeafNode.Core.Functions.LessThan, as: LessThan
-  alias LeafNode.Core.Functions.Multiply, as: Multiply
-  alias LeafNode.Core.Functions.NotEquals, as: NotEquals
-  alias LeafNode.Core.Functions.Ref, as: Ref
-  alias LeafNode.Core.Functions.SendSlackMessage, as: SendSlackMessage
-  alias LeafNode.Core.Functions.Subtract, as: Subtract
-  alias LeafNode.Core.Functions.Value, as: Value
 
   # whitelist functions we allow to execute
   @whitelist [

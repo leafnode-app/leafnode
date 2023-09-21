@@ -34,9 +34,9 @@ Text to Code document based API execution. Allows for external calls and human t
 - [x] Update postman documentation
 - [x] Execute document stored in repo
 - [x] Chose result of document
+- [x] Investigate Training
 - [ ] Input params - strict type checking to each function - dont crash system
-- [ ] if statements on each function - can be expressed - add the boolean? to the prompt input arity
-- [ ] Investigate Training
+- [ ] Writing pseudo code manually -> This way we can generate text if we need but users dont need to use AI
 
 ## Phase 2
 - [ ] string interpolation in value?

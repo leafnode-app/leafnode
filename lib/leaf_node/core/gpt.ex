@@ -56,6 +56,7 @@ defmodule LeafNode.Core.Gpt.Prompt do
     - @spec greater_than(number, number) :: boolean
     - @spec input() :: map()
     - @spec send_slack_message(string, string) :: string
+    - @spec join_string(string, value()) :: string
 
     Input: #{input}"
   end
@@ -74,7 +75,6 @@ defmodule LeafNode.Core.Gpt do
     NOTE: This module will have set the params to a manageable temp and potentially limit input
     See body
   """
-  # TODO: Meta programming can be used here to generate the functions
   def prompt(msg) do
 
     prompt = LeafNode.Core.Gpt.Prompt.query(msg)

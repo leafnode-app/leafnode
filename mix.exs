@@ -53,7 +53,8 @@ defmodule LeafNode.MixProject do
       {:httpoison, "~> 2.0"},
       {:ex_doc, "~> 0.27", only: :dev, runtime: false},
       {:uuid, "~> 1.1"},
-      {:ex_heroicons, "~> 2.0.0"}
+      {:ex_heroicons, "~> 2.0.0"},
+      {:ex_json_schema, "~> 0.10.1"}
     ]
   end
 

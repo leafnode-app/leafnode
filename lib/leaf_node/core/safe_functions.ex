@@ -17,7 +17,8 @@ defmodule LeafNode.Core.SafeFunctions do
     "greater_than",
     "input",
     "get_map_val",
-    "send_slack_message"
+    "send_slack_message",
+    "join_string"
   ]
 
   @doc """
@@ -62,8 +63,42 @@ defmodule LeafNode.Core.SafeFunctions do
     {:ok, result}
   end
 
+@doc """
+    Minus two values from eachother
+  """
+  # TODO: Make sure to look at the types here that both are NUMBERS
+  def subtract(%{ "payload" => _ ,"meta_data" => _meta_data, "params" => params}) when length(params) === 2 do
+    result = try do
+      Enum.at(params, 0) - Enum.at(params, 1)
+    catch
+      _type, _reason ->
+        "There was an error subtracting values. Confirm values are numbers and/or correctly referenced"
+    end
+
+    {:ok, result}
+  end
+
   # This is a fallback catch all if the above fails
   def subtract(_), do: {:ok, "There was a problem. Verify the input data being passed to the funciton that it matches 2 params"}
+
+
+  @doc """
+   Join Two strings together
+  """
+  # TODO: Make sure to look at the types here that both are NUMBERS
+  def join_string(%{ "payload" => _ ,"meta_data" => _meta_data, "params" => params}) when length(params) === 2 do
+    result = try do
+      "#{Enum.at(params, 0)}#{Enum.at(params, 1)}"
+    catch
+      _type, _reason ->
+        "There was an error joining string values. Confirm values are of correct type  being passed through i.e \"strings\" need to be used "
+    end
+
+    {:ok, result}
+  end
+
+  # This is a fallback catch all if the above fails
+  def join_string(_), do: {:ok, "There was a problem. Verify the input data being passed to the funciton that it matches 2 params"}
 
   @doc """
     Multiply two values together

@@ -82,7 +82,7 @@ defmodule LeafNode.Core.SafeFunctions do
   end
 
   # This is a fallback catch all if the above fails
-  def add(_), do: {:ok, "There was a problem. Verify the input data being passed to the funciton that it matches 2 params"}
+  def add(_), do: {:ok, "There was a problem. Verify the input data being passed to the function that it matches 2 params"}
 
   @doc """
     Minus two values from eachother
@@ -115,7 +115,7 @@ defmodule LeafNode.Core.SafeFunctions do
   end
 
   # This is a fallback catch all if the above fails
-  def subtract(_), do: {:ok, "There was a problem. Verify the input data being passed to the funciton that it matches 2 params"}
+  def subtract(_), do: {:ok, "There was a problem. Verify the input data being passed to the function that it matches 2 params"}
 
 
   @doc """
@@ -134,7 +134,7 @@ defmodule LeafNode.Core.SafeFunctions do
   end
 
   # This is a fallback catch all if the above fails
-  def join_string(_), do: {:ok, "There was a problem. Verify the input data being passed to the funciton that it matches 2 params"}
+  def join_string(_), do: {:ok, "There was a problem. Verify the input data being passed to the function that it matches 2 params"}
 
   @doc """
     Multiply two values together
@@ -152,7 +152,7 @@ defmodule LeafNode.Core.SafeFunctions do
   end
 
   # This is a fallback catch all if the above fails
-  def multiply(_), do: {:ok, "There was a problem. Verify the input data being passed to the funciton that it matches 2 params"}
+  def multiply(_), do: {:ok, "There was a problem. Verify the input data being passed to the function that it matches 2 params"}
 
   @doc """
     Divide a value against another
@@ -170,7 +170,7 @@ defmodule LeafNode.Core.SafeFunctions do
   end
 
   # This is a fallback catch all if the above fails
-  def divide(_), do: {:ok, "There was a problem. Verify the input data being passed to the funciton that it matches 2 params"}
+  def divide(_), do: {:ok, "There was a problem. Verify the input data being passed to the function that it matches 2 params"}
 
   @doc """
     Return the passed value
@@ -181,7 +181,7 @@ defmodule LeafNode.Core.SafeFunctions do
   end
 
   # This is a fallback catch all if the above fails
-  def value(_), do: {:ok, "There was a problem. Verify the input data being passed to the funciton that it matches 1 param"}
+  def value(_), do: {:ok, "There was a problem. Verify the input data being passed to the function that it matches 1 param"}
 
   @doc """
     Reference or get data from another paragraph
@@ -205,7 +205,7 @@ defmodule LeafNode.Core.SafeFunctions do
   end
 
   # This is a fallback catch all if the above fails
-  def ref(_), do: {:ok, "There was a problem. Verify the input data being passed to the funciton that it matches 1 param"}
+  def ref(_), do: {:ok, "There was a problem. Verify the input data being passed to the function that it matches 1 param"}
 
   @doc """
     Get a value from a map
@@ -218,7 +218,7 @@ defmodule LeafNode.Core.SafeFunctions do
   end
 
   # This is a fallback catch all if the above fails
-  def get_map_val(_), do: {:ok, "There was a problem. Verify the input data being passed to the funciton that it matches 2 params"}
+  def get_map_val(_), do: {:ok, "There was a problem. Verify the input data being passed to the function that it matches 2 params"}
 
   @doc """
     Check if one value equals another
@@ -229,7 +229,7 @@ defmodule LeafNode.Core.SafeFunctions do
   end
 
   # This is a fallback catch all if the above fails
-  def equals(_), do: {:ok, "There was a problem. Verify the input data being passed to the funciton that it matches 2 params"}
+  def equals(_), do: {:ok, "There was a problem. Verify the input data being passed to the function that it matches 2 params"}
 
   @doc """
     Check if one value is not equal to another
@@ -240,7 +240,7 @@ defmodule LeafNode.Core.SafeFunctions do
   end
 
   # This is a fallback catch all if the above fails
-  def not_equals(_), do: {:ok, "There was a problem. Verify the input data being passed to the funciton that it matches 2 params"}
+  def not_equals(_), do: {:ok, "There was a problem. Verify the input data being passed to the function that it matches 2 params"}
 
   @doc """
     Check if one value is less than another
@@ -251,7 +251,7 @@ defmodule LeafNode.Core.SafeFunctions do
   end
 
   # This is a fallback catch all if the above fails
-  def less_than(_), do: {:ok, "There was a problem. Verify the input data being passed to the funciton that it matches 2 params"}
+  def less_than(_), do: {:ok, "There was a problem. Verify the input data being passed to the function that it matches 2 params"}
 
   @doc """
     Check if one value is greater than another
@@ -261,18 +261,15 @@ defmodule LeafNode.Core.SafeFunctions do
   end
 
   # This is a fallback catch all if the above fails
-  def greater_than(_), do: {:ok, "There was a problem. Verify the input data being passed to the funciton that it matches 2 params"}
+  def greater_than(_), do: {:ok, "There was a problem. Verify the input data being passed to the function that it matches 2 params"}
 
   @doc """
     Get the input value passed
   """
   # TODO: Make sure to look at the types here are a MAP
-  def input(%{ "payload" => payload ,"meta_data" => _meta_data, "params" => params}) when length(params) === 1 do
+  def input(%{ "payload" => payload ,"meta_data" => _meta_data, "params" => params}) do
     {:ok, payload}
   end
-
-  # This is a fallback catch all if the above fails
-  def input(_), do: {:ok, "There was a problem. Verify the input data being passed to the funciton that it matches 1 param"}
 
   @doc """
     Send to slack channel
@@ -309,7 +306,7 @@ defmodule LeafNode.Core.SafeFunctions do
   end
 
   # This is a fallback catch all if the above fails
-  def send_slack_message(_), do: {:ok, "There was a problem. Verify the input data being passed to the funciton that it matches 1 param"}
+  def send_slack_message(_), do: {:ok, "There was a problem. Verify the input data being passed to the function that it matches 1 param"}
 end
 
 #TODO: Consider moving the functions in separate modules

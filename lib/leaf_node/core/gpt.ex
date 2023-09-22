@@ -41,6 +41,17 @@ defmodule LeafNode.Core.Gpt.Prompt do
     - For retrieving values from a map, phrases like 'inside the input', 'from the document map', or 'under the keys' should be interpreted as 'get_map_val(input(), \"key.goes.here\", [conditional])' or 'get_map_val(ref(ID), \"key.goes.here\", [conditional])' depending on the context.
     - Phrases like 'get the input' should directly translate to 'input()'.
     - If a Ref is inferred, always make sure the value that is passed, is a \"string\" - never pass anything else as the input type needs to be a string to this function
+    - The ref function can be expressed in ways like refernce, get, fetch from other block, other text so make sure this and anything else that describes trying to use data from another block of text will use the ref function keeping its types in mind being passed
+    - with any of the mentioned arithmetic functions, use the int value of the number if a word variation was described regardless if part was using a int and the other wasnt
+    - value function only supports the type string, boolean, number. Nothing else
+    - the function get_map_val can be described in any way that expresses the use of a object, map, dictionary in any way along with the first paramater needing to be a object. This value can ref other values
+    - comparison function, equals, not_equals, less_than, greater_than - These need to have the same type in the arguments that will be compared against
+    - input is always the input function, make sure you look at any phrasing that results in getting input data, payload, document data, passed data etc. anything in any way that is similar to describing a payload input passed to a document or the system itself
+    - join_string function needs to make sure it always passes strings to the params, nothing else, they will need to be converted otherwise. Keep any phrase around joining, concat, interpolating, or anything similar expressing joining words or strings together
+    - if the input of a func is a reference to using another function or using another function that is here as an input, this does not need to have it casted to the input type - this system allows using functions together
+    - Slack is a IM system, look for any word that describes sending a message to it in some way. Any action that seems to describe posting a message to slack
+    - Make an educated guess if there is typo's, dont just fallback to false the user tried but had spelling errors
+    - If at anypoint the persin just types the function name, use it as is as well
 
     Function Specifications:
     - @spec add(number, number) :: number

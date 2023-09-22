@@ -6,25 +6,52 @@ defmodule LeafNodeWeb.Web.Live.Document do
     ~H"""
       <!-- Header -->
       <div class="mb-4">
-        <h1 class="text-2xl font-semibold mb-1"><%= @document.name %></h1>
-        <h6 class="text-lg text-gray-400"><%= @document.description %></h6>
-        <h6 class="text-sm text-gray-400"><%= @document.id %></h6>
-        <h6 class="text-sm text-gray-400">Document result: <%= @document.result %></h6>
-        <div class="mt-5">
-          <!-- Primary Button -->
-          <button
-            phx-click="document_execute"
-            class="bg-blue-700 hover:bg-blue-600 py-2 px-4 text-sm rounded transition duration-200 ease-in-out">
-            Execute
-          </button>
-          <!-- Secondary Button -->
-          <button
-            phx-click="document_settings"
-            class="bg-gray-700 hover:bg-gray-600 py-2 px-4 text-sm rounded transition duration-200 ease-in-out">
-            Edit Settings
-          </button>
-        </div>
+        <form>
+          <div class="mb-4">
+            <label for="document-title" class="text-l font-semibold text-gray-400">Title</label>
+            <input
+              id="document-title"
+              phx-debounce="200"
+              phx-change="update_title"
+              phx-value-id={"#{@document.id}-#{@document.name}"}
+              name={"document-name"}
+              class="bg-gray-600 rounded p-2 w-full text-white"
+              value={@document.name || "Untitled Document"}
+            />
+          </div>
+
+          <div class="mb-4">
+            <label for="document-description" class="text-l font-semibold text-gray-400">Description</label>
+            <input
+              id="document-description"
+              phx-debounce="200"
+              phx-change="update_description"
+              phx-value-id={"#{@document.id}-#{@document.description}"}
+              name={"document-description"}
+              class="bg-gray-600 rounded p-2 w-full text-white"
+              value={@document.description || "Untitled Document"}
+            />
+          </div>
+
+          <h6 class="text-sm text-gray-400"><%= @document.id %></h6>
+          <h6 class="text-sm text-gray-400">Document result: <%= @document.result %></h6>
+          <div class="mt-5">
+            <!-- Primary Button -->
+            <button
+              phx-click="document_execute"
+              class="bg-blue-700 hover:bg-blue-600 py-2 px-4 text-sm rounded transition duration-200 ease-in-out">
+              Execute
+            </button>
+            <!-- Secondary Button -->
+            <button
+              phx-click="document_settings"
+              class="bg-gray-700 hover:bg-gray-600 py-2 px-4 text-sm rounded transition duration-200 ease-in-out">
+              Edit Settings
+            </button>
+          </div>
+        </form>
       </div>
+
 
       <!-- Vertical Timeline -->
       <div class="relative">
@@ -33,7 +60,7 @@ defmodule LeafNodeWeb.Web.Live.Document do
           <%= for text_block <- @texts do %>
             <li class="bg-gray-700 p-4 ml-5 rounded-lg flex">
               <div class={"rounded-full h-6 w-6 mt-2 #{if @document.result === text_block.id, do: "bg-blue-300", else: "bg-gray-500"}"}></div>
-              <div class="flex-1 ml-4">
+              <div class="flex-1 ml-4 overflow-auto">
                 <div class="flex justify-between">
                   <div class="text-gray-400 text-xs mb-2"><%= text_block.id %> </div>
                 </div>
@@ -67,7 +94,7 @@ defmodule LeafNodeWeb.Web.Live.Document do
                 <%= if !is_nil(text_block.pseudo_code) do%>
                   <div class="bg-gray-800 p-2 rounded mt-5">
                     <!-- Pseudo Code -->
-                    <pre class="text-gray-300 text-sm"><%= text_block.pseudo_code %></pre>
+                    <pre class="text-gray-300 text-sm overflow-hidden"><%= text_block.pseudo_code %></pre>
                   </div>
                   <div class="py-3 text-sm">
                     <form id={"form-set-result-#{text_block.id}"}>
@@ -76,7 +103,7 @@ defmodule LeafNodeWeb.Web.Live.Document do
                         name={"document-result-toggle-#{text_block.id}"}
                         phx-value-id={text_block.id}
                         checked={@document.result === text_block.id}
-                        type="checkbox" class="mx-2 form-checkbox h-4 w-4 text-blue-600"
+                        type="checkbox" class="mx-2 custom-checkbox form-checkbox h-4 w-4 text-blue-600"
                       >
                       Set as document result
                     </form>
@@ -255,6 +282,62 @@ defmodule LeafNodeWeb.Web.Live.Document do
     end
 
     {:noreply, assign(socket, :texts, texts)}
+  end
+
+  def handle_event("update_title", params, socket) do
+    %{ "_target" => [item]} = params
+    %{ "_target" => _, ^item => text_value} = params
+
+     # document id relevant to the texts
+    id = socket.assigns.id
+    payload = %{
+      "id" => id,
+      "name" => text_value
+    }
+
+    document = case LeafNode.Core.Documents.edit_document(payload) do
+      {:ok, _data} ->
+        case LeafNode.Core.Documents.get_document(socket.assigns.id) do
+          {:ok, data} ->
+            data
+          {:error, err} ->
+            IO.inspect("There was a problem getting the document: #{socket.assigns.id} with error: #{err}")
+            %{}
+          end
+      {:error, err} ->
+        IO.inspect("There was a problem getting the document: #{socket.assigns.id} with error: #{err}")
+        %{}
+    end
+
+    {:noreply, assign(socket, :document, document)}
+  end
+
+  def handle_event("update_description", params, socket) do
+    %{ "_target" => [item]} = params
+    %{ "_target" => _, ^item => text_value} = params
+
+     # document id relevant to the texts
+    id = socket.assigns.id
+    payload = %{
+      "id" => id,
+      "description" => text_value
+    }
+
+    document = case LeafNode.Core.Documents.edit_document(payload) do
+      {:ok, _data} ->
+        case LeafNode.Core.Documents.get_document(socket.assigns.id) do
+          {:ok, data} ->
+            data
+          {:error, err} ->
+            IO.inspect("There was a problem getting the document: #{socket.assigns.id} with error: #{err}")
+            %{}
+          end
+      {:error, err} ->
+        IO.inspect("There was a problem getting the document: #{socket.assigns.id} with error: #{err}")
+        %{}
+    end
+
+    {:noreply, assign(socket, :document, document)}
   end
 
   # handle info is used to manage events on channels

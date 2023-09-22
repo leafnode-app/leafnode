@@ -33,43 +33,49 @@ defmodule LeafNode.Core.Gpt.Prompt do
     The prompt function that we can call to get teh prompt
   """
   def query(input) do
-    "Identify and return only the first function call from a given paragraph of text. The function call should be in the format 'function(param1, param2, [conditional])'. The '[conditional]' is an optional boolean parameter that controls the execution of the function. If no function call is identified, return 'value(false)'.
+    "# Function Identification Prompt
 
-    Conditions and References:
-    - If the paragraph mentions a condition to check, like 'but check if ref(id)', include that condition as a third, optional argument in the function call. The third argument is a boolean.
-    - Functions can refer to other text results using the ref() function, which references the ID of the paragraph whose result is being called.
-    - For retrieving values from a map, phrases like 'inside the input', 'from the document map', or 'under the keys' should be interpreted as 'get_map_val(input(), \"key.goes.here\", [conditional])' or 'get_map_val(ref(ID), \"key.goes.here\", [conditional])' depending on the context.
-    - Phrases like 'get the input' should directly translate to 'input()'.
-    - If a Ref is inferred, always make sure the value that is passed, is a \"string\" - never pass anything else as the input type needs to be a string to this function
-    - The ref function can be expressed in ways like refernce, get, fetch from other block, other text so make sure this and anything else that describes trying to use data from another block of text will use the ref function keeping its types in mind being passed
-    - with any of the mentioned arithmetic functions, use the int value of the number if a word variation was described regardless if part was using a int and the other wasnt
-    - value function only supports the type string, boolean, number. Nothing else
-    - the function get_map_val can be described in any way that expresses the use of a object, map, dictionary in any way along with the first paramater needing to be a object. This value can ref other values
-    - comparison function, equals, not_equals, less_than, greater_than - These need to have the same type in the arguments that will be compared against
-    - input is always the input function, make sure you look at any phrasing that results in getting input data, payload, document data, passed data etc. anything in any way that is similar to describing a payload input passed to a document or the system itself
-    - join_string function needs to make sure it always passes strings to the params, nothing else, they will need to be converted otherwise. Keep any phrase around joining, concat, interpolating, or anything similar expressing joining words or strings together
-    - if the input of a func is a reference to using another function or using another function that is here as an input, this does not need to have it casted to the input type - this system allows using functions together
-    - Slack is a IM system, look for any word that describes sending a message to it in some way. Any action that seems to describe posting a message to slack
-    - Make an educated guess if there is typo's, dont just fallback to false the user tried but had spelling errors
-    - If at anypoint the persin just types the function name, use it as is as well
+    ## Task
+    Identify and return the firstfunction call from the provided text paragraph. A function call should be in the format 'function(param1, param2, ...)'.
 
-    Function Specifications:
-    - @spec add(number, number) :: number
-    - @spec subtract(number, number) :: number
-    - @spec multiply(number, number) :: number
-    - @spec divide(number, number) :: number
-    - @spec value(boolean | string | number) :: boolean | string | number
-    - @spec get_map_val(map(), location) :: boolean | string | number
-    - @spec ref(string) :: term()
-    - @spec equals(term(), term()) :: boolean
-    - @spec not_equals(term(), term()) :: boolean
-    - @spec less_than(number, number) :: boolean
-    - @spec greater_than(number, number) :: boolean
-    - @spec input() :: map()
-    - @spec send_slack_message(string, string) :: string
-    - @spec join_string(string, value()) :: string
+    ## Conditions and References
+    - Include conditions, such as 'but check if ref(id),' as an optional boolean third argument in the function call.
+    - Functions must precisely match the input example types and should not be guessed.
+    - Functions can reference other text results using 'ref()', which assumes the input type is a 'string.'
+    - Phrases like 'inside the input,' 'from the document map,' or 'under the keys' should be interpreted as 'get_map_val(input(), \"key.goes.here\")' or 'get_map_val(ref(ID), \"key.goes.here\")' based on context.
+    - 'get the input' directly translates to 'input()'.
+    - Ensure arithmetic functions use integer values when words are used to describe numbers. Convert numeric words to numbers in the function call.
+    - 'value' function supports only strings, booleans, and numbers. Convert numeric words to numbers within the function call.
+    - Express 'get_map_val' in any way that uses an object as the first parameter, allowing references.
+    - Comparison functions (equals, not_equals, less_than, greater_than) require consistent argument types.
+    - 'input' always represents the input function for data retrieval.
+    - 'join_string' function should receive only strings as parameters.
 
-    Input: #{input}"
+    ## Function Specifications
+    - `add(number, number) :: number`
+    - `subtract(number, number) :: number`
+    - `multiply(number, number) :: number`
+    - `divide(number, number) :: number`
+    - `value(boolean | string | number) :: boolean | string | number`
+    - `get_map_val(map(), location) :: boolean | string | number`
+    - `ref(string) :: term()`
+    - `equals(term(), term()) :: boolean`
+    - `not_equals(term(), term()) :: boolean`
+    - `less_than(number, number) :: boolean`
+    - `greater_than(number, number) :: boolean`
+    - `input() :: map()`
+    - `send_slack_message(string, string) :: string`
+    - `join_string(string | value(), string | value()) :: string`
+
+    ## Additional Notes
+    - No need to cast the input of a function when it references another function.
+    - Detect actions related to sending messages to Slack.
+    - Correct minor typos and provide pseudo-code or if you can't infer, return value(false) - don't guess!.
+    - If a function name is mentioned alone, consider it as-is.
+    - If there's function call identified, return 'value(false)'.
+
+    Here's an example input:
+    #{input}"
   end
 end
 

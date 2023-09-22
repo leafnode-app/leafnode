@@ -51,7 +51,9 @@ defmodule LeafNode.Servers.ExecutionHistoryServer do
   defp get_by_key(key, state) do
     result = Map.get(state, key)
       case result do
-        nil -> {:error, "There was an error getting data"}
+        nil ->
+          IO.inspect("There was an error getting data")
+          {:error, %{}}
         _ ->
           {:ok, result}
       end

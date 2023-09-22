@@ -214,7 +214,13 @@ defmodule LeafNode.Core.SafeFunctions do
   def get_map_val(%{ "payload" => _ ,"meta_data" => _meta_data, "params" => params}) when length(params) === 2 do
     payload_input = Enum.at(params, 0)
     location_param = Enum.at(params, 1)
-    {:ok, Kernel.get_in(payload_input, String.split(location_param, "."))}
+
+    result = try do
+      Kernel.get_in(payload_input, String.split(location_param, "."))
+    rescue _ ->
+      %{}
+    end
+    {:ok, result}
   end
 
   # This is a fallback catch all if the above fails

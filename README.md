@@ -35,6 +35,7 @@ Text to Code document based API execution. Allows for external calls and human t
 - [x] Execute document stored in repo
 - [x] Chose result of document
 - [x] Investigate Training
+- [ ] Dynamic prompt from function file along with dynamic white list list
 - [ ] Input params - strict type checking to each function - dont crash system
 - [ ] Writing pseudo code manually -> This way we can generate text if we need but users dont need to use AI
 

@@ -1,0 +1,23 @@
+# pgsql creds and location
+export DB_HOSTNAME=
+export DB_URL=
+export DB_NAME=
+export DB_USER=
+export DB_PASS=
+export DB_PORT=
+
+# Open AI
+export OPEN_AI=
+export OPEN_AI_MODEL=gpt-3.5-turbo
+
+# Port
+export PORT=5000
+
+# Secret key
+export SECRET_KEY_BASE=
+
+# phx host
+PHX_HOST=localhost
+
+# Other
+export SLACK_WEBHOOK_URL=

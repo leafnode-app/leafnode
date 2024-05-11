@@ -1,5 +1,28 @@
-defmodule LeafNodeWeb.Web.Live.Document do
+defmodule LeafNodeWeb.Web.Live.Node do
   use LeafNodeWeb, :live_view
+
+  @doc """
+    Init func that is run on init of the view
+  """
+  def mount(%{ "id" => id}, _session, socket) do
+    # Phoenix.PubSub.subscribe(LeafNode.PubSub, "doc-channel-#{id}")
+    # get the node initial data and the texts
+    node = case LeafNode.Core.Documents.get_node(id) do
+      {:ok, data} ->
+        data
+      {:error, err} ->
+        IO.inspect("There was a problem getting the node: #{id} with error: #{err}")
+        %{}
+    end
+
+    # we add the id to the socket so we have the data for later if needed
+    socket =
+      assign(socket, :id, id)
+      |> assign(:node, node)
+      |> assign(:texts, get_document_texts(id))
+      |> assign(:loading, nil)
+    {:ok, socket}
+  end
 
   # Render function
   def render(assigns) do
@@ -8,33 +31,33 @@ defmodule LeafNodeWeb.Web.Live.Document do
       <div class="mb-4">
         <form>
           <div class="mb-4">
-            <label for="document-title" class="text-l font-semibold text-gray-400">Title</label>
+            <label for="node-title" class="text-l font-semibold text-gray-400">Title</label>
             <input
-              id="document-title"
+              id="node-title"
               phx-debounce="200"
               phx-change="update_title"
-              phx-value-id={"#{@document.id}-#{@document.name}"}
-              name={"document-name"}
+              phx-value-id={"#{@node.id}-#{@node.name}"}
+              name={"node-name"}
               class="bg-gray-600 rounded p-2 w-full text-white"
-              value={@document.name || "Untitled Document"}
+              value={@node.name || "Untitled Document"}
             />
           </div>
 
           <div class="mb-4">
-            <label for="document-description" class="text-l font-semibold text-gray-400">Description</label>
+            <label for="node-description" class="text-l font-semibold text-gray-400">Description</label>
             <input
-              id="document-description"
+              id="node-description"
               phx-debounce="200"
               phx-change="update_description"
-              phx-value-id={"#{@document.id}-#{@document.description}"}
-              name={"document-description"}
+              phx-value-id={"#{@node.id}-#{@node.description}"}
+              name={"node-description"}
               class="bg-gray-600 rounded p-2 w-full text-white"
-              value={@document.description || "Untitled Document"}
+              value={@node.description || "Untitled Document"}
             />
           </div>
 
-          <h6 class="text-sm text-gray-400"><%= @document.id %></h6>
-          <h6 class="text-sm text-gray-400">Document result: <%= @document.result %></h6>
+          <h6 class="text-sm text-gray-400"><%= @node.id %></h6>
+          <h6 class="text-sm text-gray-400">Document result: <%= @node.result %></h6>
           <div class="mt-5">
             <!-- Primary Button -->
             <button
@@ -59,7 +82,7 @@ defmodule LeafNodeWeb.Web.Live.Document do
         <ul class="space-y-4">
           <%= for text_block <- @texts do %>
             <li class="bg-gray-700 p-4 ml-5 rounded-lg flex">
-              <div class={"rounded-full h-6 w-6 mt-2 #{if @document.result === text_block.id, do: "bg-blue-300", else: "bg-gray-500"}"}></div>
+              <div class={"rounded-full h-6 w-6 mt-2 #{if @node.result === text_block.id, do: "bg-blue-300", else: "bg-gray-500"}"}></div>
               <div class="flex-1 ml-4 overflow-auto">
                 <div class="flex justify-between">
                   <div class="text-gray-400 text-xs mb-2"><%= text_block.id %> </div>
@@ -100,12 +123,12 @@ defmodule LeafNodeWeb.Web.Live.Document do
                     <form id={"form-set-result-#{text_block.id}"}>
                       <input
                         phx-change="set_document_result"
-                        name={"document-result-toggle-#{text_block.id}"}
+                        name={"node-result-toggle-#{text_block.id}"}
                         phx-value-id={text_block.id}
-                        checked={@document.result === text_block.id}
+                        checked={@node.result === text_block.id}
                         type="checkbox" class="mx-2 custom-checkbox form-checkbox h-4 w-4 text-blue-600"
                       >
-                      Set as document result
+                      Set as node result
                     </form>
                   </div>
                 <% end %>
@@ -128,29 +151,6 @@ defmodule LeafNodeWeb.Web.Live.Document do
   end
 
   @doc """
-    Init func that is run on init of the view
-  """
-  def mount(%{ "id" => id}, _session, socket) do
-    # Phoenix.PubSub.subscribe(LeafNode.PubSub, "doc-channel-#{id}")
-    # get the document initial data and the texts
-    document = case LeafNode.Core.Documents.get_document(id) do
-      {:ok, data} ->
-        data
-      {:error, err} ->
-        IO.inspect("There was a problem getting the document: #{id} with error: #{err}")
-        %{}
-    end
-
-    # we add the id to the socket so we have the data for later if needed
-    socket =
-      assign(socket, :id, id)
-      |> assign(:document, document)
-      |> assign(:texts, get_document_texts(id))
-      |> assign(:loading, nil)
-    {:ok, socket}
-  end
-
-  @doc """
     The events to manage the creation of documents
   """
   def handle_event("document_execute", _params, socket) do
@@ -159,12 +159,12 @@ defmodule LeafNodeWeb.Web.Live.Document do
   end
 
   def handle_event("document_settings", _params, socket) do
-    IO.inspect("Opening document settings")
+    IO.inspect("Opening node settings")
     {:noreply, socket}
   end
 
   def handle_event("save_document", _params, socket) do
-    IO.inspect("Save document settings")
+    IO.inspect("Save node settings")
     {:noreply, socket}
   end
 
@@ -177,7 +177,7 @@ defmodule LeafNodeWeb.Web.Live.Document do
         IO.inspect(data)
         get_document_texts(id)
       {:error, err} ->
-        IO.inspect("Error get the geting texts for the document: #{id} with the error #{err}")
+        IO.inspect("Error get the geting texts for the node: #{id} with the error #{err}")
         get_document_texts(id)
     end
 
@@ -203,31 +203,31 @@ defmodule LeafNodeWeb.Web.Live.Document do
       Map.get(socket.assigns, "result") === item
       "false"
     else
-      String.split(item, "document-result-toggle-") |> Enum.at(1)
+      String.split(item, "node-result-toggle-") |> Enum.at(1)
     end
 
-    # payload for document update
+    # payload for node update
     payload = %{
       "id" => socket.assigns.id,
       "result" => result
     }
 
-    document = case LeafNode.Core.Documents.edit_document(payload) do
+    node = case LeafNode.Core.Documents.edit_document(payload) do
       {:ok, _data} ->
-        case LeafNode.Core.Documents.get_document(socket.assigns.id) do
+        case LeafNode.Core.Documents.get_node(socket.assigns.id) do
           {:ok, data} ->
             data
           {:error, err} ->
-            IO.inspect("There was a problem getting the document: #{socket.assigns.id} with error: #{err}")
+            IO.inspect("There was a problem getting the node: #{socket.assigns.id} with error: #{err}")
             %{}
           end
       {:error, err} ->
-        IO.inspect("There was a problem getting the document: #{socket.assigns.id} with error: #{err}")
+        IO.inspect("There was a problem getting the node: #{socket.assigns.id} with error: #{err}")
         %{}
     end
 
     # # we add the id to the socket so we have the data for later if needed
-    socket = assign(socket, :document, document)
+    socket = assign(socket, :node, node)
 
     {:noreply, socket}
   end
@@ -240,7 +240,7 @@ defmodule LeafNodeWeb.Web.Live.Document do
       {:ok, _data} ->
         get_document_texts(socket.assigns.id)
       {:error, err} ->
-        IO.inspect("Error get the geting texts for the document: #{id} with the error #{err}")
+        IO.inspect("Error get the geting texts for the node: #{id} with the error #{err}")
         get_document_texts(socket.assigns.id)
     end
 
@@ -255,7 +255,7 @@ defmodule LeafNodeWeb.Web.Live.Document do
       {:ok, _data} ->
         get_document_texts(socket.assigns.id)
       {:error, err} ->
-        IO.inspect("Error get the geting texts for the document: #{id} with the error #{err}")
+        IO.inspect("Error get the geting texts for the node: #{id} with the error #{err}")
         get_document_texts(socket.assigns.id)
     end
     # Phoenix.PubSub.broadcast(LeafNode.PubSub, "doc-channel-#{socket.assigns.id}", {:loading, nil})
@@ -271,13 +271,13 @@ defmodule LeafNodeWeb.Web.Live.Document do
       "id" => String.split(item, "content-") |> Enum.at(1),
       "data" => String.trim(text_value)
     }
-    # document id relevant to the texts
+    # node id relevant to the texts
     id = socket.assigns.id
     texts = case LeafNode.Core.Text.edit_text(payload) do
       {:ok, _data} ->
         get_document_texts(id)
       {:error, err} ->
-        IO.inspect("Error get the geting texts for the document: #{id} with the error #{err}")
+        IO.inspect("Error get the geting texts for the node: #{id} with the error #{err}")
         get_document_texts(id)
     end
 
@@ -288,56 +288,56 @@ defmodule LeafNodeWeb.Web.Live.Document do
     %{ "_target" => [item]} = params
     %{ "_target" => _, ^item => text_value} = params
 
-     # document id relevant to the texts
+     # node id relevant to the texts
     id = socket.assigns.id
     payload = %{
       "id" => id,
       "name" => text_value
     }
 
-    document = case LeafNode.Core.Documents.edit_document(payload) do
+    node = case LeafNode.Core.Documents.edit_document(payload) do
       {:ok, _data} ->
-        case LeafNode.Core.Documents.get_document(socket.assigns.id) do
+        case LeafNode.Core.Documents.get_node(socket.assigns.id) do
           {:ok, data} ->
             data
           {:error, err} ->
-            IO.inspect("There was a problem getting the document: #{socket.assigns.id} with error: #{err}")
+            IO.inspect("There was a problem getting the node: #{socket.assigns.id} with error: #{err}")
             %{}
           end
       {:error, err} ->
-        IO.inspect("There was a problem getting the document: #{socket.assigns.id} with error: #{err}")
+        IO.inspect("There was a problem getting the node: #{socket.assigns.id} with error: #{err}")
         %{}
     end
 
-    {:noreply, assign(socket, :document, document)}
+    {:noreply, assign(socket, :node, node)}
   end
 
   def handle_event("update_description", params, socket) do
     %{ "_target" => [item]} = params
     %{ "_target" => _, ^item => text_value} = params
 
-     # document id relevant to the texts
+     # node id relevant to the texts
     id = socket.assigns.id
     payload = %{
       "id" => id,
       "description" => text_value
     }
 
-    document = case LeafNode.Core.Documents.edit_document(payload) do
+    node = case LeafNode.Core.Documents.edit_document(payload) do
       {:ok, _data} ->
-        case LeafNode.Core.Documents.get_document(socket.assigns.id) do
+        case LeafNode.Core.Documents.get_node(socket.assigns.id) do
           {:ok, data} ->
             data
           {:error, err} ->
-            IO.inspect("There was a problem getting the document: #{socket.assigns.id} with error: #{err}")
+            IO.inspect("There was a problem getting the node: #{socket.assigns.id} with error: #{err}")
             %{}
           end
       {:error, err} ->
-        IO.inspect("There was a problem getting the document: #{socket.assigns.id} with error: #{err}")
+        IO.inspect("There was a problem getting the node: #{socket.assigns.id} with error: #{err}")
         %{}
     end
 
-    {:noreply, assign(socket, :document, document)}
+    {:noreply, assign(socket, :node, node)}
   end
 
   # handle info is used to manage events on channels

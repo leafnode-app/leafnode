@@ -1,7 +1,7 @@
 defmodule LeafNodeWeb.Router do
   # API
   alias LeafNodeWeb.Web
-  alias LeafNodeWeb.Api.{DocumentController, TextController}
+  # alias LeafNodeWeb.Api.{DocumentController, TextController}
 
   use Phoenix.Router
   import Phoenix.LiveView.Router
@@ -23,7 +23,6 @@ defmodule LeafNodeWeb.Router do
   end
 
   pipeline :validate_access_key do
-    # TODO: THIS NEEDS TO COME FROM ENV VARIABLE - Bearer token creation
     plug LeafNodeWeb.Plugs.AccessKeyAuth
   end
 
@@ -31,42 +30,40 @@ defmodule LeafNodeWeb.Router do
   scope "/", Web do
     pipe_through :browser
 
-    live "/", Live.Documents
-    live "/document/:id", Live.Document
-    # TODO: test the live views ere
-    live "/live", Live.TestLive
+    live "/", Live.Nodes
+    live "/node/:id", Live.Node
   end
 
-  scope "/api/v1/documents" do
-    pipe_through :api
-    # TODO: add the access key validation here
-    # TODO: Separate the execution code and crud operations/transactions for documents
-    # pipe_through :validate_access_key
+  # scope "/api/v1/documents" do
+  #   pipe_through :api
+  #   # TODO: add the access key validation here
+  #   # TODO: Separate the execution code and crud operations/transactions for documents
+  #   # pipe_through :validate_access_key
 
-    post "/create", DocumentController, :create_document
-    post "/execute/:id", DocumentController, :execute_document
-    post "/execute_verbose/:id", DocumentController, :execute_document_verbose
-    delete "/:id", DocumentController, :delete_document
-    put "/:id", DocumentController, :update_document
-    get "/", DocumentController, :get_documents
-    get "/list", DocumentController, :get_documents_list
-    get "/:id", DocumentController, :get_document_by_id
-  end
+  #   post "/create", DocumentController, :create_document
+  #   post "/execute/:id", DocumentController, :execute_document
+  #   post "/execute_verbose/:id", DocumentController, :execute_document_verbose
+  #   delete "/:id", DocumentController, :delete_document
+  #   put "/:id", DocumentController, :update_document
+  #   get "/", DocumentController, :get_documents
+  #   get "/list", DocumentController, :get_documents_list
+  #   get "/:id", DocumentController, :get_document_by_id
+  # end
 
-  scope "/api/v1/text" do
-    pipe_through :api
-    # TODO: add the access key validation here
-    # TODO: Separate the execution code and crud operations/transactions for documents
-    # pipe_through :validate_access_key
+  # scope "/api/v1/text" do
+  #   pipe_through :api
+  #   # TODO: add the access key validation here
+  #   # TODO: Separate the execution code and crud operations/transactions for documents
+  #   # pipe_through :validate_access_key
 
-    # we need to pass through the parent document id
-    get "/:document_id/list", TextController, :get_documents_texts_list
-    post "/:document_id/create", TextController, :create_text
-    post "/:id/generate_code", TextController, :generate_code
-    put "/:id", TextController, :update_text
-    delete "/:id", TextController, :delete_text
-    get "/:id", TextController, :get_text_by_id
-  end
+  #   # we need to pass through the parent document id
+  #   get "/:document_id/list", TextController, :get_documents_texts_list
+  #   post "/:document_id/create", TextController, :create_text
+  #   post "/:id/generate_code", TextController, :generate_code
+  #   put "/:id", TextController, :update_text
+  #   delete "/:id", TextController, :delete_text
+  #   get "/:id", TextController, :get_text_by_id
+  # end
 
   # ---- API ---- #
   # Enable LiveDashboard and Swoosh mailbox preview in development

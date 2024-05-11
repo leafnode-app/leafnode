@@ -1,5 +1,14 @@
-defmodule LeafNodeWeb.Web.Live.Documents do
+defmodule LeafNodeWeb.Web.Live.Nodes do
   use LeafNodeWeb, :live_view
+
+  @doc """
+    Init func that is run on init of the view
+  """
+  def mount(_params, _session, socket) do
+    # TODO: Check if the socket is ready before we do anything here
+    # get the new list that we send off
+    {:ok, assign(socket, :nodes, get_nodes())}
+  end
 
   # Render function
   def render(assigns) do
@@ -15,11 +24,11 @@ defmodule LeafNodeWeb.Web.Live.Documents do
           Create
         </button>
       </div>
-      <%= if is_nil(@documents) or Kernel.length(@documents) < 1 do %>
+      <%= if is_nil(@nodes) or Kernel.length(@nodes) < 1 do %>
         <p> There are no documents, create a new one to get started</p>
       <% else %>
         <ul class="space-y-4">
-          <%= for document <- @documents do %>
+          <%= for document <- @nodes do %>
             <li phx-click="document_edit" phx-value-id={document.id} >
               <a class="cursor:pointer block bg-gray-700 hover:bg-gray-600 transition duration-200 ease-in-out p-4 rounded-lg">
                 <div class="flex justify-between items-center">
@@ -51,15 +60,6 @@ defmodule LeafNodeWeb.Web.Live.Documents do
         </ul>
       <% end %>
     """
-  end
-
-  @doc """
-    Init func that is run on init of the view
-  """
-  def mount(_params, _session, socket) do
-    # TODO: Check if the socket is ready before we do anything here
-    # get the new list that we send off
-    {:ok, assign(socket, :documents, get_documents())}
   end
 
   @doc """
@@ -101,7 +101,7 @@ defmodule LeafNodeWeb.Web.Live.Documents do
         # TODO: keep texts as we use this for training later
 
         # get the new list that we send off
-        get_documents()
+        get_nodes()
       {:error, err} ->
         err
     end
@@ -112,13 +112,14 @@ defmodule LeafNodeWeb.Web.Live.Documents do
   end
 
   # helper functions to manage the reuse of certain calls
-  defp get_documents() do
-    case LeafNode.Core.Documents.list_documents do
-      {:ok, data} ->
-        data
-      {:error, _err} ->
-        IO.inspect("There was an error getting the documents")
-        []
-    end
+  defp get_nodes() do
+    # case LeafNode.Core.Documents.list_documents do
+    #   {:ok, data} ->
+    #     data
+    #   {:error, _err} ->
+    #     IO.inspect("There was an error getting the documents")
+    #     []
+    # end
+    []
   end
 end

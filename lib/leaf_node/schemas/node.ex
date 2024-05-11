@@ -8,6 +8,7 @@ defmodule LeafNode.Schemas.Node do
     field :title, :string
     field :description, :string
     field :enabled, :boolean, default: true
+    field :should_log, :boolean, default: true
     belongs_to :user, LeafNode.Accounts.User, foreign_key: :user_id, type: :integer
 
     timestamps()
@@ -15,8 +16,8 @@ defmodule LeafNode.Schemas.Node do
 
   def changeset(node, attrs) do
     node
-    |> cast(attrs, [:title, :description, :enabled, :user_id])
-    |> validate_required([:title, :description, :enabled, :user_id])
+    |> cast(attrs, [:title, :description, :enabled, :should_log, :user_id])
+    |> validate_required([:title, :description, :enabled, :should_log, :user_id])
     |> assoc_constraint(:user)
   end
 end

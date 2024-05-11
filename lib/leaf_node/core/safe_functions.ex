@@ -29,7 +29,7 @@ defmodule LeafNode.Core.SafeFunctions do
   end
 
   # TODO: Here we add the modules that will be executed or attempted with a case
-  def execute(%{ "payload" => _ ,"meta_data" => meta_data, "params" => params} = data) do
+  def execute(%{ "payload" => _ ,"meta_data" => meta_data, "params" => params} = _data) do
     case meta_data["func_string"] do
       "add" ->
         LeafNode.Core.Functions.Add.compute(params)

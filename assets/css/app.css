@@ -2,49 +2,46 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
-/* This file is for your main application CSS */
-/* Custom checkbox styles */
-.custom-checkbox {
-    position: relative;
-    display: inline-block;
-    cursor: pointer;
-  }
-  
-  .custom-checkbox input[type="checkbox"] {
-    display: none;
-  }
-  
-  .custom-checkbox .checkmark {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 20px;
-    width: 20px;
-    background-color: #ccc;
-    border-radius: 4px;
-  }
-  
-  .custom-checkbox input[type="checkbox"]:checked + .checkmark {
-    background-color: #2196F3; /* Change this color to your desired theme color */
-  }
-  
-  .custom-checkbox .checkmark:after {
-    content: "";
-    position: absolute;
-    display: none;
-  }
-  
-  .custom-checkbox input[type="checkbox"]:checked + .checkmark:after {
-    display: block;
-  }
-  
-  .custom-checkbox .checkmark:after {
-    left: 7px;
-    top: 3px;
-    width: 5px;
-    height: 10px;
-    border: solid white;
-    border-width: 0 2px 2px 0;
-    transform: rotate(45deg);
-  }
-  
+:root {
+  background: #111111;
+}
+
+#body-wrapper {
+  min-width: 320px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#root {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 5px;
+  flex: 1;
+}
+
+.status_overlay {
+  max-width: 350px;
+}
+
+.node_block_wrapper {
+  height: 75px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 15px;
+  font-size: 12px;
+}
+
+.node_vertical_line {
+  width: 2px;
+  min-height: 20px;
+  margin: 5px 0;
+  background-color: #52525b;
+}
+
+.box_input_inset_shadow {
+  background-color: #111111;
+  box-shadow: inset 0px 0px 15px #111111;
+}

@@ -36,22 +36,22 @@ defmodule LeafNodeWeb.UserConfirmationLive do
         {:noreply,
          socket
          |> put_flash(:info, "User confirmed successfully.")
-         |> redirect(to: ~p"/")}
+         |> push_navigate(to: ~p"/")}
 
       :error ->
         # If there is a current user and the account was already confirmed,
         # then odds are that the confirmation link was already visited, either
-        # by some automation or by the user themselves, so we redirect without
+        # by some automation or by the user themselves, so we push_navigate without
         # a warning message.
         case socket.assigns do
           %{current_user: %{confirmed_at: confirmed_at}} when not is_nil(confirmed_at) ->
-            {:noreply, redirect(socket, to: ~p"/")}
+            {:noreply, push_navigate(socket, to: ~p"/")}
 
           %{} ->
             {:noreply,
              socket
              |> put_flash(:error, "User confirmation link is invalid or it has expired.")
-             |> redirect(to: ~p"/")}
+             |> push_navigate(to: ~p"/")}
         end
     end
   end

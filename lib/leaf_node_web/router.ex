@@ -5,7 +5,6 @@ defmodule LeafNodeWeb.Router do
   # Auth
   alias LeafNodeWeb
   # API
-  alias LeafNodeWeb.Web
   # alias LeafNodeWeb.Api.{DocumentController, TextController}
 
   import LeafNodeWeb.UserAuth
@@ -38,11 +37,11 @@ defmodule LeafNodeWeb.Router do
   end
 
   # App dashboard - login
-  scope "/dashboard", Web do
+  scope "/dashboard", LeafNodeWeb do
     pipe_through [:browser, :require_authenticated_user]
 
-    live "/", Live.Nodes
-    live "/node/:id", Live.Node
+    live "/", NodesLive
+    live "/node/:id", NodeLive
   end
 
   ## Authentication routes

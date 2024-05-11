@@ -1,4 +1,4 @@
-defmodule LeafNodeWeb.Web.Live.Nodes do
+defmodule LeafNodeWeb.NodesLive do
   use LeafNodeWeb, :live_view
 
   @doc """
@@ -69,17 +69,17 @@ defmodule LeafNodeWeb.Web.Live.Nodes do
     # TODO: struct to make a node
     # socket = case LeafNode.Core.Documents.create_document() do
     #   {:ok, data} ->
-    #     socket = put_flash(socket, :info, "Successfully created document")
+    #     socket = put_flash(socket, :info, "Successfully created node")
     #     redirect(socket, to: "/node/#{data.id}")
     #   {:error, _err} ->
     #     socket
     # end
-    socket = redirect(socket, to: "/dashboard/node/new")
+    socket = push_navigate(socket, to: "/dashboard/node/new")
     {:noreply, socket}
   end
 
   def handle_event("document_edit", %{ "id" => id, "value" => _}, socket) do
-    socket = push_navigate(socket, to: "/document/#{id}")
+    socket = push_navigate(socket, to: "/dashboard/node/#{id}")
     {:noreply, socket}
   end
 

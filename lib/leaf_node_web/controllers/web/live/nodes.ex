@@ -66,14 +66,15 @@ defmodule LeafNodeWeb.Web.Live.Nodes do
     The events to manage the creation of documents
   """
   def handle_event("document_create", _unsigned_params, socket) do
-    socket = case LeafNode.Core.Documents.create_document() do
-      {:ok, data} ->
-        socket = put_flash(socket, :info, "Successfully created document")
-        redirect(socket, to: "/document/#{data.id}")
-      {:error, _err} ->
-        socket
-    end
-
+    # TODO: struct to make a node
+    # socket = case LeafNode.Core.Documents.create_document() do
+    #   {:ok, data} ->
+    #     socket = put_flash(socket, :info, "Successfully created document")
+    #     redirect(socket, to: "/node/#{data.id}")
+    #   {:error, _err} ->
+    #     socket
+    # end
+    socket = redirect(socket, to: "/dashboard/node/new")
     {:noreply, socket}
   end
 

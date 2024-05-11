@@ -42,6 +42,7 @@ defmodule LeafNodeWeb.Router do
     pipe_through [:browser, :require_authenticated_user]
 
     live "/", Live.Nodes
+    live "/node/:id", Live.Node
   end
 
   ## Authentication routes

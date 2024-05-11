@@ -4,21 +4,23 @@ defmodule LeafNodeWeb.Web.Live.Node do
   @doc """
     Init func that is run on init of the view
   """
-  def mount(%{ "id" => id}, _session, socket) do
-    # Phoenix.PubSub.subscribe(LeafNode.PubSub, "doc-channel-#{id}")
+  def mount(params, _session, socket) do
+    %{ "id" => id} = params
+    IO.inspect(params, label: "params")
     # get the node initial data and the texts
-    node = case LeafNode.Core.Documents.get_node(id) do
-      {:ok, data} ->
-        data
-      {:error, err} ->
-        IO.inspect("There was a problem getting the node: #{id} with error: #{err}")
-        %{}
-    end
+    # node = case nil do
+    #   {:ok, data} ->
+    #     data
+    #   {:error, err} ->
+    #     IO.inspect("There was a problem getting the node: #{id} with error: #{err}")
+    #     %{}
+    # end
 
     # we add the id to the socket so we have the data for later if needed
     socket =
       assign(socket, :id, id)
-      |> assign(:node, node)
+      # |> assign(:node, node)
+      |> assign(:node, %{ id: "test", name: "test", description: "test", result: "test"})
       |> assign(:texts, get_document_texts(id))
       |> assign(:loading, nil)
     {:ok, socket}
@@ -349,10 +351,11 @@ defmodule LeafNodeWeb.Web.Live.Node do
   # helper functions that get details
   # TODO: return object of the texts so we can update pieces when doing changes and not rerender whole list
   defp get_document_texts(id) do
-    {status, texts} = LeafNode.Core.Text.list_texts(id)
-    case status do
-      :ok -> Enum.map(texts, fn item -> item end)
-      _ -> []
-    end
+    # {status, texts} = LeafNode.Core.Text.list_texts(id)
+    # case status do
+    #   :ok -> Enum.map(texts, fn item -> item end)
+    #   _ -> []
+    # end
+    []
   end
 end

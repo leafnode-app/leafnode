@@ -49,7 +49,7 @@ defmodule LeafNodeWeb.Router do
     pipe_through [:browser, :redirect_if_user_is_authenticated]
 
     live_session :redirect_if_user_is_authenticated,
-      on_mount: [{UserAuth, :redirect_if_user_is_authenticated}] do
+      on_mount: [{LeafNodeWeb.UserAuth, :redirect_if_user_is_authenticated}] do
       live "/register", UserRegistrationLive, :new
       live "/log_in", UserLoginLive, :new
       live "/reset_password", UserForgotPasswordLive, :new
@@ -59,11 +59,11 @@ defmodule LeafNodeWeb.Router do
     post "/log_in", UserSessionController, :create
   end
 
-  scope "/", LeafNodeWeb do
+  scope "/auth", LeafNodeWeb do
     pipe_through [:browser, :require_authenticated_user]
 
     live_session :require_authenticated_user,
-      on_mount: [{UserAuth, :ensure_authenticated}] do
+      on_mount: [{LeafNodeWeb.UserAuth, :ensure_authenticated}] do
       live "/settings", UserSettingsLive, :edit
       live "/settings/confirm_email/:token", UserSettingsLive, :confirm_email
     end
@@ -75,7 +75,7 @@ defmodule LeafNodeWeb.Router do
     delete "/log_out", UserSessionController, :delete
 
     live_session :current_user,
-      on_mount: [{UserAuth, :mount_current_user}] do
+      on_mount: [{LeafNodeWeb.UserAuth, :mount_current_user}] do
       live "/confirm/:token", UserConfirmationLive, :edit
       live "/confirm", UserConfirmationInstructionsLive, :new
     end

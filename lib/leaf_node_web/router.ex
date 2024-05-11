@@ -32,14 +32,14 @@ defmodule LeafNodeWeb.Router do
 
   # Landing Page
   scope "/", LeafNodeWeb do
-    pipe_through :browser
+    pipe_through [:browser, :redirect_if_user_is_authenticated]
 
     live "/", UserLoginLive
   end
 
   # App dashboard - login
   scope "/dashboard", Web do
-    pipe_through :browser
+    pipe_through [:browser, :require_authenticated_user]
 
     live "/", Live.Nodes
   end

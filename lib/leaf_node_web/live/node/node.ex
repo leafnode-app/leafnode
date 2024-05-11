@@ -6,21 +6,19 @@ defmodule LeafNodeWeb.NodeLive do
   """
   def mount(params, _session, socket) do
     %{ "id" => id} = params
-    IO.inspect(socket.assigns, label: "socket")
-    # get the node initial data and the texts
-    # node = case nil do
-    #   {:ok, data} ->
-    #     data
-    #   {:error, err} ->
-    #     IO.inspect("There was a problem getting the node: #{id} with error: #{err}")
-    #     %{}
-    # end
+
+    node = case LeafNode.Node.get_node(id) do
+      {:ok, data} ->
+        data
+      {:error, err} ->
+        IO.inspect("There was a problem getting the node: #{id} with error: #{err}")
+        %{}
+    end
 
     # we add the id to the socket so we have the data for later if needed
     socket =
       assign(socket, :id, id)
-      # |> assign(:node, node)
-      |> assign(:node, %{ id: "test-id", name: "test", description: "test", result: "test"})
+      |> assign(:node, node)
       |> assign(:loading, nil)
     {:ok, socket}
   end
@@ -38,10 +36,10 @@ defmodule LeafNodeWeb.NodeLive do
               id="node-title"
               phx-debounce="200"
               phx-change="update_title"
-              phx-value-id={"#{@node.id}-#{@node.name}"}
-              name={"node-name"}
-              class="rounded p-2 w-full"
-              value={@node.name || "Untitled Document"}
+              phx-value-id={"#{@node.id}-#{@node.title}"}
+              name={"node-title"}
+              class="rounded p-2 w-full text-black"
+              value={@node.title || "Untitled Document"}
             />
           </div>
 
@@ -53,7 +51,7 @@ defmodule LeafNodeWeb.NodeLive do
               phx-change="update_description"
               phx-value-id={"#{@node.id}-#{@node.description}"}
               name={"node-description"}
-              class="rounded p-2 w-full"
+              class="rounded p-2 w-full text-black"
               value={@node.description || "Untitled Document"}
             />
           </div>
@@ -64,68 +62,9 @@ defmodule LeafNodeWeb.NodeLive do
     """
   end
 
-  @doc """
-    The events to manage the creation of documents
-  """
-  def handle_event("document_execute", _params, socket) do
-    IO.inspect("Execute Document")
-    {:noreply, socket}
-  end
-
   def handle_event("back_home", _params, socket) do
-    IO.inspect("Save node settings")
     {:noreply, socket |> push_navigate(to: "/dashboard")}
   end
-
-
-  def handle_event("set_node_result", params, socket) do
-    %{ "_target" => [item]} = params
-
-    # we will not get data on a false value, so we make a fallback for a false state match
-    result_toggle_check = try do
-      %{ "_target" => _, ^item => state} = params
-      %{ "item" => item, "status" => state}
-    rescue _e ->
-      %{ "item" => item, "status" => "false" }
-    end
-
-    # compare the status of checkbox with a default on false set
-    %{ "item" => item, "status" => status} = result_toggle_check
-
-    # create relevant payload based on false but compare if selected result - false (turn off)
-    result = if status === "false" do
-      Map.get(socket.assigns, "result") === item
-      "false"
-    else
-      String.split(item, "node-result-toggle-") |> Enum.at(1)
-    end
-
-    # payload for node update
-    payload = %{
-      "id" => socket.assigns.id,
-      "result" => result
-    }
-
-    node = case LeafNode.Core.Documents.edit_document(payload) do
-      {:ok, _data} ->
-        case LeafNode.Core.Documents.get_node(socket.assigns.id) do
-          {:ok, data} ->
-            data
-          {:error, err} ->
-            IO.inspect("There was a problem getting the node: #{socket.assigns.id} with error: #{err}")
-            %{}
-          end
-      {:error, err} ->
-        IO.inspect("There was a problem getting the node: #{socket.assigns.id} with error: #{err}")
-        %{}
-    end
-
-    # # we add the id to the socket so we have the data for later if needed
-    socket = assign(socket, :node, node)
-
-    {:noreply, socket}
-  end
-
 
   def handle_event("update_title", params, socket) do
     %{ "_target" => [item]} = params
@@ -135,12 +74,12 @@ defmodule LeafNodeWeb.NodeLive do
     id = socket.assigns.id
     payload = %{
       "id" => id,
-      "name" => text_value
+      "title" => text_value
     }
 
-    node = case LeafNode.Core.Documents.edit_document(payload) do
+    node = case LeafNode.Node.edit_node(payload) do
       {:ok, _data} ->
-        case LeafNode.Core.Documents.get_node(socket.assigns.id) do
+        case LeafNode.Node.get_node(socket.assigns.id) do
           {:ok, data} ->
             data
           {:error, err} ->
@@ -166,9 +105,9 @@ defmodule LeafNodeWeb.NodeLive do
       "description" => text_value
     }
 
-    node = case LeafNode.Core.Documents.edit_document(payload) do
+    node = case LeafNode.Node.edit_node(payload) do
       {:ok, _data} ->
-        case LeafNode.Core.Documents.get_node(socket.assigns.id) do
+        case LeafNode.Node.get_node(socket.assigns.id) do
           {:ok, data} ->
             data
           {:error, err} ->

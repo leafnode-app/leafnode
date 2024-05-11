@@ -36,7 +36,7 @@ defmodule LeafNode.Servers.ExecutionServer do
     ExecutionHistoryServer.start_link(document_id)
 
     # get the document in memory if it exists
-    {status, document} = LeafNode.Core.Documents.get_document(document_id)
+    {status, document} = LeafNode.Node.get_document(document_id)
 
     case status do
       :ok ->

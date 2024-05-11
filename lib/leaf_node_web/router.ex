@@ -37,11 +37,19 @@ defmodule LeafNodeWeb.Router do
   end
 
   # App dashboard - login
-  scope "/dashboard", LeafNodeWeb do
-    pipe_through [:browser, :require_authenticated_user]
+  scope "/", LeafNodeWeb do
+    pipe_through [:browser]
 
-    live "/", NodesLive
-    live "/node/:id", NodeLive
+    delete "/auth/log_out", UserSessionController, :delete
+
+    live_session :current_user,
+      on_mount: [{LeafNodeWeb.UserAuth, :mount_current_user}] do
+      live "/dashboard", NodesLive
+      live "/dashboard/node/:id", NodeLive
+
+      live "/auth/confirm/:token", UserConfirmationLive, :edit
+      live "/auth/confirm", UserConfirmationInstructionsLive, :new
+    end
   end
 
   ## Authentication routes
@@ -66,18 +74,6 @@ defmodule LeafNodeWeb.Router do
       on_mount: [{LeafNodeWeb.UserAuth, :ensure_authenticated}] do
       live "/settings", UserSettingsLive, :edit
       live "/settings/confirm_email/:token", UserSettingsLive, :confirm_email
-    end
-  end
-
-  scope "/auth/", LeafNodeWeb do
-    pipe_through [:browser]
-
-    delete "/log_out", UserSessionController, :delete
-
-    live_session :current_user,
-      on_mount: [{LeafNodeWeb.UserAuth, :mount_current_user}] do
-      live "/confirm/:token", UserConfirmationLive, :edit
-      live "/confirm", UserConfirmationInstructionsLive, :new
     end
   end
 

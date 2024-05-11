@@ -15,15 +15,6 @@ defmodule LeafNode.Schemas.Log do
     timestamps()
   end
 
-  def get_logs_by_node(node_id) do
-    query = from n in __MODULE__, where: n.node_id == ^node_id
-    LeafNode.Repo.all(query)
-  end
-
-  def get_log(id) do
-    LeafNode.Repo.get(__MODULE__, id)
-  end
-
   def changeset(log, attrs) do
     log
     |> cast(attrs, [:input, :result, :status, :node_id])

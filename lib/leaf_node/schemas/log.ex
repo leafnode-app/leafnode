@@ -1,6 +1,7 @@
 defmodule LeafNode.Schemas.Log do
   use Ecto.Schema
   import Ecto.Changeset
+  import Ecto.Query
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
@@ -12,6 +13,15 @@ defmodule LeafNode.Schemas.Log do
     belongs_to :node, LeafNode.Schemas.Node
 
     timestamps()
+  end
+
+  def get_logs_by_node(node_id) do
+    query = from n in __MODULE__, where: n.node_id == ^node_id
+    LeafNode.Repo.all(query)
+  end
+
+  def get_log(id) do
+    LeafNode.Repo.get(__MODULE__, id)
   end
 
   def changeset(log, attrs) do

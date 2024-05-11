@@ -28,42 +28,6 @@ defmodule LeafNode.Core.SafeFunctions do
     @whitelist
   end
 
-  # TODO: Here we add the modules that will be executed or attempted with a case
-  def execute(%{ "payload" => _ ,"meta_data" => meta_data, "params" => params} = _data) do
-    case meta_data["func_string"] do
-      "add" ->
-        LeafNode.Core.Functions.Add.compute(params)
-      "subtract" ->
-        LeafNode.Core.Functions.Subtract.compute(params)
-      "multiply" ->
-        LeafNode.Core.Functions.Multiply.compute(params)
-      "divide" ->
-        LeafNode.Core.Functions.Divide.compute(params)
-      "value" ->
-        LeafNode.Core.Functions.Value.compute(params)
-      "ref" ->
-        LeafNode.Core.Functions.Ref.compute(params)
-      "equals" ->
-        LeafNode.Core.Functions.Equals.compute(params)
-      "not_equals" ->
-        LeafNode.Core.Functions.NotEquals.compute(params)
-      "less_than" ->
-        LeafNode.Core.Functions.LessThan.compute(params)
-      "greater_than" ->
-        LeafNode.Core.Functions.GreaterThan.compute(params)
-      "input" ->
-        LeafNode.Core.Functions.Input.compute(params)
-      "get_map_val" ->
-        LeafNode.Core.Functions.GetMapVal.compute(params)
-      "send_slack_message" ->
-        LeafNode.Core.Functions.SendSlackMessage.compute(params)
-      "join_string" ->
-        LeafNode.Core.Functions.JoinString.compute(params)
-      _ ->
-        "Function does not exist"
-    end
-  end
-
   @doc """
     Add two values together
   """

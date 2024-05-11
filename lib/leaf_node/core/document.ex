@@ -9,17 +9,17 @@ defmodule LeafNode.Core.Documents do
     Create a document - genreate an id and pass payload to be persisted
   """
   def create_document() do
-    changeset = LeafNodeWeb.Models.Document.changeset(%LeafNodeWeb.Models.Document{result: "false"}, %{})
+    # changeset = LeafNodeWeb.Models.Document.changeset(%LeafNodeWeb.Models.Document{result: "false"}, %{})
 
-    case {_, result} = LeafNodeRepo.insert(changeset) do
-      {:ok, _} ->
-        {:ok,
-          %{
-            id: Map.get(result, :id)
-          }
-        }
-      {:error, _} -> {:error, "There was a problem creating document"}
-    end
+    # case {_, result} = LeafNodeRepo.insert(changeset) do
+    #   {:ok, _} ->
+    #     {:ok,
+    #       %{
+    #         id: Map.get(result, :id)
+    #       }
+    #     }
+    #   {:error, _} -> {:error, "There was a problem creating document"}
+    # end
   end
 
   @doc """

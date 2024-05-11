@@ -10,22 +10,22 @@ defmodule LeafNode.Core.Text do
   """
   def create_text(data) do
     # We need to get the data first if there is for the document and add order
-    case LeafNode.Core.Documents.get_document(document_id = Map.get(data, "document_id")) do
-      {:ok, _} ->
-        count = case list_texts(document_id) do
-          {:ok, texts} ->
-            length(texts) + 1
-          {:error, _} -> 1
-        end
+    # case LeafNode.Core.Documents.get_document(document_id = Map.get(data, "document_id")) do
+    #   {:ok, _} ->
+    #     count = case list_texts(document_id) do
+    #       {:ok, texts} ->
+    #         length(texts) + 1
+    #       {:error, _} -> 1
+    #     end
 
-        add_count = Map.put_new(data, "order", count)
-        changeset = LeafNodeWeb.Models.Text.changeset(%LeafNodeWeb.Models.Text{}, add_count)
-        case LeafNodeRepo.insert(changeset) do
-          {:ok, _} -> {:ok, "Successfully created text"}
-          {:error, _} -> {:error, "There was a problem creating text"}
-        end
-      _ -> {:error, "Unable to find document"}
-    end
+    #     add_count = Map.put_new(data, "order", count)
+    #     changeset = LeafNodeWeb.Models.Text.changeset(%LeafNodeWeb.Models.Text{}, add_count)
+    #     case LeafNodeRepo.insert(changeset) do
+    #       {:ok, _} -> {:ok, "Successfully created text"}
+    #       {:error, _} -> {:error, "There was a problem creating text"}
+    #     end
+    #   _ -> {:error, "Unable to find document"}
+    # end
   end
 
   @doc """

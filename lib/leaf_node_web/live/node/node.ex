@@ -75,24 +75,7 @@ defmodule LeafNodeWeb.NodeLive do
 
       <div class="flex flex-col md:flex-row gap-1 justify-center">
         <div class="flex flex-col grow bg-zinc-900 rounded-lg p-4 w-full md:w-80 border border-stone-900">
-          <div class="h-3/5 relative">
-            <div id="chart" />
-          </div>
-
-          <div class="h-2/5 bg-grey-500 p-1">
-            <div class="mb-2 border-b border-zinc-900 dark:border-zinc-900">
-              <ul
-                class="flex flex-wrap mb-px text-sm font-medium text-center"
-                role="tablist"
-              >
-                <li class="me-2">
-                  <div class="inline-block p-4 border-b-2 rounded-t-lg">
-                    Logs
-                  </div>
-                </li>
-              </ul>
-            </div>
-
+          <div class="h-full bg-grey-500 p-1">
             <%!-- Logs --%>
             <ul class="divide-y divide-zinc-900 dark:border-zinc-900 px-2">
               <li class="py-2 sm:py-2">
@@ -129,7 +112,7 @@ defmodule LeafNodeWeb.NodeLive do
                   </div>
                 </div>
               </li>
-              <li class="py-2 sm:py-2 hover:bg-light-300">
+              <li class="py-2 sm:py-2">
                 <div class="flex items-center space-x-4 rtl:space-x-reverse">
                   <div class="flex-1 min-w-0">
                     <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
@@ -168,25 +151,16 @@ defmodule LeafNodeWeb.NodeLive do
               </div>
 
           <div class="flex-1 bg-zinc-900 py-4 px-2 rounded-lg border border-stone-900">
-            <div class="flex gap-3 p-2">
-              <div class="flex-grow">title</div>
-              <div class="px-1 cursor-pointer">
-                  <i class="fa-solid fa-gear"></i>
-                </div>
-            </div>
-
-            <div class="flex align-center justify-center items-center my-3 gap-3">
+            <div>
               <input
                 type="text"
                 id="disabled-input"
                 aria-label="disabled input"
                 class="box_input_inset_shadow disabledmb-6 text-gray-900 text-sm rounded-lg border-stone-900 block w-full p-4 cursor-not-allowed dark:text-gray-400"
-                value="https://leafnode.app/dispatch/[SOME_NODE_ID]"
+                value={"https://leafnode.app/dispatch/" <> @node.id}
                 disabled
               />
-              <div class="p-3 cursor-pointer">
-                <i class="fa-regular fa-copy"></i>
-              </div>
+              <div class="text-xs p-2 text-gray-600"> Access Token: <%= @node.access_key %> </div>
             </div>
 
             <span class="bg-orange-100 text-xs font-medium mx-1 px-2 py-0.5 rounded dark:bg-orange-700">

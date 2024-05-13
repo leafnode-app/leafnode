@@ -10,7 +10,7 @@ defmodule LeafNode.Node do
     Create a node - genreate an id and pass payload to be persisted
   """
   def create_node(user_id) do
-    changeset = Schemas.Node.changeset(%Schemas.Node{user_id: user_id}, %{})
+    changeset = Schemas.Node.changeset(%Schemas.Node{}, %{user_id: user_id, access_key: UUID.uuid4()})
 
     case {_, result} = LeafNodeRepo.insert(changeset) do
       {:ok, _} ->
@@ -104,7 +104,8 @@ defmodule LeafNode.Node do
           description: n.description,
           enabled: n.enabled,
           should_log: n.should_log,
-          expected_payload: n.expected_payload
+          expected_payload: n.expected_payload,
+          access_key: n.access_key
         }
       )
 
@@ -130,7 +131,8 @@ defmodule LeafNode.Node do
            description: n.description,
            enabled: n.enabled,
            should_log: n.should_log,
-           expected_payload: n.expected_payload
+           expected_payload: n.expected_payload,
+           access_key: n.access_key
          }}
       rescue
         _e ->

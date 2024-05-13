@@ -1,10 +1,10 @@
 defmodule LeafNode.Servers.ExecutionServer do
   @moduledoc """
-    The execution server that will be used to create instances when executing a document
+    The execution server that will be used to create instances when executing a node
   """
   use GenServer
   require Logger
-  alias LeafNode.Servers.ExecutionHistoryServer, as: ExecutionHistoryServer
+  alias LeafNode.Core.Log
 
   @doc """
     State the server with base argument data
@@ -29,51 +29,36 @@ defmodule LeafNode.Servers.ExecutionServer do
   end
 
   @doc """
-    Here we listen for the execution of the document
+    Here we listen for the execution of the node
   """
-  def handle_call({:execute, document_id, payload}, _form, state) do
-    # start the agent server for this document -  make sure its started
-    ExecutionHistoryServer.start_link(document_id)
+  def handle_call({:execute, node_id, payload}, _form, state) do
+    # get the node
+    {status, node} = LeafNode.Core.Node.get_node(node_id)
 
-    # get the document in memory if it exists
-    {status, document} = LeafNode.Node.get_document(document_id)
-
+    # check node fetch data
     case status do
       :ok ->
-        # Here we get all the details of texts that has psuedo code associated with it
-        {status, texts} = LeafNode.Core.Text.list_texts(document_id)
-        text_data = case status do
-          :ok -> Enum.filter(texts, fn item -> !is_nil(item.pseudo_code) end)
-          _ -> []
-        end
-        doc_with_texts = Map.put(document, :texts, text_data)
-
-        {status, result} = start_execution(doc_with_texts, payload)
-        # Stop the history server instance here
-        GenServer.stop(String.to_atom("history_" <> document_id), :normal)
+        {status, result} = start_execution(node, payload)
         {:stop, :normal, {status, result}, state}
       _ ->
-        # Stop the history server instance here
-        GenServer.stop(String.to_atom("history_" <> document_id), :normal)
-        {:stop, :normal, {:error, "There was an error executing the document"}, state}
+        {:stop, :normal, {:error, "There was an error executing the node"}, state}
     end
   end
 
   @doc """
-    We need to go through the relevant document to execute the code and store result
+    Executing the node itself
   """
-  defp start_execution(document, payload) do
-    # Flush the execution history before updating the data
-    GenServer.call(String.to_atom("history_" <> document.id), :flush_history)
-    # get the functions - and attempt excute
-    Enum.each(document.texts, fn text ->
-      pseudo_code = text.pseudo_code
-      LeafNode.Core.Code.execute(pseudo_code, document.id, text.id, payload)
-    end)
+  defp start_execution(node, payload) do
+    # LeafNode.Core.Code.execute(pseudo_code, node.id, text.id, payload)
+    # TODO: Add the logic for the node execution in general
 
+    # Here we need to set the logs - random for now
+    Log.create_log(node.id, payload, payload, Enum.random([true, false]))
+
+    # We just send the payload back for now - this needs to be based off the execution of the node
     {:ok, %{
-      "document" => document,
-      "results" => GenServer.call(String.to_atom("history_" <> document.id), :get_history)
+      "node" => node,
+      "result" => payload
     }}
   end
 end

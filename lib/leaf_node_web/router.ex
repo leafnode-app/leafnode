@@ -83,21 +83,6 @@ defmodule LeafNodeWeb.Router do
     post "/:id", NodeController, :execute_node
   end
 
-  # scope "/api/v1/text" do
-  #   pipe_through :api
-  #   # TODO: add the access key validation here
-  #   # TODO: Separate the execution code and crud operations/transactions for documents
-  #   # pipe_through :validate_access_key
-
-  #   # we need to pass through the parent document id
-  #   get "/:document_id/list", TextController, :get_documents_texts_list
-  #   post "/:document_id/create", TextController, :create_text
-  #   post "/:id/generate_code", TextController, :generate_code
-  #   put "/:id", TextController, :update_text
-  #   delete "/:id", TextController, :delete_text
-  #   get "/:id", TextController, :get_text_by_id
-  # end
-
   # ---- API ---- #
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:leaf_node, :dev_routes) do

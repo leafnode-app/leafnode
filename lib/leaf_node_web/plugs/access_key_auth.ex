@@ -3,7 +3,7 @@ defmodule LeafNodeWeb.Plugs.AccessKeyAuth do
     Plug that will be used to check the connection against the access keys for a node to execute
   """
   import Plug.Conn
-  alias LeafNode.Node
+  alias LeafNode.Core.Node
 
   @doc """
     Initialize the conneciton with opts to be passed when passing the connection through the plug

@@ -8,7 +8,7 @@ defmodule LeafNodeWeb.NodeLive do
     %{"id" => id} = params
 
     node =
-      case LeafNode.Node.get_node(id) do
+      case LeafNode.Core.Node.get_node(id) do
         {:ok, data} ->
           data
 
@@ -17,10 +17,15 @@ defmodule LeafNodeWeb.NodeLive do
           %{}
       end
 
+    # TODO: We need a async fetch of logs and paginated down the line
+    {status, logs} = LeafNode.Core.Log.list_logs(id)
+    log_list = if status === :ok && is_list(logs), do: logs, else: []
+
     # we add the id to the socket so we have the data for later if needed
     socket =
       assign(socket, :id, id)
       |> assign(:node, node)
+      |> assign(:logs, log_list)
       |> assign(:loading, nil)
 
     {:ok, socket}
@@ -77,59 +82,34 @@ defmodule LeafNodeWeb.NodeLive do
         <div class="flex flex-col grow bg-zinc-900 rounded-lg p-4 w-full md:w-80 border border-stone-900">
           <div class="h-full bg-grey-500 p-1">
             <%!-- Logs --%>
-            <ul class="divide-y divide-zinc-900 dark:border-zinc-900 px-2">
-              <li class="py-2 sm:py-2">
-                <div class="flex items-center space-x-4 rtl:space-x-reverse">
-                  <div class="flex-1 min-w-0">
-                    <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
-                      Item 1
-                    </p>
-                    <p class="text-sm text-gray-500 truncate dark:text-gray-400">
-                      2018-09-19T01:30:00.000Z
-                    </p>
-                  </div>
-                  <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
-                    <span class="bg-red-100  text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-red-700">
-                      Failed
-                    </span>
-                  </div>
-                </div>
-              </li>
-              <li class="py-2 sm:py-2">
-                <div class="flex items-center space-x-4 rtl:space-x-reverse">
-                  <div class="flex-1 min-w-0">
-                    <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
-                      Item 2
-                    </p>
-                    <p class="text-sm text-gray-500 truncate dark:text-gray-400">
-                      2018-09-19T01:30:00.000Z
-                    </p>
-                  </div>
-                  <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
-                    <span class="bg-green-100 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-green-700">
-                      Success
-                    </span>
-                  </div>
-                </div>
-              </li>
-              <li class="py-2 sm:py-2">
-                <div class="flex items-center space-x-4 rtl:space-x-reverse">
-                  <div class="flex-1 min-w-0">
-                    <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
-                      Item 3
-                    </p>
-                    <p class="text-sm text-gray-500 truncate dark:text-gray-400">
-                      2018-09-19T01:30:00.000Z
-                    </p>
-                  </div>
-                  <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
-                    <span class="bg-green-100 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-green-700">
-                      Success
-                    </span>
-                  </div>
-                </div>
-              </li>
-            </ul>
+            <%= if Enum.empty?(@logs) do%>
+              No logs
+            <%= else%>
+              <ul class="divide-y divide-zinc-900 dark:border-zinc-900 px-2">
+                <%= for item <- @logs do %>
+                  <li class="py-2 sm:py-2">
+                    <div class="flex items-center space-x-4 rtl:space-x-reverse">
+                      <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
+                          <%= item.id %>
+                        </p>
+                        <p class="text-sm text-gray-500 truncate dark:text-gray-400">
+                          <%= item.inserted_at %>
+                        </p>
+                      </div>
+                      <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
+                      <span class={
+                        "text-xs font-medium me-2 px-2.5 py-0.5 rounded" <>
+                        if item.status, do: "bg-green-100 dark:bg-green-700", else: "bg-red-100 dark:bg-red-700"
+                      }>
+                        <%= item.status %>
+                      </span>
+                      </div>
+                    </div>
+                  </li>
+                <% end %>
+              </ul>
+            <%= end%>
           </div>
 
           </div>
@@ -157,7 +137,7 @@ defmodule LeafNodeWeb.NodeLive do
                 id="disabled-input"
                 aria-label="disabled input"
                 class="box_input_inset_shadow disabledmb-6 text-gray-900 text-sm rounded-lg border-stone-900 block w-full p-4 cursor-not-allowed dark:text-gray-400"
-                value={"https://leafnode.app/api/v1/node" <> @node.id}
+                value={"https://leafnode.app/api/v1/node/" <> @node.id}
                 disabled
               />
               <div class="text-xs p-2 text-gray-600"> header (x-api-token: <%= @node.access_key %>) </div>
@@ -212,9 +192,9 @@ defmodule LeafNodeWeb.NodeLive do
     }
 
     node =
-      case LeafNode.Node.edit_node(payload) do
+      case LeafNode.Core.Node.edit_node(payload) do
         {:ok, _data} ->
-          case LeafNode.Node.get_node(socket.assigns.id) do
+          case LeafNode.Core.Node.get_node(socket.assigns.id) do
             {:ok, data} ->
               data
 
@@ -250,9 +230,9 @@ defmodule LeafNodeWeb.NodeLive do
     }
 
     node =
-      case LeafNode.Node.edit_node(payload) do
+      case LeafNode.Core.Node.edit_node(payload) do
         {:ok, _data} ->
-          case LeafNode.Node.get_node(socket.assigns.id) do
+          case LeafNode.Core.Node.get_node(socket.assigns.id) do
             {:ok, data} ->
               data
 

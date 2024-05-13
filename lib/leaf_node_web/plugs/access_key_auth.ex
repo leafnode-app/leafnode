@@ -1,9 +1,9 @@
 defmodule LeafNodeWeb.Plugs.AccessKeyAuth do
   @moduledoc """
-    Plug that will be used to check the connection against the access keys for a process to execute
+    Plug that will be used to check the connection against the access keys for a node to execute
   """
   import Plug.Conn
-  alias LeafNode.Core.AccessKeys, as: AccessKeys
+  alias LeafNode.Node
 
   @doc """
     Initialize the conneciton with opts to be passed when passing the connection through the plug
@@ -14,59 +14,38 @@ defmodule LeafNodeWeb.Plugs.AccessKeyAuth do
     The call function that gets called after init setup. We check the header and the access token
   """
   def call(conn, _opts) do
-    # we need to get the process that is being executed
-    %{"process_id" => process_id} = Map.get(conn, :params, nil)
+    %{"id" => id} = Map.get(conn, :params, nil)
 
-    if check_process_restriction(process_id) === :restricted do
-      case get_req_header(conn, "authorization") do
-        [token] ->
-          token =
-            String.split(token, " ")
-            |> List.last()
+    case get_req_header(conn, "x-api-key") do
+      [token] ->
+        token =
+          String.split(token, " ")
+          |> List.last()
 
-          # we check if the process needs to be restricted
-          check_process_access(conn, token, process_id)
-        _ ->
-          return( conn, 401,
-            %{ "message" => "Unauthorized access execute restricted process.",
-              "success" => false,
-              "data" => %{}
-            }
-          )
-      end
-    else
-      conn
+        check_process_access(conn, token, id)
+      _ ->
+        return(conn, 401,
+          %{ "message" => "Unable to execute node. Contact node admin",
+            "success" => false,
+            "data" => %{}
+          }
+        )
     end
   end
 
-  # we need to check if the process is restricted
-  defp check_process_restriction(process_id) do
-    {status, process} = LeafNode.Core.Process.get_process(process_id)
+  # we check the passed token validity
+  defp check_process_access(conn, token, id) do
+    {status, node} = Node.get_node(id)
     case status do
       :ok ->
-        if Map.get(process, :restricted, false) do
-          :restricted
-        else
-          :non_restricted
-        end
-      _ -> :not_found
-    end
-  end
-
-  # we check the passed tokena and if the access is relevant to process execution
-  defp check_process_access(conn, token, process_id) do
-    {status, valid_tokens} = AccessKeys.process_by_access_key
-    case status do
-      :ok ->
-        access_token_processes = Map.get(valid_tokens, token, [])
-        if Enum.member?(access_token_processes, process_id) do
+        node_access_token = Map.get(node, :access_key)
+        if node_access_token === token do
           # we can assign a flag around the connection to know its accessible
           conn
-           |> assign(:execution_access, true)
         else
           return( conn, 401,
             %{ "message" =>
-                "Unauthorized access. Make sure the access token you have is correct",
+                "Unauthorized access.",
               "success" => false,
               "data" => %{}
             }

@@ -103,7 +103,7 @@ defmodule LeafNodeWeb.NodesLive do
         data
 
       {:error, _err} ->
-        IO.inspect("There was an error getting the documents")
+        IO.inspect("There was an error getting the nodes")
         []
     end
   end

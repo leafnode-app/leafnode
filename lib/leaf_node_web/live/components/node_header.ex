@@ -57,73 +57,49 @@ defmodule LeafNodeWeb.Components.NodeHeader do
     %{"_target" => _, ^item => text_value} = params
 
     node_id = assigns.node.id
-
     payload = %{
       "id" => node_id,
       "title" => text_value
     }
 
-    node =
-      case LeafNode.Core.Node.edit_node(payload) do
-        {:ok, _data} ->
-          case LeafNode.Core.Node.get_node(node_id) do
-            {:ok, data} ->
-              data
-
-            {:error, err} ->
-              IO.inspect(
-                "There was a problem getting the node: #{node_id} with error: #{err}"
-              )
-
-              %{}
-          end
-
-        {:error, err} ->
-          IO.inspect(
-            "There was a problem getting the node: #{node_id} with error: #{err}"
-          )
-
-          %{}
-      end
-
-    {:noreply, assign(socket, :node, node)}
+    {:noreply, assign(socket, :node, update_node(payload, node_id))}
   end
 
   def handle_event("update_description", params, %{assigns: assigns} = socket) do
     %{"_target" => [item]} = params
     %{"_target" => _, ^item => text_value} = params
 
-    # node id relevant to the texts
     node_id = assigns.node.id
-
     payload = %{
       "id" => node_id,
       "description" => text_value
     }
 
-    node =
-      case LeafNode.Core.Node.edit_node(payload) do
-        {:ok, _data} ->
-          case LeafNode.Core.Node.get_node(node_id) do
-            {:ok, data} ->
-              data
+    {:noreply, assign(socket, :node, update_node(payload, node_id))}
+  end
 
-            {:error, err} ->
-              IO.inspect(
-                "There was a problem getting the node: #{node_id} with error: #{err}"
-              )
+  # This is a generic crud operation against helpers to update node
+  defp update_node(payload, id) do
+    case LeafNode.Core.Node.edit_node(payload) do
+      {:ok, _data} ->
+        case LeafNode.Core.Node.get_node(id) do
+          {:ok, data} ->
+            data
 
-              %{}
-          end
+          {:error, err} ->
+            IO.inspect(
+              "There was a problem getting the node: #{id} with error: #{err}"
+            )
 
-        {:error, err} ->
-          IO.inspect(
-            "There was a problem getting the node: #{node_id} with error: #{err}"
-          )
+            %{}
+        end
 
-          %{}
-      end
+      {:error, err} ->
+        IO.inspect(
+          "There was a problem getting the node: #{id} with error: #{err}"
+        )
 
-    {:noreply, assign(socket, :node, node)}
+        %{}
+    end
   end
 end

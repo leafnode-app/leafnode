@@ -43,7 +43,7 @@ defmodule LeafNodeWeb.LogDetailsLive do
             <p class="text-sm text-gray-400 mb-1"><span class="font-semibold text-gray-300">Updated At:</span> <%= @log.updated_at %></p>
             <p class="text-sm text-gray-400"><span class="font-semibold text-gray-300">Status:</span>
               <span class={
-                "text-xs font-medium px-2.5 py-0.5 rounded " <>
+                "text-xs font-medium px-1 py-0.5 rounded " <>
                 if @log.status, do: "bg-green-100 text-green-800 dark:bg-green-700 dark:text-green-100", else: "bg-red-100 text-red-800 dark:bg-red-700 dark:text-red-100"
               }>
                 <%= if @log.status, do: "Success", else: "Failure" %>

@@ -38,6 +38,7 @@ defmodule LeafNode.Core.Log do
     query =
       from(n in Schemas.Log,
         where: n.node_id == ^node_id,
+        order_by: [desc: n.inserted_at],
         select: %{
           id: n.id,
           node_id: n.node_id,

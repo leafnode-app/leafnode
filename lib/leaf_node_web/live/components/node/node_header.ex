@@ -9,7 +9,7 @@ defmodule LeafNodeWeb.Components.NodeHeader do
 
   def render(assigns) do
     ~H"""
-      <div class="flex flex-col gap-1 py-1">
+      <div>
         <div phx-click="back_home" phx-target={@myself} class="text-white cursor-pointer mx-2 mb-2"> back </div>
         <div class="bg-zinc-900 rounded-lg py-4 px-2 border border-stone-900">
           <div class="flex gap-3 p-2">

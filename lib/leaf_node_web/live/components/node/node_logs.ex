@@ -8,11 +8,11 @@ defmodule LeafNodeWeb.Components.NodeLogs do
 
   def render(assigns) do
     ~H"""
-      <div class="grow bg-zinc-900 rounded-lg p-4 w-full md:w-80 border border-stone-900 h-full bg-grey-500 p-1">
+      <div class="grow bg-zinc-900 rounded-lg p-4 border border-stone-900 h-100% bg-grey-500 p-1">
         <%!-- Logs --%>
         <%= if Enum.empty?(@logs) do%>
           No logs
-        <%= else%>
+        <% else%>
           <ul class="divide-y divide-zinc-900 dark:border-zinc-900 px-2">
             <%= for item <- @logs do %>
               <li class="py-2 sm:py-2">
@@ -37,7 +37,7 @@ defmodule LeafNodeWeb.Components.NodeLogs do
               </li>
             <% end %>
           </ul>
-        <%= end%>
+        <% end%>
       </div>
     """
   end

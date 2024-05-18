@@ -36,16 +36,12 @@ defmodule LeafNodeWeb.NodeLive do
   def render(assigns) do
     ~H"""
       <.live_component module={NodeHeader} id="node_header" node={@node} />
-
-      <div class="flex flex-col md:flex-row gap-1 justify-center">
-          <%!-- Column 1 --%>
-          <.live_component module={NodeLogs} id="node_logs_column" logs={@logs} />
-
-          <div class="flex flex-col grow gap-1 w-full md:w-80">
-            <.live_component module={NodeSettings} id="node_settings" />
-            <.live_component module={NodeDetails} id="node_details" node={@node} />
-          </div>
-      </div>
+      <div class="my-2" />
+      <.live_component module={NodeSettings} id="node_settings" />
+      <div class="my-2" />
+      <.live_component module={NodeDetails} id="node_details" node={@node} />
+      <div class="my-2" />
+      <.live_component module={NodeLogs} id="node_logs_column" logs={@logs} />
     """
   end
 end

@@ -3,6 +3,7 @@ defmodule LeafNodeWeb.Router do
   import Phoenix.LiveView.Router
 
   # Auth
+  alias LeafNodeWeb.LogLive
   alias LeafNodeWeb
   # API
   alias LeafNodeWeb.Api.{NodeController}
@@ -46,6 +47,7 @@ defmodule LeafNodeWeb.Router do
       on_mount: [{LeafNodeWeb.UserAuth, :mount_current_user}] do
       live "/dashboard", NodesLive
       live "/dashboard/node/:id", NodeLive
+      live "/dashboard/log/:id", LogDetailsLive
 
       live "/auth/confirm/:token", UserConfirmationLive, :edit
       live "/auth/confirm", UserConfirmationInstructionsLive, :new

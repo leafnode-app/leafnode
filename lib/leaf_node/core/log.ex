@@ -2,7 +2,7 @@ defmodule LeafNode.Core.Log do
   @moduledoc """
     Methods around the Log and persistence/data management
   """
-  import Ecto.Query, only: [from: 2]
+  import Ecto.Query, only: [from: 2, where: 3, preload: 2]
   alias LeafNode.Repo, as: LeafNodeRepo
   alias LeafNode.Schemas
 
@@ -83,5 +83,15 @@ defmodule LeafNode.Core.Log do
       {:ok, data} -> {:ok, data}
       _ -> {:error, "There was an error getting the current log"}
     end
+  end
+
+  @doc """
+    Get the associated node for the current log
+  """
+  def get_log_with_node(log_id) do
+    Schemas.Log
+    |> where([l], l.id == ^log_id)
+    |> preload(:node)
+    |> LeafNodeRepo.one()
   end
 end

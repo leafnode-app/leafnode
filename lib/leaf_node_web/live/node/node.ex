@@ -41,7 +41,78 @@ defmodule LeafNodeWeb.NodeLive do
       <div class="my-2" />
       <.live_component module={NodeDetails} id="node_details" node={@node} />
       <div class="my-2" />
-      <.live_component module={NodeLogs} id="node_logs_column" logs={@logs} />
+      <.live_component module={NodeLogs} id="node_logs" logs={@logs} node={@node} />
     """
+  end
+
+  # Bubble up events that are specific for nodes that will require a re-render
+  def handle_event("toggle_enabled", _, %{assigns: assigns} = socket) do
+    node = assigns.node || false
+
+    # get the node from the channel so we can try and toggle the state
+    case node do
+      false ->
+        {:noreply, socket}
+      _ ->
+        payload = %{
+          "id" => node.id,
+          "enabled" => !node.enabled
+        }
+
+        updated_node = update_node(payload, node)
+        socket = socket
+          |> assign(:node, updated_node)
+          |> assign(:enabled, updated_node.enabled || false)
+
+        {:noreply, socket}
+    end
+  end
+
+  def handle_event("toggle_should_log", _, %{assigns: assigns} = socket) do
+    node = assigns.node || false
+
+    # get the node from the channel so we can try and toggle the state
+    case node do
+      false ->
+        {:noreply, socket}
+      _ ->
+        payload = %{
+          "id" => node.id,
+          "should_log" => !node.should_log
+        }
+
+        updated_node = update_node(payload, node)
+        socket = socket
+          |> assign(:node, updated_node)
+          |> assign(:should_log, updated_node.should_log || false)
+
+        {:noreply, socket}
+    end
+  end
+
+  # TODO: move this to a more global util
+  defp update_node(node, prev_node) do
+    node_id = node["id"]
+    case LeafNode.Core.Node.edit_node(node) do
+      {:ok, _data} ->
+        case LeafNode.Core.Node.get_node(node_id) do
+          {:ok, data} ->
+            data
+
+          {:error, err} ->
+            IO.inspect(
+              "There was a problem getting the node: #{node_id} with error: #{err}"
+            )
+
+            prev_node
+        end
+
+      {:error, err} ->
+        IO.inspect(
+          "There was a problem getting the node to update: #{node_id} with error: #{err}"
+        )
+
+        prev_node
+    end
   end
 end

@@ -56,39 +56,38 @@ defmodule LeafNodeWeb.Components.NodeHeader do
     %{"_target" => [item]} = params
     %{"_target" => _, ^item => text_value} = params
 
-    node_id = assigns.node.id
     payload = %{
-      "id" => node_id,
+      "id" => assigns.node.id,
       "title" => text_value
     }
 
-    {:noreply, assign(socket, :node, update_node(payload, node_id))}
+    {:noreply, assign(socket, :node, update_node(payload))}
   end
 
   def handle_event("update_description", params, %{assigns: assigns} = socket) do
     %{"_target" => [item]} = params
     %{"_target" => _, ^item => text_value} = params
 
-    node_id = assigns.node.id
     payload = %{
-      "id" => node_id,
+      "id" => assigns.node.id,
       "description" => text_value
     }
 
-    {:noreply, assign(socket, :node, update_node(payload, node_id))}
+    {:noreply, assign(socket, :node, update_node(payload))}
   end
 
-  # This is a generic crud operation against helpers to update node
-  defp update_node(payload, id) do
-    case LeafNode.Core.Node.edit_node(payload) do
+  # TODO: move this to a more global util
+  defp update_node(node) do
+    node_id = node["id"]
+    case LeafNode.Core.Node.edit_node(node) do
       {:ok, _data} ->
-        case LeafNode.Core.Node.get_node(id) do
+        case LeafNode.Core.Node.get_node(node_id) do
           {:ok, data} ->
             data
 
           {:error, err} ->
             IO.inspect(
-              "There was a problem getting the node: #{id} with error: #{err}"
+              "There was a problem getting the node: #{node_id} with error: #{err}"
             )
 
             %{}
@@ -96,7 +95,7 @@ defmodule LeafNodeWeb.Components.NodeHeader do
 
       {:error, err} ->
         IO.inspect(
-          "There was a problem getting the node: #{id} with error: #{err}"
+          "There was a problem getting the node to update: #{node_id} with error: #{err}"
         )
 
         %{}

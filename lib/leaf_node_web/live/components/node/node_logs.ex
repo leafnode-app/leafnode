@@ -5,11 +5,16 @@ defmodule LeafNodeWeb.Components.NodeLogs do
   use Phoenix.LiveComponent
 
   attr :logs, :list, required: true
+  attr :node, :map, required: true
 
   def render(assigns) do
     ~H"""
+    <div>
       <div class="grow bg-zinc-900 rounded-lg p-4 border border-stone-900 h-100% bg-grey-500 p-1">
-        <%!-- Logs --%>
+      <div :if={!@node.should_log}class="p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400" role="alert">
+        Logs has been paused, logs wont be shown when node is run until settings has been changed above
+      </div>
+      <div disabled={!@node.should_log} class={if !@node.should_log, do: "opacity-10", else: "opacity-100"}>
         <%= if Enum.empty?(@logs) do%>
           No logs
         <% else%>
@@ -39,6 +44,8 @@ defmodule LeafNodeWeb.Components.NodeLogs do
           </ul>
         <% end%>
       </div>
+      </div>
+    </div>
     """
   end
 end

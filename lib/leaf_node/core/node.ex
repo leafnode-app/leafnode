@@ -120,6 +120,7 @@ defmodule LeafNode.Core.Node do
     Get the details of a node by id
   """
   def get_node(id) do
+    IO.inspect(id, label: "GETTING NODE")
     result =
       try do
         n = LeafNodeRepo.get!(Schemas.Node, id)

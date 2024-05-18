@@ -1,6 +1,9 @@
 defmodule LeafNodeWeb.NodeLive do
   use LeafNodeWeb, :live_view
 
+  # import components
+  alias LeafNodeWeb.Components.NodeHeader
+
   @doc """
     Init func that is run on init of the view
   """
@@ -26,7 +29,6 @@ defmodule LeafNodeWeb.NodeLive do
       assign(socket, :id, id)
       |> assign(:node, node)
       |> assign(:logs, log_list)
-      |> assign(:loading, nil)
 
     {:ok, socket}
   end
@@ -34,49 +36,7 @@ defmodule LeafNodeWeb.NodeLive do
   # Render function
   def render(assigns) do
     ~H"""
-      <!-- Header -->
-      <div phx-click="back_home" class="text-white cursor-pointer mx-2 mb-2"> back </div>
-
-      <div class="flex flex-col gap-1 py-1">
-        <div class="bg-zinc-900 rounded-lg py-4 px-2 border border-stone-900">
-          <div class="flex gap-3 p-2">
-            <div class="flex-grow"><%= @node.title %></div>
-            <div class="px-1 cursor-pointer">
-                <i class="fa-solid fa-gear"></i>
-              </div>
-          </div>
-        </div>
-      </div>
-
-      <%!-- <form>
-          <div class="mb-4">
-            <label for="node-title" class="text-l font-semibold text-white">Title</label>
-            <input
-              id="node-title"
-              phx-debounce="200"
-              phx-change="update_title"
-              phx-value-id={"#{@node.id}-#{@node.title}"}
-              name={"node-title"}
-              class="rounded p-2 w-full text-black"
-              value={@node.title || "Untitled Document"}
-            />
-          </div>
-
-          <div class="mb-4">
-            <label for="node-description" class="text-l font-semibold text-white">Description</label>
-            <input
-              id="node-description"
-              phx-debounce="200"
-              phx-change="update_description"
-              phx-value-id={"#{@node.id}-#{@node.description}"}
-              name={"node-description"}
-              class="rounded p-2 w-full text-black"
-              value={@node.description || "Untitled Document"}
-            />
-          </div>
-
-          <h6 class="text-sm text-white"><%= @node.id %></h6>
-        </form> --%>
+      <.live_component module={NodeHeader} id="node_header" node={@node} />
 
       <div class="flex flex-col md:flex-row gap-1 justify-center">
         <div class="flex flex-col grow bg-zinc-900 rounded-lg p-4 w-full md:w-80 border border-stone-900">
@@ -140,7 +100,10 @@ defmodule LeafNodeWeb.NodeLive do
                 value={LeafNodeWeb.Endpoint.url() <> "/api/v1/node/" <> @node.id}
                 disabled
               />
-              <div class="text-xs p-2 text-gray-600"> header (x-api-token: <%= @node.access_key %>) </div>
+              <div class="py-4">
+                <div class="text-xs px-2 text-gray-600"> x-api-token: </div>
+                <div class="text-xs px-2 text-gray-600"> <%= @node.access_key %> </div>
+              </div>
             </div>
 
             <span class="bg-orange-100 text-xs font-medium mx-1 px-2 py-0.5 rounded dark:bg-orange-700">
@@ -173,90 +136,5 @@ defmodule LeafNodeWeb.NodeLive do
         </div>
       </div>
     """
-  end
-
-  def handle_event("back_home", _params, socket) do
-    {:noreply, socket |> push_navigate(to: "/dashboard")}
-  end
-
-  def handle_event("update_title", params, socket) do
-    %{"_target" => [item]} = params
-    %{"_target" => _, ^item => text_value} = params
-
-    # node id relevant to the texts
-    id = socket.assigns.id
-
-    payload = %{
-      "id" => id,
-      "title" => text_value
-    }
-
-    node =
-      case LeafNode.Core.Node.edit_node(payload) do
-        {:ok, _data} ->
-          case LeafNode.Core.Node.get_node(socket.assigns.id) do
-            {:ok, data} ->
-              data
-
-            {:error, err} ->
-              IO.inspect(
-                "There was a problem getting the node: #{socket.assigns.id} with error: #{err}"
-              )
-
-              %{}
-          end
-
-        {:error, err} ->
-          IO.inspect(
-            "There was a problem getting the node: #{socket.assigns.id} with error: #{err}"
-          )
-
-          %{}
-      end
-
-    {:noreply, assign(socket, :node, node)}
-  end
-
-  def handle_event("update_description", params, socket) do
-    %{"_target" => [item]} = params
-    %{"_target" => _, ^item => text_value} = params
-
-    # node id relevant to the texts
-    id = socket.assigns.id
-
-    payload = %{
-      "id" => id,
-      "description" => text_value
-    }
-
-    node =
-      case LeafNode.Core.Node.edit_node(payload) do
-        {:ok, _data} ->
-          case LeafNode.Core.Node.get_node(socket.assigns.id) do
-            {:ok, data} ->
-              data
-
-            {:error, err} ->
-              IO.inspect(
-                "There was a problem getting the node: #{socket.assigns.id} with error: #{err}"
-              )
-
-              %{}
-          end
-
-        {:error, err} ->
-          IO.inspect(
-            "There was a problem getting the node: #{socket.assigns.id} with error: #{err}"
-          )
-
-          %{}
-      end
-
-    {:noreply, assign(socket, :node, node)}
-  end
-
-  # handle info is used to manage events on channels
-  def handle_info({:loading, text_block_id}, socket) do
-    {:noreply, assign(socket, loading: text_block_id)}
   end
 end

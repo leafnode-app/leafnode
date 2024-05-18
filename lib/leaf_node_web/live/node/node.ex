@@ -137,7 +137,7 @@ defmodule LeafNodeWeb.NodeLive do
                 id="disabled-input"
                 aria-label="disabled input"
                 class="box_input_inset_shadow disabledmb-6 text-gray-900 text-sm rounded-lg border-stone-900 block w-full p-4 cursor-not-allowed dark:text-gray-400"
-                value={"https://leafnode.app/api/v1/node/" <> @node.id}
+                value={LeafNodeWeb.Endpoint.url() <> "/api/v1/node/" <> @node.id}
                 disabled
               />
               <div class="text-xs p-2 text-gray-600"> header (x-api-token: <%= @node.access_key %>) </div>

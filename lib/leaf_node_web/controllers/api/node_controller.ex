@@ -18,12 +18,12 @@ defmodule LeafNodeWeb.Api.NodeController do
     # Start the server if not already running
     LeafNode.Servers.ExecutionServer.start_link(id)
 
-    {status, %{ "node" => _node, "result" => node_result}} =
+    {status, resp} =
       GenServer.call(String.to_atom("execution_process_" <> id), {:execute, id, payload})
 
     case status do
-      :ok -> return(conn, 200, Helpers.http_resp(200, true, node_result))
-      _ -> return(conn, 404, Helpers.http_resp(404, false, %{}))
+      :ok -> return(conn, 200, Helpers.http_resp(200, true, resp))
+      _ -> return(conn, 404, Helpers.http_resp(404, false, resp))
     end
   end
 

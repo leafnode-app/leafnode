@@ -6,6 +6,7 @@ defmodule LeafNode.Servers.ExecutionServer do
   require Logger
   alias LeafNode.Core.Log
 
+  @error_execution "There was an error executing the node"
   @doc """
     State the server with base argument data
   """
@@ -35,13 +36,17 @@ defmodule LeafNode.Servers.ExecutionServer do
     # get the node
     {status, node} = LeafNode.Core.Node.get_node(node_id)
 
-    # check node fetch data
-    case status do
-      :ok ->
-        {status, result} = start_execution(node, payload)
-        {:stop, :normal, {status, result}, state}
-      _ ->
-        {:stop, :normal, {:error, "There was an error executing the node"}, state}
+    if node.enabled do
+      # check node fetch data
+      case status do
+        :ok ->
+          {status, result} = start_execution(node, payload)
+          {:stop, :normal, {status, result}, state}
+        _ ->
+          {:stop, :normal, {:error, @error_execution}, state}
+        end
+      else
+        {:stop, :normal, {:error, @error_execution}, state}
     end
   end
 
@@ -53,12 +58,11 @@ defmodule LeafNode.Servers.ExecutionServer do
     # TODO: Add the logic for the node execution in general
 
     # Here we need to set the logs - random for now
-    Log.create_log(node.id, payload, payload, Enum.random([true, false]))
+    if (node.should_log) do
+      Log.create_log(node.id, payload, payload, Enum.random([true, false]))
+    end
 
     # We just send the payload back for now - this needs to be based off the execution of the node
-    {:ok, %{
-      "node" => node,
-      "result" => payload
-    }}
+    {:ok, payload}
   end
 end

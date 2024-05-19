@@ -22,7 +22,7 @@ defmodule LeafNodeWeb.Components.NodeHeader do
                 phx-target={@myself}
                 phx-value-id={"#{@node.id}-#{@node.title}"}
                 name={"node-title"}
-                class="rounded p-2 w-full text-black"
+                class="focus:outline-none box_input_inset_shadow text-gray-900 text-sm rounded-lg border-stone-900 block w-full p-4 dark:text-gray-400"
                 value={@node.title || "Untitled Document"}
               />
               <div class="py-2"/>
@@ -34,7 +34,7 @@ defmodule LeafNodeWeb.Components.NodeHeader do
                 phx-target={@myself}
                 phx-value-id={"#{@node.id}-#{@node.description}"}
                 name={"node-description"}
-                class="rounded p-2 w-full text-black"
+                class="focus:outline-none box_input_inset_shadow text-gray-900 text-sm rounded-lg border-stone-900 block w-full p-4 dark:text-gray-400"
                 value={@node.description || "Untitled Document"}
               />
             </form>

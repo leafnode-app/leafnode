@@ -37,7 +37,7 @@ defmodule LeafNodeWeb.Components.NodeLogs do
                         "text-xs font-medium me-2 px-2.5 py-0.5 rounded " <>
                         if item.status, do: "bg-green-100 dark:bg-green-700", else: "bg-red-100 dark:bg-red-700"
                       }>
-                        <%= item.status %>
+                        <%= if item.status, do: "Success", else: "Failure" %>
                       </span>
                     </div>
                   </div>

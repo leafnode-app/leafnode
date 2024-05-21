@@ -4,7 +4,7 @@
 Document based API gateway that allows creation of documents and having the documuments be run through endpoints - With this you are able to express what you want to do with the payload coming in using text and AI has it expressed in code based on whitelist options the system understands as relevant and the data can be selected and mutated sequencually through blocks with the entire document output able to be selected as the result of the endpoint.
 
 ## Features
-The project is currently not in active development but a side project that later will be the basis of another.
+The project is currently in active development but a side project that later will be the basis of another.
 
 1. UI that allows creating documents
 2. Create blocks in documents

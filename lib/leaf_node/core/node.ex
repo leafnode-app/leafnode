@@ -14,9 +14,14 @@ defmodule LeafNode.Core.Node do
 
     case {_, result} = LeafNodeRepo.insert(changeset) do
       {:ok, _} ->
+        node_id = Map.get(result, :id)
+
+        # attempt to make an init node expression - we rely on the schema to set defaults
+        LeafNode.Core.Expression.create_expression(node_id, "some.object.key", "===", "string", "")
+
         {:ok,
          %{
-           id: Map.get(result, :id)
+           id: node_id
          }}
 
       {:error, _} ->

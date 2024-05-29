@@ -1,70 +1,65 @@
 defmodule LeafNode.Core.Code do
   @moduledoc """
-    The module that we will use for core functionality to check and generate code.
-    We can use this to convert to and from text <-> code and hold whitelist of functions
+  The module that we will use for core functionality to check and generate code.
+  We can use this to convert to and from text <-> code and hold whitelist of functions.
   """
-
   require Logger
+
   @doc """
-    We execute the function that was passed based on permission
+  Execute the function that was passed based on permission.
   """
-  # TODO: Too many inputs here!
-  def execute(func_string, document_id, text_id, payload) do
-    case Code.string_to_quoted(func_string) do
-      {:ok, ast} ->
-        case evaluate_ast(ast, document_id, text_id, payload) do
-          {:ok, result} ->
-            # We assume the server is up - we can start up later if needed
-            GenServer.call(String.to_atom("history_" <> document_id), {:set_history, text_id, result})
-            # return for execution purposes but we dont need this
-            {:ok, result}
-          {:error, reason} ->
-            Logger.error("Error executing function: #{reason}")
-            {:error, "Error executing function"}
-        end
+  def execute(payload, %{id: _, input: input, type: type, value: value, expression: expression}) do
+    # Try to get the input value based on the selected input path
+    payload_value = Kernel.get_in(payload, String.split(input, "."))
+
+    # Convert the stored value to the relevant type
+    case type_conversion(value, type) do
+      {:ok, converted_value} ->
+        # Compare the payload value against the converted value using the expression
+        result = compare(payload_value, converted_value, expression)
+        IO.inspect(result, label: "Comparison Result")
+        {:ok, result}
+
       {:error, reason} ->
-        Logger.error("Unable to parse function string: #{inspect(reason)}")
-        {:error, "Unable to parse function string"}
+        Logger.error("Type conversion error: #{reason}")
+        {:error, reason}
     end
   end
 
-  @doc """
-    Check if we are permitted to use the function
-  """
-  defp evaluate_ast({func_atom, _, args}, document_id, text_id, payload) when is_atom(func_atom) do
-    func_string = Atom.to_string(func_atom)
-    allowed_functions = LeafNode.Core.SafeFunctions.allowed_functions()
-    if Enum.member?(allowed_functions, func_string) do
-      # we need to get the value from the keyword list, the result
-      evaluated_args = Enum.map(args, fn item ->
-        case evaluate_ast(item, document_id, text_id, payload) do
-          {_, value} -> value
-          [_: value] -> value
-        end
-      end)
-
-      # created a payload with metadata
-      input = %{
-        "payload" => payload,
-        "params" => evaluated_args,
-        "meta_data" => %{
-          "document_id" => document_id,
-          "text_id" => text_id,
-          "type" => func_string
-        }
-      }
-      # TODO: Look at how we can dynamically use the functions modules?
-      # We want to avoid making atoms, so this might have the safe functions module first
-      apply(LeafNode.Core.SafeFunctions, func_atom, [input])
-    else
-      {:error, "Function #{func_string} is not allowed"}
+  # Convert the stored value to the relevant type
+  defp type_conversion(value, type) when type === "string" do
+    {:ok, to_string(value)}
+  end
+  defp type_conversion(value, type) when type === "integer" do
+    case Integer.parse(value) do
+      {int, ""} -> {:ok, int}
+      _ -> {:error, "Unable to execute as value can't be converted to type integer"}
     end
   end
+  defp type_conversion(value, type) when type === "boolean" do
+    case value do
+      true -> {:ok, true}
+      false -> {:ok, false}
+      "true" -> {:ok, true}
+      "false" -> {:ok, false}
+      _ -> {:error, "Unable to execute as value can't be converted to type boolean"}
+    end
+  end
+  defp type_conversion(_, _type) do
+    {:error, "Unsupported type"}
+  end
 
-  # the base and last value that will be executed to the safe functions
-  defp evaluate_ast(value, _document_id, _text_id, _payload) do
-    {:ok, value}
+  # Compare the payload value against the converted value using the expression
+  defp compare(nil, _, _), do: false
+  defp compare(payload_value, converted_value, expression) do
+    case expression do
+      "===" -> payload_value === converted_value
+      "!=" -> payload_value != converted_value
+      ">" -> payload_value > converted_value
+      ">=" -> payload_value >= converted_value
+      "<" -> payload_value < converted_value
+      "<=" -> payload_value <= converted_value
+      _ -> false
+    end
   end
 end
-
-# GenServer.call(LeafNode.Servers.ExecutionServer, {:execute, "2a591b73-0c39-4fd1-af09-ae5252f738c6"}, 10000)

@@ -5,6 +5,7 @@ defmodule LeafNode.Servers.ExecutionServer do
   use GenServer
   require Logger
   alias LeafNode.Core.Log
+  alias LeafNode.Core.Expression
 
   @error_execution "There was an error executing the node"
   @doc """
@@ -54,15 +55,30 @@ defmodule LeafNode.Servers.ExecutionServer do
     Executing the node itself
   """
   defp start_execution(node, payload) do
-    # LeafNode.Core.Code.execute(pseudo_code, node.id, text.id, payload)
-    # TODO: Add the logic for the node execution in general
-
-    # Here we need to set the logs - random for now
-    if (node.should_log) do
-      Log.create_log(node.id, payload, payload, Enum.random([true, false]))
+    {status, resp} = Expression.get_expression_by_node(node.id)
+    case status do
+      :ok ->
+        execute(node, payload, resp)
+      _ ->
+        # failed to execute node
+        error_result = "Missing node expression"
+        log_result(node, payload, LeafNode.Utils.Helpers.http_resp(404, false, error_result), false)
+        {:error, error_result}
     end
+  end
 
-    # We just send the payload back for now - this needs to be based off the execution of the node
-    {:ok, payload}
+  # The execution of the node expression against the payload
+  defp execute(node, payload, expression) do
+    {_, result} = LeafNode.Core.Code.execute(payload, expression)
+    IO.inspect(result, label: "EXECUTE")
+    log_result(node, payload, LeafNode.Utils.Helpers.http_resp(200, true, result), result)
+    {:ok, result}
+  end
+
+  # Attempt to log the node input and persist
+  defp log_result(node, input, result, status) do
+    if (node.should_log) do
+      Log.create_log(node.id, input, result, status)
+    end
   end
 end

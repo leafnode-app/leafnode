@@ -6,18 +6,36 @@ defmodule LeafNode.Core.Node do
   alias LeafNode.Repo, as: LeafNodeRepo
   alias LeafNode.Schemas
 
+  # The expressions I can compare against
+  @expressions_types [
+    "===",
+    "!=",
+    ">",
+    ">=",
+    "<",
+    "<="
+  ]
+
+  # The condition types to select
+  @cond_types [
+    "string",
+    "integer",
+    "boolean"
+  ]
+
   @doc """
     Create a node - genreate an id and pass payload to be persisted
   """
   def create_node(user_id) do
-    changeset = Schemas.Node.changeset(%Schemas.Node{}, %{user_id: user_id, access_key: UUID.uuid4()})
+    changeset =
+      Schemas.Node.changeset(%Schemas.Node{}, %{user_id: user_id, access_key: UUID.uuid4()})
 
     case {_, result} = LeafNodeRepo.insert(changeset) do
       {:ok, _} ->
         node_id = Map.get(result, :id)
 
         # attempt to make an init node expression - we rely on the schema to set defaults
-        LeafNode.Core.Expression.create_expression(node_id, "some.object.key", "===", "string", "")
+        LeafNode.Core.Expression.create_expression(node_id, "", "===", "string", "")
 
         {:ok,
          %{
@@ -125,7 +143,6 @@ defmodule LeafNode.Core.Node do
     Get the details of a node by id
   """
   def get_node(id) do
-    IO.inspect(id, label: "GETTING NODE")
     result =
       try do
         n = LeafNodeRepo.get!(Schemas.Node, id)
@@ -149,5 +166,13 @@ defmodule LeafNode.Core.Node do
       {:ok, data} -> {:ok, data}
       _ -> {:error, "There was an error getting the current node"}
     end
+  end
+
+  # The expression and condition types options - this can be a def of a struct later
+  def expression_types do
+    @expressions_types
+  end
+  def condition_types do
+    @cond_types
   end
 end

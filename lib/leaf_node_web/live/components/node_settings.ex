@@ -1,25 +1,9 @@
 defmodule LeafNodeWeb.Components.NodeSettings do
   @moduledoc """
-  General node conditions and side effects that need to be run
+  General node conditions and side effects that need to be run.
   """
   use Phoenix.LiveComponent
-
-  # The expressions I can compare against
-  @expressions_types [
-    "===",
-    "!=",
-    ">",
-    ">=",
-    "<",
-    "<="
-  ]
-
-  # The condition types to select
-  @cond_types [
-    "string",
-    "integer",
-    "boolean"
-  ]
+  import LeafNode.Core.Node, only: [expression_types: 0, condition_types: 0]
 
   def update(assigns, socket) do
     expression = assigns.expression || %{}
@@ -34,8 +18,8 @@ defmodule LeafNodeWeb.Components.NodeSettings do
       |> assign(:node_id, Map.get(expression, :node_id))
       |> assign(:show_modal, false)
       |> assign(:form_opts, %{
-          expressions_types: @expressions_types,
-          cond_types: @cond_types
+          expressions_types: expression_types(),
+          cond_types: condition_types()
         })
     }
   end
@@ -47,7 +31,7 @@ defmodule LeafNodeWeb.Components.NodeSettings do
         <div class="flex flex-col p-4 h-full gap-1 justify-center flex-1">
           <div class="node_block_wrapper box_input_inset_shadow cursor-pointer" phx-target={@myself} phx-click="open_modal">
             <pre class="px-1 text-orange-300">
-              when :: <%= empty_check(@input, "input") %> <%= empty_check(@cond, "condition") %> <%= empty_check(@value, "value") %></pre>
+            when :: <%= empty_check(@input, "input") %> <%= empty_check(@cond, "condition") %> <%= empty_check(@value, "value") %> <%= "(type: #{empty_check(@type, "type")})" %> </pre>
           </div>
           <small class="text-gray-500 pt-2 px-2">Select the box above to start adding logic to compare against based on the expected payload</small>
         </div>
@@ -98,6 +82,7 @@ defmodule LeafNodeWeb.Components.NodeSettings do
               <div class="mb-4">
                 <label class="block text-sm font-medium text-gray-300 mb-2">Value:</label>
                 <%= if @type == "boolean" do %>
+                  <input type="hidden" name="value" value={@value} />
                   <div class="flex items-center p-4 bg-zinc-700 rounded-md cursor-pointer" phx-click="toggle_boolean" phx-target={@myself}>
                     <input type="checkbox"
                       name="value"
@@ -136,6 +121,8 @@ defmodule LeafNodeWeb.Components.NodeSettings do
   end
 
   def handle_event("save_condition", %{"input" => input, "expression" => expression, "value" => value, "type" => type}, socket) do
+    IO.inspect(type, label: "TYPE")
+    IO.inspect(value, label: "BOOLEAN")
     value = if type == "boolean", do: if(value == "on", do: "true", else: "false"), else: value
     updated_expression = %{
       "id" => socket.assigns.id,

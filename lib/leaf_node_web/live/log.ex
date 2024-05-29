@@ -16,15 +16,10 @@ defmodule LeafNodeWeb.LogDetailsLive do
           %{}
       end
 
-    # Not good as we might not have a log but we assume there is for being on this page
-    {status, expression} = LeafNode.Core.Expression.get_expression_by_node(log.node_id)
-    expr = if status === :ok, do: expression, else: %{}
-
     # Add the id and log to the socket
     socket =
       assign(socket, :id, id)
       |> assign(:log, log)
-      |> assign(:expression, expr)
 
     {:ok, socket}
   end
@@ -32,7 +27,6 @@ defmodule LeafNodeWeb.LogDetailsLive do
   def render(assigns) do
     input_json = Jason.encode!(assigns.log.input, pretty: true)
     result_json = Jason.encode!(assigns.log.result, pretty: true)
-    expression_json = Jason.encode!(assigns.expression, pretty: true)
 
     ~H"""
     <div class="text-gray-300">
@@ -55,11 +49,6 @@ defmodule LeafNodeWeb.LogDetailsLive do
                 <%= if @log.status, do: "Success", else: "Failure" %>
               </span>
             </p>
-          </div>
-
-          <div class="mb-6">
-            <h4 class="text-l font-semibold mb-2">Expression Used:</h4>
-            <pre class="bg-zinc-800 rounded-lg p-4 overflow-auto whitespace-pre-wrap"><%= @expression.input %> <%= @expression.expression %> <%= @expression.value %></pre>
           </div>
 
           <div class="mb-6">

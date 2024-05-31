@@ -86,7 +86,7 @@ defmodule LeafNodeWeb.NodesLive do
         {:ok, _data} ->
           get_nodes(socket)
 
-        {:error, err} ->
+        {:error, _err} ->
           []
       end
 

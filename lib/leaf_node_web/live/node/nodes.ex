@@ -64,7 +64,7 @@ defmodule LeafNodeWeb.NodesLive do
     user = socket.assigns.current_user
 
     socket =
-      case LeafNode.Core.Node.create_node(user.id) do
+      case LeafNode.Repo.Node.create_node(user.id) do
         {:ok, data} ->
           push_navigate(socket, to: "/dashboard/node/#{data.id}")
 
@@ -82,7 +82,7 @@ defmodule LeafNodeWeb.NodesLive do
 
   def handle_event("node_delete", %{"id" => id, "value" => _}, socket) do
     nodes =
-      case LeafNode.Core.Node.delete_node(id) do
+      case LeafNode.Repo.Node.delete_node(id) do
         {:ok, _data} ->
           get_nodes(socket)
 
@@ -98,7 +98,7 @@ defmodule LeafNodeWeb.NodesLive do
   defp get_nodes(socket) do
     user = socket.assigns.current_user
 
-    case LeafNode.Core.Node.list_nodes(user.id) do
+    case LeafNode.Repo.Node.list_nodes(user.id) do
       {:ok, data} ->
         data
 

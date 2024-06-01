@@ -79,9 +79,9 @@ defmodule LeafNodeWeb.Components.NodeHeader do
   # TODO: move this to a more global util
   defp update_node(node) do
     node_id = node["id"]
-    case LeafNode.Core.Node.edit_node(node) do
+    case LeafNode.Repo.Node.edit_node(node) do
       {:ok, _data} ->
-        case LeafNode.Core.Node.get_node(node_id) do
+        case LeafNode.Repo.Node.get_node(node_id) do
           {:ok, data} ->
             data
 

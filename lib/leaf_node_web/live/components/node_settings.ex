@@ -3,7 +3,7 @@ defmodule LeafNodeWeb.Components.NodeSettings do
   General node conditions and side effects that need to be run.
   """
   use Phoenix.LiveComponent
-  import LeafNode.Core.Node, only: [expression_types: 0, condition_types: 0]
+  import LeafNode.Repo.Node, only: [expression_types: 0, condition_types: 0]
 
   def update(assigns, socket) do
     expression = assigns.expression || %{}

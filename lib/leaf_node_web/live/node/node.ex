@@ -10,14 +10,14 @@ defmodule LeafNodeWeb.NodeLive do
     %{"id" => id} = params
 
     node =
-      case LeafNode.Core.Node.get_node(id) do
+      case LeafNode.Repo.Node.get_node(id) do
         {:ok, data} -> data
         {:error, err} ->
           IO.inspect("There was a problem getting the node: #{id} with error: #{err}")
           %{}
       end
 
-    {status, logs} = LeafNode.Core.Log.list_logs(id)
+    {status, logs} = LeafNode.Repo.Log.list_logs(id)
     log_list = if status === :ok && is_list(logs), do: logs, else: []
 
     {status, expression} = LeafNode.Core.Expression.get_expression_by_node(id)
@@ -81,9 +81,9 @@ defmodule LeafNodeWeb.NodeLive do
 
   defp update_node(node, prev_node) do
     node_id = node["id"]
-    case LeafNode.Core.Node.edit_node(node) do
+    case LeafNode.Repo.Node.edit_node(node) do
       {:ok, _data} ->
-        case LeafNode.Core.Node.get_node(node_id) do
+        case LeafNode.Repo.Node.get_node(node_id) do
           {:ok, data} -> data
           {:error, err} ->
             IO.inspect("There was a problem getting the node: #{node_id} with error: #{err}")

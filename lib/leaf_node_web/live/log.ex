@@ -7,7 +7,7 @@ defmodule LeafNodeWeb.LogDetailsLive do
   """
   def mount(%{"id" => id}, _session, socket) do
     log =
-      case LeafNode.Core.Log.get_log(id) do
+      case LeafNode.Repo.Log.get_log(id) do
         {:ok, data} ->
           data
 

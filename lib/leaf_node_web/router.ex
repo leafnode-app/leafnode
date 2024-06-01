@@ -32,9 +32,24 @@ defmodule LeafNodeWeb.Router do
 
   # Landing Page
   scope "/", LeafNodeWeb do
+    pipe_through [:browser]
+
+    live "/", UserLoginLive
+
+    # TODO: privacy policy and terms of service - make sure to update google and services that need this
+    # live "/privacy-policy", GeneralLive, :privacy_policy
+    # live "/terms-of-service", GeneralLive, :terms_of_service
+  end
+
+  # Landing Page
+  scope "/", LeafNodeWeb do
     pipe_through [:browser, :redirect_if_user_is_authenticated]
 
     live "/", UserLoginLive
+
+    # TODO: privacy policy and terms of service - make sure to update google and services that need this
+    # live "/privacy-policy", GeneralLive, :privacy_policy
+    # live "/terms-of-service", GeneralLive, :terms_of_service
   end
 
   # App dashboard - login
@@ -51,6 +66,10 @@ defmodule LeafNodeWeb.Router do
 
       live "/auth/confirm/:token", UserConfirmationLive, :edit
       live "/auth/confirm", UserConfirmationInstructionsLive, :new
+
+      # Google callback for authenticating the app
+      get "/auth/request", GoogleController, :request
+      get "/auth/callback", GoogleController, :callback
     end
   end
 
@@ -84,6 +103,8 @@ defmodule LeafNodeWeb.Router do
     pipe_through [:api, :validate_access_key]
     post "/:id", NodeController, :execute_node
   end
+
+  # Publuc routes
 
   # ---- API ---- #
   # Enable LiveDashboard and Swoosh mailbox preview in development

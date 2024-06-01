@@ -1,4 +1,4 @@
-defmodule LeafNode.Core.Node do
+defmodule LeafNode.Repo.Node do
   @moduledoc """
     Methods around the Documents and persistence/data management
   """

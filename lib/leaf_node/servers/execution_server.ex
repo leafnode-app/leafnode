@@ -4,7 +4,7 @@ defmodule LeafNode.Servers.ExecutionServer do
   """
   use GenServer
   require Logger
-  alias LeafNode.Core.Log
+  alias LeafNode.Repo.Log
   alias LeafNode.Core.Expression
 
   @error_execution "There was an error executing the node"
@@ -35,7 +35,7 @@ defmodule LeafNode.Servers.ExecutionServer do
   """
   def handle_call({:execute, node_id, payload}, _form, state) do
     # get the node
-    {status, node} = LeafNode.Core.Node.get_node(node_id)
+    {status, node} = LeafNode.Repo.Node.get_node(node_id)
 
     if node.enabled do
       # check node fetch data
@@ -70,9 +70,8 @@ defmodule LeafNode.Servers.ExecutionServer do
   # The execution of the node expression against the payload
   defp execute(node, payload, expression) do
     {_, result} = LeafNode.Core.Code.execute(payload, expression)
-    IO.inspect(result, label: "EXECUTE")
     log_result(node, payload, LeafNode.Utils.Helpers.http_resp(200, true, result), result)
-    {:ok, result}
+    execute_integration(result)
   end
 
   # Attempt to log the node input and persist
@@ -80,5 +79,13 @@ defmodule LeafNode.Servers.ExecutionServer do
     if (node.should_log) do
       Log.create_log(node.id, input, result, status)
     end
+  end
+
+  # Here we do the integration if the node has and the relevant result and conditions are met
+  defp execute_integration(node_result) do
+    IO.inspect("DO INTEGRATION HERE")
+
+    # Return result regardless for now to calling for the user process instance
+    {:ok, node_result}
   end
 end

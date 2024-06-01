@@ -1,4 +1,4 @@
-defmodule LeafNode.Core.Log do
+defmodule LeafNode.Repo.Log do
   @moduledoc """
     Methods around the Log and persistence/data management
   """

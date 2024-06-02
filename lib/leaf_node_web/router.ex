@@ -67,8 +67,8 @@ defmodule LeafNodeWeb.Router do
       live "/auth/confirm/:token", UserConfirmationLive, :edit
       live "/auth/confirm", UserConfirmationInstructionsLive, :new
 
-      # Google callback for authenticating the app
-      get "/auth/request", GoogleController, :request
+      # Google callback for authenticating the app - we pass the node id along
+      get "/auth/request/:node_id", GoogleController, :request
       get "/auth/callback", GoogleController, :callback
     end
   end

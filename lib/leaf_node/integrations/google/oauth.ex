@@ -44,6 +44,16 @@ defmodule LeafNode.Google.OAuth do
       approval_prompt: @approval_prompt
     )
   end
+  def authorize_url(client, redirect_uri, params) do
+    OAuth2.Client.authorize_url!(
+      client,
+      redirect_uri: redirect_uri,
+      scope: @scope,
+      access_type: @access_type,
+      approval_prompt: @approval_prompt,
+      state: Base.encode64(Jason.encode!(params))
+    )
+  end
 
   @doc """
     Get an auth token that can be stored along with a refresh token to use for reqeust against googer services

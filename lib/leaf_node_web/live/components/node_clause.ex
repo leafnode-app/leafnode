@@ -33,7 +33,7 @@ defmodule LeafNodeWeb.Components.NodeClause do
             <pre class="px-1 text-orange-300">
             when :: <%= empty_check(@input, "input") %> <%= empty_check(@cond, "condition") %> <%= empty_check(@value, "value") %> <%= "(type: #{empty_check(@type, "type")})" %> </pre>
           </div>
-          <small class="text-gray-500 pt-2 px-2">Select the box above to start adding logic to compare against based on the expected payload</small>
+          <small class="text-gray-500 text-center pt-2 px-2">Select the box above to start adding logic to compare against based on the expected payload</small>
         </div>
       </div>
 
@@ -158,7 +158,7 @@ defmodule LeafNodeWeb.Components.NodeClause do
   end
 
   defp update_expression(expression) do
-    case LeafNode.Core.Expression.edit_expression(expression) do
+    case LeafNode.Repo.Expression.edit_expression(expression) do
       {:ok, _} -> :ok
       {:error, err} -> IO.inspect("There was a problem updating the expression: #{err}")
     end

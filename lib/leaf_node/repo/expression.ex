@@ -1,4 +1,4 @@
-defmodule LeafNode.Core.Expression do
+defmodule LeafNode.Repo.Expression do
   @moduledoc """
     Methods around the Expressions for the nodes and logic associated with them
   """

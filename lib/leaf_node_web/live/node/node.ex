@@ -20,7 +20,7 @@ defmodule LeafNodeWeb.NodeLive do
     {status, logs} = LeafNode.Repo.Log.list_logs(id)
     log_list = if status === :ok && is_list(logs), do: logs, else: []
 
-    {status, expression} = LeafNode.Core.Expression.get_expression_by_node(id)
+    {status, expression} = LeafNode.Repo.Expression.get_expression_by_node(id)
     expr = if status === :ok, do: expression, else: %{}
 
     socket =
@@ -38,12 +38,59 @@ defmodule LeafNodeWeb.NodeLive do
     <.live_component module={NodeHeader} id="node_header" node={@node} />
     <div class="my-2" />
     <.live_component module={NodeClause} id="node_clause" expression={@expression} />
+    <div class="my-2" />
     <.live_component module={NodeIntegration} id="node_integrations" node={@node} />
     <div class="my-2" />
     <.live_component module={NodeDetails} id="node_details" node={@node} />
     <div class="my-2" />
     <.live_component module={NodeLogs} id="node_logs" logs={@logs} node={@node} />
     """
+  end
+
+  def handle_event("update_integration", values, %{assigns: assigns} = socket) do
+    node = assigns.node || false
+    user = assigns.current_user || false
+    case node do
+      false -> {:noreply, socket}
+      _ ->
+        values_check = if values["type"] === "none",
+          do: %{ type: "none", input: nil, has_oauth: false },
+          else: Map.merge(node.integration_settings, values)
+
+        payload = %{"id" => node.id, "integration_settings" => values_check}
+        {status, updated_node} = update_node(payload, node)
+
+        socket =
+          socket
+          |> assign(:node, updated_node)
+
+        updated_node = if status === :ok do
+          node = updated_node
+          integration_payload = Map.merge(node.integration_settings, values)
+          type = integration_payload["type"]
+
+          integration_token = if type !== "none" do
+            LeafNode.Repo.OAuthToken.get_token(user.id, type)
+          end
+
+          has_oauth = if integration_token, do: true, else: false
+          payload =
+            %{
+              "id" => node.id,
+              "integration_settings" =>
+                Map.merge(node.integration_settings, %{ "has_oauth" => has_oauth })
+            }
+
+          {_, updated_node} = update_node(payload, node)
+          updated_node
+        end
+
+        socket =
+          socket
+          |> assign(:node, updated_node)
+
+        {:noreply, socket}
+    end
   end
 
   def handle_event("toggle_enabled", _, %{assigns: assigns} = socket) do
@@ -85,14 +132,15 @@ defmodule LeafNodeWeb.NodeLive do
     case LeafNode.Repo.Node.edit_node(node) do
       {:ok, _data} ->
         case LeafNode.Repo.Node.get_node(node_id) do
-          {:ok, data} -> data
+          {:ok, data} ->
+            {:ok, data}
           {:error, err} ->
             IO.inspect("There was a problem getting the node: #{node_id} with error: #{err}")
-            prev_node
+            {:error, prev_node}
         end
       {:error, err} ->
         IO.inspect("There was a problem getting the node to update: #{node_id} with error: #{err}")
-        prev_node
+        {:error, prev_node}
     end
   end
 end

@@ -3,71 +3,59 @@ defmodule LeafNodeWeb.Components.NodeIntegration do
     General node side effect that would be expected to run
   """
   use Phoenix.LiveComponent
+  alias LeafNodeWeb.Router.Helpers, as: Routes
+  import LeafNode.Repo.Node, only: [integration_types: 0]
 
   # TODO: THIS NEEDS TO BE MORE GENERIC TO MANAGE THE DIFFERENT TYPES FOR EACH INTEGRATION SETTINGS
 
   def update(assigns, socket) do
     integration_settings = assigns.node.integration_settings || %{}
 
-
+    IO.inspect(integration_settings)
     {:ok,
-      socket
-      # |> assign(:id, Map.get(expression, :id))
-      # |> assign(:input, Map.get(expression, :input, ""))
-      # |> assign(:cond, Map.get(expression, :expression, ""))
-      # |> assign(:value, Map.get(expression, :value, ""))
-      # |> assign(:type, Map.get(expression, :type, ""))
-      # |> assign(:node_id, Map.get(expression, :node_id))
-      # |> assign(:show_modal, false)
-      # |> assign(:form_opts, %{
-      #     expressions_types: expression_types(),
-      #     cond_types: condition_types()
-      #   })
-    }
+     socket
+     |> assign(:show_modal, false)
+     |> assign(:node, assigns.node)
+     |> assign(:input, Map.get(integration_settings, "input"))
+     |> assign(:type, Map.get(integration_settings, "type"))
+     |> assign(:has_oauth, Map.get(integration_settings, "has_oauth"))
+     |> assign(:form_opts, %{
+       integrations: integration_types()
+     })}
   end
 
   def render(assigns) do
     ~H"""
     <div class="flex-1 bg-zinc-900 h-100% py-4 px-2 rounded-lg border border-stone-900">
-      <%!-- <div>
+      <%= if @type === "none" do %>
         <div class="flex flex-col p-4 h-full gap-1 justify-center flex-1">
           <div class="node_block_wrapper box_input_inset_shadow cursor-pointer" phx-target={@myself} phx-click="open_modal">
-            <pre class="px-1 text-orange-300">
-            when :: <%= empty_check(@input, "input") %> <%= empty_check(@cond, "condition") %> <%= empty_check(@value, "value") %> <%= "(type: #{empty_check(@type, "type")})" %> </pre>
+            click here to add integration
           </div>
-          <small class="text-gray-500 pt-2 px-2">Select the box above to start adding logic to compare against based on the expected payload</small>
         </div>
-      </div> --%>
+      <% else %>
+        <div>
+          <div class="flex flex-col p-4 h-full gap-1 justify-center flex-1">
+            <%= if @has_oauth do %>
+              <div class="node_block_wrapper box_input_inset_shadow cursor-pointer" phx-target={@myself} phx-click="open_modal">
+                <%!-- <pre class="text-blue-300"> --%>
+                  <%= @input %> (<%= @type %>)
+                <%!-- </pre> --%>
+              </div>
+            <% else %>
+              <div class="node_block_wrapper box_input_inset_shadow cursor-pointer" phx-target={@myself} phx-click="oauth_access">
+                <div>click here to grant Integration (<%= empty_check(@type, "type") %>) permissions</div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
 
-      <%!-- <%= if @show_modal do %>
+      <%= if @show_modal do %>
         <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div class="bg-zinc-800 p-6 rounded-lg shadow-lg w-1/2 max-w-lg">
-            <h2 class="text-2xl text-white mb-4">Add Condition</h2>
-            <form phx-submit="save_condition" phx-target={@myself}>
-              <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-300 mb-2">Input:</label>
-                <input
-                  autocomplete="false"
-                  type="text"
-                  name="input"
-                  value={@input}
-                  phx-target={@myself}
-                  class="focus:outline-none box_input_inset_shadow
-                    text-gray-900 text-sm rounded-lg border-stone-900 block w-full p-4 dark:text-gray-400" />
-                <small class="text-gray-500">Specify the input field to be checked. Check logs based on expected input using dot.notation.for.selection</small>
-              </div>
-              <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-300 mb-2">Expression:</label>
-                <select name="expression"
-                  class="focus:outline-none box_input_inset_shadow
-                    text-gray-900 text-sm rounded-lg border-stone-900
-                    block w-full p-4 dark:text-gray-400">
-                  <%= for expr <- @form_opts.expressions_types do %>
-                    <option value={expr} selected={expr == @cond}><%= expr %></option>
-                  <% end %>
-                </select>
-                <small class="text-gray-500">Choose the condition expression.</small>
-              </div>
+            <h2 class="text-2xl text-white mb-4">Integration</h2>
+            <form phx-submit="update_integration">
               <div class="mb-4">
                 <label class="block text-sm font-medium text-gray-300 mb-2">Type:</label>
                 <select name="type"
@@ -75,33 +63,29 @@ defmodule LeafNodeWeb.Components.NodeIntegration do
                   phx-target={@myself}
                   class="focus:outline-none box_input_inset_shadow text-gray-900
                     text-sm rounded-lg border-stone-900 block w-full p-4 dark:text-gray-400">
-                  <%= for cond_type <- @form_opts.cond_types do %>
-                    <option value={cond_type} selected={cond_type == @type}><%= cond_type %></option>
+                  <%= for integration <- @form_opts.integrations do %>
+                    <option value={integration} selected={integration == @type}><%= integration %></option>
                   <% end %>
                 </select>
-                <small class="text-gray-500">Select the type of value.</small>
+                <small class="text-gray-500">Select the type of integration.</small>
               </div>
-              <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-300 mb-2">Value:</label>
-                <%= if @type == "boolean" do %>
-                  <input type="hidden" name="value" value={@value} />
-                  <div class="flex items-center p-4 bg-zinc-700 rounded-md cursor-pointer" phx-click="toggle_boolean" phx-target={@myself}>
-                    <input type="checkbox"
-                      name="value"
-                      class="focus:outline-none text-gray-900
-                        text-sm rounded-lg border-stone-900" checked={@value == "true"} />
-                    <span class="ml-3 text-gray-300">True</span>
-                  </div>
-                  <small class="text-gray-500">Toggle to set the boolean value.</small>
-                <% else %>
-                  <input auto-complete="false"
+
+              <%!-- Input in order to store against the settings - this needs to be schema settings for type --%>
+              <%= if @type !== "none" do %>
+                <div class="mb-4">
+                  <label class="block text-sm font-medium text-gray-300 mb-2">Input:</label>
+                  <input
+                    autocomplete="false"
                     type="text"
-                    name="value"
-                    value={@value} class="focus:outline-none box_input_inset_shadow text-gray-900
-                      text-sm rounded-lg border-stone-900 block w-full p-4 dark:text-gray-400" />
-                  <small class="text-gray-500">Enter the value to compare against.</small>
-                <% end %>
-              </div>
+                    name="input"
+                    value={@input}
+                    phx-target={@myself}
+                    class="focus:outline-none box_input_inset_shadow
+                      text-gray-900 text-sm rounded-lg border-stone-900 block w-full p-4 dark:text-gray-400" />
+                  <small class="text-gray-500">Specify the input field to be checked. Check logs based on expected input using dot.notation.for.selection</small>
+                </div>
+              <% end %>
+
               <div class="flex justify-end gap-2">
                 <button type="submit" phx-target={@myself} class="px-4 py-2 bg-blue-600 text-white rounded-md">Save</button>
                 <button type="button" phx-target={@myself} phx-click="close_modal" class="px-4 py-2 bg-gray-600 text-white rounded-md">Cancel</button>
@@ -109,9 +93,14 @@ defmodule LeafNodeWeb.Components.NodeIntegration do
             </form>
           </div>
         </div>
-      <% end %> --%>
+      <% end %>
     </div>
     """
+  end
+
+  def handle_event("oauth_access", _params, socket) do
+    # TODO we need to change this
+    {:noreply, redirect(socket, to: "/auth/request/#{socket.assigns.node.id}")}
   end
 
   def handle_event("open_modal", _params, socket) do
@@ -122,47 +111,15 @@ defmodule LeafNodeWeb.Components.NodeIntegration do
     {:noreply, assign(socket, show_modal: false)}
   end
 
-  def handle_event("save_condition", %{"input" => input, "expression" => expression, "value" => value, "type" => type}, socket) do
-    value = if type == "boolean", do: if(value == "on", do: "true", else: "false"), else: value
-    updated_expression = %{
-      "id" => socket.assigns.id,
-      "input" => input,
-      "expression" => expression,
-      "value" => value,
-      "type" => type,
-      "node_id" => socket.assigns.node_id
-    }
-    update_settings(updated_expression)
-
-    {:noreply,
-     socket
-     |> assign(:cond, expression)
-     |> assign(:input, input)
-     |> assign(:value, value)
-     |> assign(:type, type)
-     |> assign(:show_modal, false)}
-  end
-
-  def handle_event("change_type", %{"type" => type}, socket) do
-    {:noreply, assign(socket, :type, type)}
-  end
-
-  def handle_event("toggle_boolean", _params, socket) do
-    value = if socket.assigns.value == "true", do: "false", else: "true"
-    {:noreply, assign(socket, :value, value)}
-  end
-
   defp empty_check(value, type) when value == "" do
     "[#{type}]"
   end
+
   defp empty_check(value, _type) do
     value
   end
 
-  defp update_settings(expression) do
-    case LeafNode.Core.Expression.edit_expression(expression) do
-      {:ok, _} -> :ok
-      {:error, err} -> IO.inspect("There was a problem updating the expression: #{err}")
-    end
+  def handle_event("change_type", %{"type" => type}, socket) do
+    {:noreply, assign(socket, :type, type)}
   end
 end

@@ -31,6 +31,10 @@ defmodule LeafNodeWeb.GoogleController do
     # TODO: use the changeset to determine if this needs to be success or not
     try do
       resp = LeafNode.Repo.OAuthToken.store_token(user_id, "google_sheets", token_data.access_token, token_data.refresh_token, token_data.expires_at)
+
+      # update the node integration settings flag - checks need to be done here so we know we update the flag
+      edit = LeafNode.Repo.Node.edit_node(%{ "id" => state["node_id"], "integration_settings" => %{ "has_oauth" => true} })
+
       redirect(conn, to: "/dashboard/node/" <> state["node_id"])
     rescue e ->
       redirect(conn, to: "/dashboard/node/" <> state["node_id"])

@@ -5,7 +5,7 @@ defmodule LeafNode.Servers.ExecutionServer do
   use GenServer
   require Logger
   alias LeafNode.Repo.Log
-  alias LeafNode.Core.Expression
+  alias LeafNode.Repo.Expression
 
   @error_execution "There was an error executing the node"
   @doc """

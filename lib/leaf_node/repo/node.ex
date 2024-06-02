@@ -7,6 +7,12 @@ defmodule LeafNode.Repo.Node do
   alias LeafNode.Schemas
 
   # The expressions I can compare against
+  @integration_types [
+    "none",
+    "google_sheets"
+  ]
+
+  # The expressions I can compare against
   @expressions_types [
     "===",
     "!=",
@@ -42,7 +48,7 @@ defmodule LeafNode.Repo.Node do
         node_id = Map.get(result, :id)
 
         # attempt to make an init node expression - we rely on the schema to set defaults
-        LeafNode.Core.Expression.create_expression(node_id, "", "===", "string", "")
+        LeafNode.Repo.Expression.create_expression(node_id, "", "===", "string", "")
 
         {:ok,
          %{
@@ -78,7 +84,7 @@ defmodule LeafNode.Repo.Node do
             enabled: Map.get(data, "enabled", struct.enabled),
             should_log: Map.get(data, "should_log", struct.should_log),
             expected_payload: Map.get(data, "expected_payload", struct.expected_payload),
-            integration_settings: Map.get(data, "integration_settings", struct.integration_settings)
+            integration_settings: Map.merge(struct.integration_settings, data["integration_settings"])
           )
 
         # we need to add or update the node texts here
@@ -184,5 +190,8 @@ defmodule LeafNode.Repo.Node do
   end
   def condition_types do
     @cond_types
+  end
+  def integration_types do
+    @integration_types
   end
 end

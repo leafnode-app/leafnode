@@ -4,8 +4,11 @@ defmodule LeafNodeWeb.Components.NodeIntegration do
   """
   use Phoenix.LiveComponent
 
+  # TODO: THIS NEEDS TO BE MORE GENERIC TO MANAGE THE DIFFERENT TYPES FOR EACH INTEGRATION SETTINGS
+
   def update(assigns, socket) do
-    IO.inspect(assigns, label: "assigns")
+    integration_settings = assigns.node.integration_settings || %{}
+
 
     {:ok,
       socket

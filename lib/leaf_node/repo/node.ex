@@ -33,7 +33,7 @@ defmodule LeafNode.Repo.Node do
         %{
           user_id: user_id,
           access_key: UUID.uuid4(),
-          settings: %{ type: "none", input: nil, has_oauth: false }
+          integration_settings: %{ type: "none", input: nil, has_oauth: false }
         }
       )
 
@@ -78,7 +78,7 @@ defmodule LeafNode.Repo.Node do
             enabled: Map.get(data, "enabled", struct.enabled),
             should_log: Map.get(data, "should_log", struct.should_log),
             expected_payload: Map.get(data, "expected_payload", struct.expected_payload),
-            settings: Map.get(data, "settings", struct.settings)
+            integration_settings: Map.get(data, "integration_settings", struct.integration_settings)
           )
 
         # we need to add or update the node texts here
@@ -137,7 +137,7 @@ defmodule LeafNode.Repo.Node do
           should_log: n.should_log,
           expected_payload: n.expected_payload,
           access_key: n.access_key,
-          settings: n.settings
+          integration_settings: n.integration_settings
         }
       )
 
@@ -165,7 +165,7 @@ defmodule LeafNode.Repo.Node do
            should_log: n.should_log,
            expected_payload: n.expected_payload,
            access_key: n.access_key,
-           settings: n.settings
+           integration_settings: n.integration_settings
          }}
       rescue
         _e ->

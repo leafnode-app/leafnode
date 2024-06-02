@@ -16,13 +16,10 @@ defmodule LeafNode.Repo.OAuthToken do
     Repo.insert_or_update(changeset)
   end
 
+  @doc """
+    Fetch a user oauth token for a given integration type
+  """
   def get_token(user_id, integration_type) do
     Repo.one(from t in OAuthToken, where: t.user_id == ^user_id and t.integration_type == ^integration_type)
-  end
-
-  def refresh_token(token_info) do
-    # TODO: Implement token refresh logic here
-    IO.inspect(token_info, label: "token_info")
-    :ok
   end
 end

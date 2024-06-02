@@ -15,6 +15,7 @@ defmodule LeafNode.Schemas.OAuthToken do
   def changeset(oauth_tokens, attrs) do
     oauth_tokens
     |> cast(attrs, [:user_id, :integration_type, :access_token, :refresh_token, :expires_at])
+    |> unique_constraint([:user_id, :integration_type])
     |> validate_required([:user_id, :integration_type, :access_token])
   end
 end

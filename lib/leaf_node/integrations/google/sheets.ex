@@ -1,5 +1,5 @@
 defmodule LeafNode.Integrations.Google.Sheets do
-  alias LeafNode.GoogleOAuth
+  alias LeafNode.Google.OAuth
 
   @doc """
     Get the account token details here
@@ -11,7 +11,7 @@ defmodule LeafNode.Integrations.Google.Sheets do
   @doc """
     Append values to google sheet
   """
-  # LeafNode.Integrations.Google.Sheets.write_to_sheet(token, "1oFKM0fU74b_qmDzqunhb9qcVghwgybSPTS8VCzYxORE", "Sheet1!A1:D1", [["some", "value", "goes", "here"]])
+  # LeafNode.Integrations.Google.Sheets.write_to_sheet(token, "1oFKM0fU74b_qmDzqunhb9qcVghwgybSPTS8VCzYxORE", "A1:D1", [["some", "value", "goes", "here"]])
   def write_to_sheet(token, spreadsheet_id, range, values) do
     # Specify the valueInputOption parameter
     value_input_option = "USER_ENTERED"  # or "RAW" based on your requirement

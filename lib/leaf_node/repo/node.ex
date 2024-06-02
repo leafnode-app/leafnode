@@ -28,7 +28,14 @@ defmodule LeafNode.Repo.Node do
   """
   def create_node(user_id) do
     changeset =
-      Schemas.Node.changeset(%Schemas.Node{}, %{user_id: user_id, access_key: UUID.uuid4()})
+      Schemas.Node.changeset(
+        %Schemas.Node{},
+        %{
+          user_id: user_id,
+          access_key: UUID.uuid4(),
+          settings: %{ type: "none", input: nil, has_oauth: false }
+        }
+      )
 
     case {_, result} = LeafNodeRepo.insert(changeset) do
       {:ok, _} ->
@@ -70,7 +77,8 @@ defmodule LeafNode.Repo.Node do
             description: Map.get(data, "description", struct.description),
             enabled: Map.get(data, "enabled", struct.enabled),
             should_log: Map.get(data, "should_log", struct.should_log),
-            expected_payload: Map.get(data, "expected_payload", struct.expected_payload)
+            expected_payload: Map.get(data, "expected_payload", struct.expected_payload),
+            settings: Map.get(data, "settings", struct.settings)
           )
 
         # we need to add or update the node texts here
@@ -128,7 +136,8 @@ defmodule LeafNode.Repo.Node do
           enabled: n.enabled,
           should_log: n.should_log,
           expected_payload: n.expected_payload,
-          access_key: n.access_key
+          access_key: n.access_key,
+          settings: n.settings
         }
       )
 
@@ -155,7 +164,8 @@ defmodule LeafNode.Repo.Node do
            enabled: n.enabled,
            should_log: n.should_log,
            expected_payload: n.expected_payload,
-           access_key: n.access_key
+           access_key: n.access_key,
+           settings: n.settings
          }}
       rescue
         _e ->

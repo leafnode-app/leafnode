@@ -1,6 +1,6 @@
-defmodule LeafNodeWeb.Components.NodeSettings do
+defmodule LeafNodeWeb.Components.NodeClause do
   @moduledoc """
-  General node conditions and side effects that need to be run.
+    General node conditions
   """
   use Phoenix.LiveComponent
   import LeafNode.Repo.Node, only: [expression_types: 0, condition_types: 0]
@@ -121,8 +121,6 @@ defmodule LeafNodeWeb.Components.NodeSettings do
   end
 
   def handle_event("save_condition", %{"input" => input, "expression" => expression, "value" => value, "type" => type}, socket) do
-    IO.inspect(type, label: "TYPE")
-    IO.inspect(value, label: "BOOLEAN")
     value = if type == "boolean", do: if(value == "on", do: "true", else: "false"), else: value
     updated_expression = %{
       "id" => socket.assigns.id,

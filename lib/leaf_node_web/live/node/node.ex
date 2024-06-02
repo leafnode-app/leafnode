@@ -1,7 +1,7 @@
 defmodule LeafNodeWeb.NodeLive do
   use LeafNodeWeb, :live_view
 
-  alias LeafNodeWeb.Components.{NodeHeader, NodeLogs, NodeDetails, NodeSettings}
+  alias LeafNodeWeb.Components.{NodeHeader, NodeLogs, NodeDetails, NodeClause, NodeIntegration}
 
   @doc """
   Init func that is run on init of the view
@@ -37,7 +37,8 @@ defmodule LeafNodeWeb.NodeLive do
     ~H"""
     <.live_component module={NodeHeader} id="node_header" node={@node} />
     <div class="my-2" />
-    <.live_component module={NodeSettings} id="node_settings" expression={@expression} />
+    <.live_component module={NodeClause} id="node_clause" expression={@expression} />
+    <.live_component module={NodeIntegration} id="node_integrations" node={@node} />
     <div class="my-2" />
     <.live_component module={NodeDetails} id="node_details" node={@node} />
     <div class="my-2" />

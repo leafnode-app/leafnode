@@ -8,27 +8,19 @@ defmodule LeafNode.Integrations.Google.Sheets do
     The metadata to get information on how to render the fields in order to interact with the interaction
   """
   # TODO: This could be changed to use json schema - we can then get this info based on selected type and render it
-  def input_info(type) when type === :write do
+  def input_info(type) when type === "google_sheet_write" do
     [
-      {:token, :string},
-      {:spreadsheet_id, :string},
-      {:tab, :string},
-      {:range_start, :string},
-      {:range_end, :string},
-      {:values, :string},
+      {"spreadsheet_id", "Spreadsheet Id", "text", "The spreadsheet id to write to"},
+      {"tab", "Tab", "text", "The tab of the associated spreadsheet"},
+      {"range_start", "Range Start", "text", "The starting range column i.e A1 etc"},
+      {"range_end", "Range End", "text", "The ending column - needed along with starting range as this is the last column"},
+      {"input", "Input", "text", "The comma separated values that will be inserted i.e this,is,a,test (It ideally maps to range coumns)"},
     ]
   end
 
-  def input_info(type) when type === :get do
-    [
-      {:token, :string},
-      {:spreadsheet_id, :string},
-      {:tab, :string},
-      {:range_start, :string},
-      {:range_end, :string},
-      {:values, :string}
-    ]
-  end
+  # def input_info(type) when type === "google_sheet_get" do
+  #   :ok
+  # end
 
   def input_info(), do: raise("Not supported")
 

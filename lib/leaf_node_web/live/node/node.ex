@@ -50,11 +50,12 @@ defmodule LeafNodeWeb.NodeLive do
   def handle_event("update_integration", values, %{assigns: assigns} = socket) do
     node = assigns.node || false
     user = assigns.current_user || false
+
     case node do
       false -> {:noreply, socket}
       _ ->
         values_check = if values["type"] === "none",
-          do: %{ type: "none", input: nil, has_oauth: false },
+          do: %{ "type" => "none", "input" => nil, "has_oauth" => false },
           else: Map.merge(node.integration_settings, values)
 
         payload = %{"id" => node.id, "integration_settings" => values_check}
@@ -64,11 +65,13 @@ defmodule LeafNodeWeb.NodeLive do
           socket
           |> assign(:node, updated_node)
 
+        # TODO: move this to a new function as its only purpose is
         updated_node = if status === :ok do
           node = updated_node
           integration_payload = Map.merge(node.integration_settings, values)
           type = integration_payload["type"]
 
+          IO.inspect(integration_payload)
           integration_token = if type !== "none" do
             LeafNode.Repo.OAuthToken.get_token(user.id, type)
           end
@@ -127,9 +130,10 @@ defmodule LeafNodeWeb.NodeLive do
     end
   end
 
-  defp update_node(node, prev_node) do
-    node_id = node["id"]
-    case LeafNode.Repo.Node.edit_node(node) do
+  defp update_node(node_partial, prev_node) do
+    node_id = node_partial["id"]
+    IO.inspect(node_partial, label: "node_partial")
+    case LeafNode.Repo.Node.edit_node(node_partial) do
       {:ok, _data} ->
         case LeafNode.Repo.Node.get_node(node_id) do
           {:ok, data} ->
@@ -142,5 +146,9 @@ defmodule LeafNodeWeb.NodeLive do
         IO.inspect("There was a problem getting the node to update: #{node_id} with error: #{err}")
         {:error, prev_node}
     end
+  end
+
+  defp update_oauth_flag_check() do
+
   end
 end

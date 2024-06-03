@@ -3,7 +3,7 @@ defmodule LeafNode.Schemas.NodeSettings do
     Defines the settings for a Node.
   """
 
-  @allowed_types ["none", "google_sheets"]
+  @allowed_types LeafNode.Repo.Node.integration_types()
 
   defstruct type: nil, input: nil, has_oauth: false
 

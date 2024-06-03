@@ -10,8 +10,6 @@ defmodule LeafNodeWeb.Components.NodeIntegration do
 
   def update(assigns, socket) do
     integration_settings = assigns.node.integration_settings || %{}
-
-    IO.inspect(integration_settings)
     {:ok,
      socket
      |> assign(:show_modal, false)
@@ -19,6 +17,7 @@ defmodule LeafNodeWeb.Components.NodeIntegration do
      |> assign(:input, Map.get(integration_settings, "input"))
      |> assign(:type, Map.get(integration_settings, "type"))
      |> assign(:has_oauth, Map.get(integration_settings, "has_oauth"))
+     |> assign(:integration_settings, integration_settings)
      |> assign(:form_opts, %{
        integrations: integration_types()
      })}
@@ -27,29 +26,28 @@ defmodule LeafNodeWeb.Components.NodeIntegration do
   def render(assigns) do
     ~H"""
     <div class="flex-1 bg-zinc-900 h-100% py-4 px-2 rounded-lg border border-stone-900">
-      <%= if @type === "none" do %>
-        <div class="flex flex-col p-4 h-full gap-1 justify-center flex-1">
-          <div class="node_block_wrapper box_input_inset_shadow cursor-pointer" phx-target={@myself} phx-click="open_modal">
-            click here to add integration
-          </div>
+      <%!-- TODO: need to have a separate things for connecting integrations that could be next to it? --%>
+      <div class="flex flex-col p-4 h-full gap-1 justify-center flex-1">
+        <div class="node_block_wrapper box_input_inset_shadow cursor-pointer mb-4" phx-target={@myself} phx-click="open_modal">
+          <%= if @type === "none" do %>
+            Add integration
+          <% else %>
+            <%= @type %> :: <%= @input %>
+          <% end %>
         </div>
-      <% else %>
-        <div>
-          <div class="flex flex-col p-4 h-full gap-1 justify-center flex-1">
-            <%= if @has_oauth do %>
-              <div class="node_block_wrapper box_input_inset_shadow cursor-pointer" phx-target={@myself} phx-click="open_modal">
-                <%!-- <pre class="text-blue-300"> --%>
-                  <%= @input %> (<%= @type %>)
-                <%!-- </pre> --%>
-              </div>
-            <% else %>
-              <div class="node_block_wrapper box_input_inset_shadow cursor-pointer" phx-target={@myself} phx-click="oauth_access">
-                <div>click here to grant Integration (<%= empty_check(@type, "type") %>) permissions</div>
-              </div>
-            <% end %>
-          </div>
-        </div>
-      <% end %>
+
+        <%!-- We make sure the user selected an integration before we request to have the user connect --%>
+        <%= if @type !== "none" do %>
+          <button
+            phx-click="oauth_access"
+            phx-target={@myself}
+            disabled={@has_oauth}
+              class={"#{if @has_oauth, do: "bg-gray-800", else: "bg-blue-700 hover:bg-blue-600"} py-2 px-4 text-sm rounded transition duration-200 ease-in-out w-auto self-center"}
+            >
+            <%= if @has_oauth, do: "Connected", else: "Authorize integration" %>
+          </button>
+        <% end %>
+      </div>
 
       <%= if @show_modal do %>
         <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
@@ -73,16 +71,20 @@ defmodule LeafNodeWeb.Components.NodeIntegration do
               <%!-- Input in order to store against the settings - this needs to be schema settings for type --%>
               <%= if @type !== "none" do %>
                 <div class="mb-4">
-                  <label class="block text-sm font-medium text-gray-300 mb-2">Input:</label>
-                  <input
-                    autocomplete="false"
-                    type="text"
-                    name="input"
-                    value={@input}
-                    phx-target={@myself}
-                    class="focus:outline-none box_input_inset_shadow
-                      text-gray-900 text-sm rounded-lg border-stone-900 block w-full p-4 dark:text-gray-400" />
-                  <small class="text-gray-500">Specify the input field to be checked. Check logs based on expected input using dot.notation.for.selection</small>
+                  <%= for {id, title, type, desc} <- LeafNode.Integrations.Google.Sheets.input_info(@type) do %>
+                    <div class="py-2">
+                      <label class="block text-sm font-medium text-gray-300 text-xs"><%= title %></label>
+                      <span class="text-gray-500 pb-5 text-xs"><%= desc %></span>
+                      <input
+                        autocomplete="false"
+                        type={type}
+                        name={id}
+                        value={@integration_settings[id]}
+                        phx-target={@myself}
+                        class="focus:outline-none box_input_inset_shadow
+                          text-gray-900 text-sm rounded-lg border-stone-900 block w-full p-4 dark:text-gray-400" />
+                    </div>
+                  <% end %>
                 </div>
               <% end %>
 

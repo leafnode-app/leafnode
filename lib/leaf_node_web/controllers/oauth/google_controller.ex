@@ -7,7 +7,8 @@ defmodule LeafNodeWeb.GoogleController do
   alias LeafNodeWeb.Router.Helpers, as: Routes
   import Logger
 
-  @integration_type :google_sheet
+  # TODO: this is too hard coded, later we might request other things from google
+  @integration_type :google_sheet_write
 
   @doc """
     Request access url for the user to grant access to the scoped services
@@ -33,7 +34,7 @@ defmodule LeafNodeWeb.GoogleController do
         Routes.google_url(conn, :callback)
       )
 
-      try do
+    try do
       {_, value} = IntegrationsEnum.dump(@integration_type)
       # attempt to store token - the rescue will run if this fails for some reason
       LeafNode.Repo.OAuthToken.store_token(

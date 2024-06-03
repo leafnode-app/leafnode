@@ -1,4 +1,7 @@
 defmodule LeafNodeWeb.GoogleController do
+  @moduledoc """
+    The OAuth controller that will manage the redirects and reqeuest to for token in order to set or store for the user
+  """
   use LeafNodeWeb, :controller
   alias LeafNode.Google.OAuth, as: GoogleOAuth
   alias LeafNodeWeb.Router.Helpers, as: Routes

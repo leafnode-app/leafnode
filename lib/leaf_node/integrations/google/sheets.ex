@@ -28,7 +28,7 @@ defmodule LeafNode.Integrations.Google.Sheets do
     Append values to google sheet
   """
   # LeafNode.Integrations.Google.Sheets.write_to_sheet(token, "1oFKM0fU74b_qmDzqunhb9qcVghwgybSPTS8VCzYxORE", "A1:D1", [["some", "value", "goes", "here"]])
-  def write_to_sheet(token, spreadsheet_id, range, values) do
+  def write_to_sheet(access_token, spreadsheet_id, range, values) do
     # Specify the valueInputOption parameter
     # or "RAW" based on your requirement
     value_input_option = "USER_ENTERED"
@@ -38,7 +38,7 @@ defmodule LeafNode.Integrations.Google.Sheets do
       "https://sheets.googleapis.com/v4/spreadsheets/#{spreadsheet_id}/values/#{range}:append?valueInputOption=USER_ENTERED"
 
     headers = [
-      {"Authorization", "Bearer #{token.access_token}"},
+      {"Authorization", "Bearer #{access_token}"},
       {"Content-Type", "application/json"}
     ]
 

@@ -151,7 +151,8 @@ defmodule LeafNode.Repo.Node do
            should_log: n.should_log,
            expected_payload: n.expected_payload,
            access_key: n.access_key,
-           integration_settings: n.integration_settings
+           integration_settings: n.integration_settings,
+           user_id: n.user_id
          }}
       rescue
         _e ->

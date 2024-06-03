@@ -2,13 +2,15 @@ defmodule LeafNodeWeb.GoogleController do
   use LeafNodeWeb, :controller
   alias LeafNode.Google.OAuth, as: GoogleOAuth
   alias LeafNodeWeb.Router.Helpers, as: Routes
+  import Logger
+
+  @integration_type :google_sheet
 
   @doc """
     Request access url for the user to grant access to the scoped services
   """
   def request(conn, %{"node_id" => node_id} = params) do
     redirect_uri = Routes.google_url(conn, :callback)
-    # TOOD: change this so that its more generic as this is used for google as we pass the relevant node
     auth_url = GoogleOAuth.authorize_url(GoogleOAuth.client(), redirect_uri, %{ node_id: node_id})
     redirect(conn, external: auth_url)
   end
@@ -18,26 +20,43 @@ defmodule LeafNodeWeb.GoogleController do
     If the user has a token already check expiry and maybe try generate a new one if needed
   """
   def callback(conn, %{"code" => code, "state" => state} = params) do
-    # TOOD: we need to do some check around status?
     state = Base.decode64!(state) |> Jason.decode!()
     user_id = conn.assigns.current_user.id
 
-    client = GoogleOAuth.client()
-    redirect_uri = Routes.google_url(conn, :callback)
+    %OAuth2.Client{ token: token_data} =
+      GoogleOAuth.get_token(
+        GoogleOAuth.client(),
+        code,
+        Routes.google_url(conn, :callback)
+      )
 
-    resp = GoogleOAuth.get_token(client, code, redirect_uri)
-    %OAuth2.Client{ token: token_data} = resp
-
-    # TODO: use the changeset to determine if this needs to be success or not
-    try do
-      resp = LeafNode.Repo.OAuthToken.store_token(user_id, "google_sheets", token_data.access_token, token_data.refresh_token, token_data.expires_at)
+      try do
+      {_, value} = IntegrationsEnum.dump(@integration_type)
+      # attempt to store token - the rescue will run if this fails for some reason
+      LeafNode.Repo.OAuthToken.store_token(
+        user_id,
+        value,
+        token_data.access_token,
+        token_data.refresh_token,
+        token_data.expires_at
+      )
 
       # update the node integration settings flag - checks need to be done here so we know we update the flag
-      edit = LeafNode.Repo.Node.edit_node(%{ "id" => state["node_id"], "integration_settings" => %{ "has_oauth" => true} })
+      {status, _node} = LeafNode.Repo.Node.edit_node(%{ "id" => state["node_id"], "integration_settings" => %{ "has_oauth" => true} })
 
-      redirect(conn, to: "/dashboard/node/" <> state["node_id"])
+      case status do
+        :ok ->
+          node_redirect(conn, state)
+        _ ->
+          Logger.error("Unable to  update the node oauth flag")
+          node_redirect(conn, state)
+      end
     rescue e ->
-      redirect(conn, to: "/dashboard/node/" <> state["node_id"])
+      Logger.error("There was a problem trying to store the token")
+      node_redirect(conn, state)
     end
   end
+
+  # redirect back to the dashboard board or to a node specific path
+  defp node_redirect(conn, state), do: redirect(conn, to: "/dashboard/node/" <> state["node_id"])
 end

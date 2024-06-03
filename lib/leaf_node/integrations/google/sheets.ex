@@ -9,6 +9,17 @@ defmodule LeafNode.Integrations.Google.Sheets do
   end
 
   @doc """
+    The metadata to get information on how to render the fields in order to interact with the interaction
+  """
+  def meta_data(type) when type === :write do
+    :todo
+  end
+  def meta_data(type) when type === :get do
+    :todo
+  end
+  def meta_data(), do: raise "Not supported"
+
+  @doc """
     Append values to google sheet
   """
   # LeafNode.Integrations.Google.Sheets.write_to_sheet(token, "1oFKM0fU74b_qmDzqunhb9qcVghwgybSPTS8VCzYxORE", "A1:D1", [["some", "value", "goes", "here"]])

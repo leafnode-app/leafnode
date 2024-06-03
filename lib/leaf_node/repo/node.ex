@@ -6,29 +6,6 @@ defmodule LeafNode.Repo.Node do
   alias LeafNode.Repo, as: LeafNodeRepo
   alias LeafNode.Schemas
 
-  # The expressions I can compare against
-  @integration_types [
-    "none",
-    "google_sheets"
-  ]
-
-  # The expressions I can compare against
-  @expressions_types [
-    "===",
-    "!=",
-    ">",
-    ">=",
-    "<",
-    "<="
-  ]
-
-  # The condition types to select
-  @cond_types [
-    "string",
-    "integer",
-    "boolean"
-  ]
-
   @doc """
     Create a node - genreate an id and pass payload to be persisted
   """
@@ -39,7 +16,7 @@ defmodule LeafNode.Repo.Node do
         %{
           user_id: user_id,
           access_key: UUID.uuid4(),
-          integration_settings: %{ type: "none", input: nil, has_oauth: false }
+          integration_settings: %{type: "none", input: nil, has_oauth: false}
         }
       )
 
@@ -84,7 +61,8 @@ defmodule LeafNode.Repo.Node do
             enabled: Map.get(data, "enabled", struct.enabled),
             should_log: Map.get(data, "should_log", struct.should_log),
             expected_payload: Map.get(data, "expected_payload", struct.expected_payload),
-            integration_settings: Map.merge(struct.integration_settings, data["integration_settings"])
+            integration_settings:
+              Map.merge(struct.integration_settings, data["integration_settings"])
           )
 
         # we need to add or update the node texts here
@@ -186,12 +164,18 @@ defmodule LeafNode.Repo.Node do
 
   # The expression and condition types options - this can be a def of a struct later
   def expression_types do
-    @expressions_types
+    ExpressionsEnum.__enum_map__()
+    |> Enum.map(fn {_, v} -> v end)
   end
+
   def condition_types do
-    @cond_types
+    CondEnum.__enum_map__()
+    |> Enum.map(fn {_, v} -> v end)
   end
+
+  # This expands the enum and returns a list
   def integration_types do
-    @integration_types
+    IntegrationsEnum.__enum_map__()
+    |> Enum.map(fn {_, v} -> v end)
   end
 end

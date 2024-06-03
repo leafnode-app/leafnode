@@ -56,6 +56,7 @@ defmodule LeafNode.MixProject do
       {:uuid, "~> 1.1"},
       {:ex_heroicons, "~> 2.0.0"},
       {:ex_json_schema, "~> 0.10.1"},
+      {:ecto_enum, "~> 1.4"},
       {:oauth2, "2.1.0"}
     ]
   end

@@ -50,6 +50,7 @@ defmodule LeafNode.Repo.Node do
           {:error, "There was an error trying to get the node #{"id"}"}
       end
 
+    integrations_settings = if is_nil(data["integration_settings"]), do: %{}, else: data["integration_settings"]
     # we have a struct that we got something
     case result do
       {:ok, struct} ->
@@ -62,7 +63,7 @@ defmodule LeafNode.Repo.Node do
             should_log: Map.get(data, "should_log", struct.should_log),
             expected_payload: Map.get(data, "expected_payload", struct.expected_payload),
             integration_settings:
-              Map.merge(struct.integration_settings, data["integration_settings"])
+              Map.merge(struct.integration_settings, integrations_settings)
           )
 
         IO.inspect(updated_struct, label: "updated_struct")

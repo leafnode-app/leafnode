@@ -3,16 +3,6 @@
 ## Overview
 Document based API gateway that allows creation of documents and having the documuments be run through endpoints - With this you are able to express what you want to do with the payload coming in using text and AI has it expressed in code based on whitelist options the system understands as relevant and the data can be selected and mutated sequencually through blocks with the entire document output able to be selected as the result of the endpoint.
 
-## Features
-The project is currently in active development but a side project that later will be the basis of another.
-
-1. UI that allows creating documents
-2. Create blocks in documents
-3. Documents have unique identifiers that become routes to endpoints to POST to
-4. Use AI LLM in order to infer custom psuedo code from text that generates pseudo code.
-5. The ability to use basic mutation from block inputs referencing and taking results of other blocks
-6. Setting document results to be the result of the call
-
 ## Installation and Usage
 The application is built with Elixir(Phoenix) and Erlang. It is packaged with Docker but is able to be started without. This assumes you already have Elixir up and running on the current machine.
 

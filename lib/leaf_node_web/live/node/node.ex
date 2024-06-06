@@ -103,7 +103,7 @@ defmodule LeafNodeWeb.NodeLive do
       false -> {:noreply, socket}
       _ ->
         payload = %{"id" => node.id, "enabled" => !node.enabled}
-        updated_node = update_node(payload, node)
+        {_status, updated_node} = update_node(payload, node)
         socket =
           socket
           |> assign(:node, updated_node)
@@ -120,7 +120,7 @@ defmodule LeafNodeWeb.NodeLive do
       false -> {:noreply, socket}
       _ ->
         payload = %{"id" => node.id, "should_log" => !node.should_log}
-        updated_node = update_node(payload, node)
+        {_status, updated_node} = update_node(payload, node)
         socket =
           socket
           |> assign(:node, updated_node)
@@ -132,7 +132,6 @@ defmodule LeafNodeWeb.NodeLive do
 
   defp update_node(node_partial, prev_node) do
     node_id = node_partial["id"]
-    IO.inspect(node_partial, label: "node_partial")
     case LeafNode.Repo.Node.edit_node(node_partial) do
       {:ok, _data} ->
         case LeafNode.Repo.Node.get_node(node_id) do

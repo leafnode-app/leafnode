@@ -107,7 +107,7 @@ defmodule LeafNode.Servers.ExecutionServer do
   end
 
   # This is the call to execute the types
-  defp integration_type(type, %{user_id: user_id} = node) when type === "google_sheet_write" do
+  defp integration_type(type, %{user_id: user_id} = node) when type === "google" do
     %{
       "input" => input,
       "range_end" => range_end,

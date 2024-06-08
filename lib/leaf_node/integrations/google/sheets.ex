@@ -8,7 +8,7 @@ defmodule LeafNode.Integrations.Google.Sheets do
     The metadata to get information on how to render the fields in order to interact with the interaction
   """
   # TODO: This could be changed to use json schema - we can then get this info based on selected type and render it
-  def input_info(type) when type === "google_sheet_write" do
+  def input_info(type) do
     [
       {"spreadsheet_id", "Spreadsheet Id", "text", "The spreadsheet id to write to"},
       {"tab", "Tab", "text", "The tab of the associated spreadsheet"},

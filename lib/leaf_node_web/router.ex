@@ -72,7 +72,6 @@ defmodule LeafNodeWeb.Router do
       get "/auth/google/request/:node_id", GoogleController, :request
       get "/auth/google/callback", GoogleController, :callback
       # Notion
-      get "/auth/notion/request/:node_id", GoogleController, :request
       # get "/auth/notion/callback", GoogleController, :callback
     end
   end

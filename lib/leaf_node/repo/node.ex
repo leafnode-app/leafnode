@@ -6,6 +6,8 @@ defmodule LeafNode.Repo.Node do
   alias LeafNode.Repo, as: LeafNodeRepo
   alias LeafNode.Schemas
 
+  @available_types ["none", "google_sheet_write", "notion_page_write"]
+
   @doc """
     Create a node - genreate an id and pass payload to be persisted
   """
@@ -178,8 +180,17 @@ defmodule LeafNode.Repo.Node do
   end
 
   # This expands the enum and returns a list
+  # potentially create a type and mapped to integration key
   def integration_types do
-    IntegrationsEnum.__enum_map__()
+    integrations = IntegrationsEnum.__enum_map__()
     |> Enum.map(fn {_, v} -> v end)
+
+    [{"none", nil}, {"google_sheets_write", "google"}, {"notion_page_write", "notion"}]
+
+    Enum.map(@available_types, fn item ->
+      i_type = Enum.at(String.split(item, "_"), 0)
+      {item, i_type}
+    end)
   end
+
 end

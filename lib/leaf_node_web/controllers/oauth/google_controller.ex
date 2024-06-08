@@ -5,10 +5,10 @@ defmodule LeafNodeWeb.GoogleController do
   use LeafNodeWeb, :controller
   alias LeafNode.Google.OAuth, as: GoogleOAuth
   alias LeafNodeWeb.Router.Helpers, as: Routes
+  require Logger
 
   # TODO: this is too hard coded, later we might request other things from google
-  @integration_type :google_sheet_write
-
+  @integration_type :google
   @doc """
     Request access url for the user to grant access to the scoped services
   """

@@ -10,6 +10,8 @@ defmodule LeafNodeWeb.Components.NodeIntegration do
 
   def update(assigns, socket) do
     integration_settings = assigns.node.integration_settings || %{}
+
+    IO.inspect(integration_types())
     {:ok,
      socket
      |> assign(:show_modal, false)
@@ -40,6 +42,7 @@ defmodule LeafNodeWeb.Components.NodeIntegration do
         <%= if @type !== "none" do %>
           <button
             phx-click="oauth_access"
+            phx-value-oauth-type="test_value"
             phx-target={@myself}
             disabled={@has_oauth}
               class={"#{if @has_oauth, do: "bg-gray-800", else: "bg-blue-700 hover:bg-blue-600"} py-2 px-4 text-sm rounded transition duration-200 ease-in-out w-auto self-center"}
@@ -61,8 +64,8 @@ defmodule LeafNodeWeb.Components.NodeIntegration do
                   phx-target={@myself}
                   class="focus:outline-none box_input_inset_shadow text-gray-900
                     text-sm rounded-lg border-stone-900 block w-full p-4 dark:text-gray-400">
-                  <%= for integration <- @form_opts.integrations do %>
-                    <option value={integration} selected={integration == @type}><%= integration %></option>
+                  <%= for {action, integration} <- @form_opts.integrations do %>
+                    <option value={integration} selected={integration == @type}><%= action %></option>
                   <% end %>
                 </select>
                 <small class="text-gray-500">Select the type of integration.</small>
@@ -100,9 +103,11 @@ defmodule LeafNodeWeb.Components.NodeIntegration do
     """
   end
 
-  def handle_event("oauth_access", _params, socket) do
-    # TODO we need to change this
-    {:noreply, redirect(socket, to: "/auth/request/#{socket.assigns.node.id}")}
+  def handle_event("oauth_access", %{ "oauth-type" => oauth_type}, socket) do
+    # case oauth_type do
+
+    # end
+    {:noreply, redirect(socket, to: "/auth/google/request/#{socket.assigns.node.id}")}
   end
 
   def handle_event("open_modal", _params, socket) do

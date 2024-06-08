@@ -1,8 +1,7 @@
-defmodule LeafNode.Google.OAuth do
+defmodule LeafNode.Notion.OAuth do
   @moduledoc """
-    The Oatuh module for google to auth the details for the client secret
+    The Oatuh module for notion to auth the details for the client secret
   """
-  use OAuth2.Strategy
 
   @scope Application.compile_env(:scopes, :spreadsheet_read_write)
   @client_secret Application.compile_env(:client_secrets_google, :client_secret)
@@ -44,6 +43,7 @@ defmodule LeafNode.Google.OAuth do
       approval_prompt: @approval_prompt
     )
   end
+
   def authorize_url(client, redirect_uri, params) do
     OAuth2.Client.authorize_url!(
       client,

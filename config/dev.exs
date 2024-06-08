@@ -81,3 +81,4 @@ config :swoosh, :api_client, false
 
 # import the dev secrets config
 import_config "google_secrets.exs"
+import_config "notion_secrets.exs"

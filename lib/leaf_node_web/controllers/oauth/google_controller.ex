@@ -5,7 +5,6 @@ defmodule LeafNodeWeb.GoogleController do
   use LeafNodeWeb, :controller
   alias LeafNode.Google.OAuth, as: GoogleOAuth
   alias LeafNodeWeb.Router.Helpers, as: Routes
-  import Logger
 
   # TODO: this is too hard coded, later we might request other things from google
   @integration_type :google_sheet_write

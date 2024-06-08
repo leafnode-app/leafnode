@@ -21,6 +21,7 @@ defmodule LeafNode.Repo.Node do
           integration_settings: %{type: "none", input: nil, has_oauth: false}
         }
       )
+    # TODO: Use the flag to check if valid
 
     case {_, result} = LeafNodeRepo.insert(changeset) do
       {:ok, _} ->
@@ -182,10 +183,13 @@ defmodule LeafNode.Repo.Node do
   # This expands the enum and returns a list
   # potentially create a type and mapped to integration key
   def integration_types do
-    integrations = IntegrationsEnum.__enum_map__()
+    IntegrationsEnum.__enum_map__()
     |> Enum.map(fn {_, v} -> v end)
+  end
 
-    [{"none", nil}, {"google_sheets_write", "google"}, {"notion_page_write", "notion"}]
+  def integrations_list do
+    IntegrationsEnum.__enum_map__()
+    |> Enum.map(fn {_, v} -> v end)
 
     Enum.map(@available_types, fn item ->
       i_type = Enum.at(String.split(item, "_"), 0)

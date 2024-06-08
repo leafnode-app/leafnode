@@ -62,7 +62,6 @@ defmodule LeafNodeWeb.NodesLive do
   """
   def handle_event("node_create", _, socket) do
     user = socket.assigns.current_user
-
     socket =
       case LeafNode.Repo.Node.create_node(user.id) do
         {:ok, data} ->

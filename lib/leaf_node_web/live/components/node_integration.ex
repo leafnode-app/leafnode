@@ -4,14 +4,13 @@ defmodule LeafNodeWeb.Components.NodeIntegration do
   """
   use Phoenix.LiveComponent
   alias LeafNodeWeb.Router.Helpers, as: Routes
-  import LeafNode.Repo.Node, only: [integration_types: 0]
+  import LeafNode.Repo.Node, only: [integrations_list: 0]
 
   # TODO: THIS NEEDS TO BE MORE GENERIC TO MANAGE THE DIFFERENT TYPES FOR EACH INTEGRATION SETTINGS
 
   def update(assigns, socket) do
     integration_settings = assigns.node.integration_settings || %{}
 
-    IO.inspect(integration_types())
     {:ok,
      socket
      |> assign(:show_modal, false)
@@ -21,7 +20,7 @@ defmodule LeafNodeWeb.Components.NodeIntegration do
      |> assign(:has_oauth, Map.get(integration_settings, "has_oauth"))
      |> assign(:integration_settings, integration_settings)
      |> assign(:form_opts, %{
-       integrations: integration_types()
+       integrations: integrations_list()
      })}
   end
 
@@ -42,7 +41,7 @@ defmodule LeafNodeWeb.Components.NodeIntegration do
         <%= if @type !== "none" do %>
           <button
             phx-click="oauth_access"
-            phx-value-oauth-type="test_value"
+            phx-value-oauth-type={@type}
             phx-target={@myself}
             disabled={@has_oauth}
               class={"#{if @has_oauth, do: "bg-gray-800", else: "bg-blue-700 hover:bg-blue-600"} py-2 px-4 text-sm rounded transition duration-200 ease-in-out w-auto self-center"}
@@ -104,6 +103,7 @@ defmodule LeafNodeWeb.Components.NodeIntegration do
   end
 
   def handle_event("oauth_access", %{ "oauth-type" => oauth_type}, socket) do
+    IO.inspect(oauth_type)
     # case oauth_type do
 
     # end

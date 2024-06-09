@@ -8,21 +8,17 @@ defmodule LeafNode.Integrations.Google.Sheets do
     The metadata to get information on how to render the fields in order to interact with the interaction
   """
   # TODO: This could be changed to use json schema - we can then get this info based on selected type and render it
-  def input_info(type) do
+  def input_info() do
     [
       {"spreadsheet_id", "Spreadsheet Id", "text", "The spreadsheet id to write to"},
       {"tab", "Tab", "text", "The tab of the associated spreadsheet"},
       {"range_start", "Range Start", "text", "The starting range column i.e A1 etc"},
-      {"range_end", "Range End", "text", "The ending column - needed along with starting range as this is the last column"},
-      {"input", "Input", "text", "The comma separated values that will be inserted i.e this,is,a,test (It ideally maps to range coumns)"},
+      {"range_end", "Range End", "text",
+       "The ending column - needed along with starting range as this is the last column"},
+      {"input", "Input", "text",
+       "The comma separated values that will be inserted i.e this,is,a,test (It ideally maps to range coumns)"}
     ]
   end
-
-  # def input_info(type) when type === "google_sheet_get" do
-  #   :ok
-  # end
-
-  def input_info(), do: raise("Not supported")
 
   @doc """
     Append values to google sheet
@@ -31,7 +27,6 @@ defmodule LeafNode.Integrations.Google.Sheets do
   def write_to_sheet(access_token, spreadsheet_id, range, values) do
     # Specify the valueInputOption parameter
     # or "RAW" based on your requirement
-    value_input_option = "USER_ENTERED"
 
     # Update the URL to include the valueInputOption parameter
     url =

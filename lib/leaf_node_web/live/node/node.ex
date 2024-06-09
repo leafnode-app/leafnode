@@ -71,7 +71,6 @@ defmodule LeafNodeWeb.NodeLive do
           integration_payload = Map.merge(node.integration_settings, values)
           type = integration_payload["type"]
 
-          IO.inspect(integration_payload)
           integration_token = if type !== "none" do
             LeafNode.Repo.OAuthToken.get_token(user.id, type)
           end
@@ -145,9 +144,5 @@ defmodule LeafNodeWeb.NodeLive do
         IO.inspect("There was a problem getting the node to update: #{node_id} with error: #{err}")
         {:error, prev_node}
     end
-  end
-
-  defp update_oauth_flag_check() do
-
   end
 end

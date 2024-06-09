@@ -2,13 +2,12 @@ defmodule LeafNode.Notion.OAuth do
   @moduledoc """
     The Oatuh module for notion to auth the details for the client secret
   """
+  use OAuth2.Strategy
 
-  @scope Application.compile_env(:scopes, :spreadsheet_read_write)
-  @client_secret Application.compile_env(:client_secrets_google, :client_secret)
-  @client_id Application.compile_env(:client_secrets_google, :client_id)
-  @site "https://accounts.google.com"
-  @authorize_url "https://accounts.google.com/o/oauth2/auth"
-  @token_url "https://accounts.google.com/o/oauth2/token"
+  @client_secret Application.compile_env(:client_secrets_notion, :client_secret)
+  @client_id Application.compile_env(:client_secrets_notion, :client_id)
+  @authorize_url "https://api.notion.com/v1/oauth/authorize"
+  @token_url "https://api.notion.com/v1/oauth/token"
   @access_type "offline"
   # the user needs to do this and approve in order to get a refresh token we can use for later
   @approval_prompt "force"
@@ -18,15 +17,15 @@ defmodule LeafNode.Notion.OAuth do
   """
   def client(strategy \\ nil) do
     opts_strategy = if strategy, do: [strategy: strategy], else: []
+
     opts_default = [
       client_id: @client_id,
       client_secret: @client_secret,
-      site: @site,
-      authorize_url: @authorize_url,
-      token_url: @token_url
+      authorize_url: @authorize_url
     ]
 
     opts = opts_strategy ++ opts_default
+
     OAuth2.Client.new(opts)
     |> OAuth2.Client.put_serializer("application/json", Jason)
   end
@@ -38,7 +37,6 @@ defmodule LeafNode.Notion.OAuth do
     OAuth2.Client.authorize_url!(
       client,
       redirect_uri: redirect_uri,
-      scope: @scope,
       access_type: @access_type,
       approval_prompt: @approval_prompt
     )
@@ -48,9 +46,6 @@ defmodule LeafNode.Notion.OAuth do
     OAuth2.Client.authorize_url!(
       client,
       redirect_uri: redirect_uri,
-      scope: @scope,
-      access_type: @access_type,
-      approval_prompt: @approval_prompt,
       state: Base.encode64(Jason.encode!(params))
     )
   end
@@ -58,14 +53,26 @@ defmodule LeafNode.Notion.OAuth do
   @doc """
     Get an auth token that can be stored along with a refresh token to use for reqeust against googer services
   """
-  def get_token(client, code, redirect_uri) do
-    OAuth2.Client.get_token!(client, [
+  def get_token(code, redirect_uri) do
+    encoded = Base.encode64("#{@client_id}:#{@client_secret}")
+    body = %{
       code: code,
       redirect_uri: redirect_uri,
-      client_id: @client_id,
-      client_secret: @client_secret,
       grant_type: "authorization_code"
-    ])
+    }
+    |> Jason.encode!() # Ensure to use Jason for encoding the map to a JSON string
+
+    headers = [
+      {"Content-type", "application/json"},
+      {"Authorization", "Basic #{encoded}"}
+    ]
+
+    # TODO: this needs to be changed as there are other cases
+    case HTTPoison.post(@token_url, body, headers) do
+      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
+        {:ok, body |> Jason.decode!()}
+      _ -> {:error, "There was an error"}
+    end
   end
 
   @doc """
@@ -73,11 +80,12 @@ defmodule LeafNode.Notion.OAuth do
   """
   def refresh_token(refresh_token) do
     client = client(OAuth2.Strategy.Refresh)
-    OAuth2.Client.get_token!(client, [
+
+    OAuth2.Client.get_token!(client,
       refresh_token: refresh_token,
       client_id: @client_id,
       client_secret: @client_secret,
       grant_type: "refresh_token"
-    ])
+    )
   end
 end

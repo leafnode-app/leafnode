@@ -133,6 +133,22 @@ defmodule LeafNode.Servers.ExecutionServer do
     log_result(node, node, LeafNode.Utils.Helpers.http_resp(code, success_check, resp), success_check)
   end
 
+  defp integration_type(type, %{user_id: user_id} = node) when type === "notion" do
+    %{
+      "page_id" => page_id,
+      "content" => content
+    } = node.integration_settings
+
+    token_details = LeafNode.Repo.OAuthToken.get_token(user_id, type)
+    {status, resp} = LeafNode.Integrations.Notion.Pages.append_content(page_id, token_details.access_token, content)
+
+    success_check = if status == :ok, do: true, else: false
+    code = if success_check, do: 200, else: 500
+    # async log
+    # TODO: find a better result for the logs based off integration
+    log_result(node, node, LeafNode.Utils.Helpers.http_resp(code, success_check, resp), success_check)
+  end
+
   # If the user selected the none type
   defp integration_type(type, _) when type === "none" do
     :none

@@ -3,7 +3,7 @@ defmodule LeafNode.Repo.OAuthToken do
   alias LeafNode.Repo
   alias LeafNode.Schemas.OAuthToken
 
-  def store_token(user_id, type, access_token, refresh_token, expires_at) do
+  def store_token(user_id, type, access_token, refresh_token \\ nil, expires_at \\ nil) do
     changeset = %OAuthToken{}
     |> OAuthToken.changeset(%{
       user_id: user_id,
@@ -12,6 +12,8 @@ defmodule LeafNode.Repo.OAuthToken do
       refresh_token: refresh_token,
       expires_at: expires_at
     })
+
+    IO.inspect(changeset)
 
     Repo.insert!(changeset)
   end

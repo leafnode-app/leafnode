@@ -5,6 +5,10 @@ defmodule LeafNodeWeb.Components.NodeIntegration do
   use Phoenix.LiveComponent
   alias LeafNodeWeb.Router.Helpers, as: Routes
   import LeafNode.Repo.Node, only: [integrations_list: 0]
+  require Logger
+
+  @google "google"
+  @notion "notion"
 
   # TODO: THIS NEEDS TO BE MORE GENERIC TO MANAGE THE DIFFERENT TYPES FOR EACH INTEGRATION SETTINGS
 
@@ -73,7 +77,7 @@ defmodule LeafNodeWeb.Components.NodeIntegration do
               <%!-- Input in order to store against the settings - this needs to be schema settings for type --%>
               <%= if @type !== "none" do %>
                 <div class="mb-4">
-                  <%= for {id, title, type, desc} <- LeafNode.Integrations.Google.Sheets.input_info(@type) do %>
+                  <%= for {id, title, type, desc} <- render_integration_settings(@type) do %>
                     <div class="py-2">
                       <label class="block text-sm font-medium text-gray-300 text-xs"><%= title %></label>
                       <span class="text-gray-500 pb-5 text-xs"><%= desc %></span>
@@ -102,12 +106,18 @@ defmodule LeafNodeWeb.Components.NodeIntegration do
     """
   end
 
-  def handle_event("oauth_access", %{ "oauth-type" => oauth_type}, socket) do
-    IO.inspect(oauth_type)
-    # case oauth_type do
+  def handle_event("oauth_access", %{"oauth-type" => oauth_type}, socket) do
+    case oauth_type do
+      @notion ->
+        {:noreply, redirect(socket, to: "/auth/notion/request/#{socket.assigns.node.id}")}
 
-    # end
-    {:noreply, redirect(socket, to: "/auth/google/request/#{socket.assigns.node.id}")}
+      @google ->
+        {:noreply, redirect(socket, to: "/auth/google/request/#{socket.assigns.node.id}")}
+
+      _ ->
+        Logger.error("Attempt to try and auth an integration that is not part of the list")
+        {:noreply, socket}
+    end
   end
 
   def handle_event("open_modal", _params, socket) do
@@ -118,15 +128,35 @@ defmodule LeafNodeWeb.Components.NodeIntegration do
     {:noreply, assign(socket, show_modal: false)}
   end
 
-  defp empty_check(value, type) when value == "" do
-    "[#{type}]"
-  end
-
-  defp empty_check(value, _type) do
-    value
-  end
-
   def handle_event("change_type", %{"type" => type}, socket) do
-    {:noreply, assign(socket, :type, type)}
+    # here we check if the integration exists before we try update the state
+    # LeafNode.Repo.OAuthToken.get_token(2, "notion")
+    node = socket.assigns.node
+    user_id = node.user_id
+
+    case LeafNode.Repo.OAuthToken.get_token(user_id, type) do
+      nil ->
+        # user has no toke for the selected integration
+        socket =
+          socket
+          |> assign(:type, type)
+          |> assign(:has_oauth, false)
+
+        {:noreply, socket}
+
+      _ ->
+        {:noreply, assign(socket, :type, type)}
+    end
+  end
+
+  # The settings to render for the integration
+  defp render_integration_settings(type) do
+    case type do
+      @google ->
+        LeafNode.Integrations.Google.Sheets.input_info()
+
+      @notion ->
+        LeafNode.Integrations.Notion.Pages.input_info()
+    end
   end
 end

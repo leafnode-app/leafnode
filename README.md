@@ -15,8 +15,6 @@ NOTE: You will need to have a postgres database up and running in order to have 
 5. Run the command `docker-compose build`
 5. Run the command `docker-compose up -d`
 
-At this point the application should be running
-
 ## Note
 A lot of the app does not have tests as things are a POC but still working and managed to prove what an idea but and usable as a MVP.
 

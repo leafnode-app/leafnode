@@ -16,7 +16,7 @@ defmodule LeafNode.Integrations.Google.Sheets do
       {"range_end", "Range End", "text",
        "The ending column - needed along with starting range as this is the last column"},
       {"input", "Input", "text",
-       "The comma separated values that will be inserted i.e this,is,a,test (It ideally maps to range coumns)"}
+       "The comma separated values that will be inserted i.e this,is,a,test (It ideally maps to range coumns). Use :: to then use dot notion to use payload values e.g world,::some.input,hello"}
     ]
   end
 

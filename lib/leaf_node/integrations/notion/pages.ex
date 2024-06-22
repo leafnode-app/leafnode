@@ -11,10 +11,11 @@ defmodule LeafNode.Integrations.Notion.Pages do
   def input_info() do
     [
       {"page_id", "Page Id", "text", "The page id to write to"},
-      {"content", "Content", "text", "The content to write to the notion page or append to"}
+      {"content", "Content", "text", "The content to write to Notion page. Use :: to then use dot notion to use payload values e.g ::some.input"}
     ]
   end
 
+  @spec append_content(any(), any(), any()) :: {:error, any()} | {:ok, any()}
   @doc """
     Append values to notion page - this is a basic block, it can be changed later
   """

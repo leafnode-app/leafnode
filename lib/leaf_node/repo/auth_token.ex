@@ -3,6 +3,7 @@ defmodule LeafNode.Repo.OAuthToken do
   alias LeafNode.Repo
   alias LeafNode.Schemas.OAuthToken
 
+
   def store_token(user_id, type, access_token, refresh_token \\ nil, expires_at \\ nil) do
     changeset = %OAuthToken{}
     |> OAuthToken.changeset(%{
@@ -13,11 +14,12 @@ defmodule LeafNode.Repo.OAuthToken do
       expires_at: expires_at
     })
 
-    IO.inspect(changeset)
-
     Repo.insert!(changeset)
   end
 
+  @doc """
+    Update the oauth token (refresh token) in order to make a new token
+  """
   def update_token(oauth_struct, access_token, refresh_token, expires_at) do
     Ecto.Changeset.change(oauth_struct, %{
       access_token: access_token,
@@ -26,6 +28,19 @@ defmodule LeafNode.Repo.OAuthToken do
     })
   end
 
+  @doc """
+    Remove the current token by id given the user
+  """
+  def remove_token(user_id, integration) do
+    token = get_token(user_id, integration)
+
+    case Repo.delete token do
+      {:ok, _} -> {:ok, "Removed token #{token.id}"}
+      _ -> {:error, "There was a problem removing token #{token.id}"}
+    end
+  end
+
+  @spec get_token(any(), any()) :: any()
   @doc """
     Fetch a user oauth token for a given integration type
   """

@@ -3,7 +3,6 @@ defmodule LeafNodeWeb.Components.NodeIntegration do
     General node side effect that would be expected to run
   """
   use Phoenix.LiveComponent
-  alias LeafNodeWeb.Router.Helpers, as: Routes
   import LeafNode.Repo.Node, only: [integrations_list: 0]
   require Logger
 
@@ -11,12 +10,12 @@ defmodule LeafNodeWeb.Components.NodeIntegration do
   @notion "notion"
 
   # TODO: THIS NEEDS TO BE MORE GENERIC TO MANAGE THE DIFFERENT TYPES FOR EACH INTEGRATION SETTINGS
-
   def update(assigns, socket) do
     integration_settings = assigns.node.integration_settings || %{}
 
     {:ok,
      socket
+     |> assign(:current_user, assigns.current_user)
      |> assign(:show_modal, false)
      |> assign(:node, assigns.node)
      |> assign(:input, Map.get(integration_settings, "input"))
@@ -44,24 +43,25 @@ defmodule LeafNodeWeb.Components.NodeIntegration do
         <%!-- We make sure the user selected an integration before we request to have the user connect --%>
         <%= if @type !== "none" do %>
           <div class="flex align-items justify-center gap-2">
-            <button
-              phx-click="oauth_access"
-              phx-value-oauth-type={@type}
-              phx-target={@myself}
-              disabled={@has_oauth}
-                class={"#{if @has_oauth, do: "bg-gray-800", else: "bg-blue-700 hover:bg-blue-600"} py-2 px-4 text-sm rounded transition duration-200 ease-in-out w-auto self-center"}
-              >
-              <%= if @has_oauth, do: "Connected", else: "Authorize integration" %>
-            </button>
-
             <%= if @has_oauth do %>
               <button
                 phx-click="oauth_disconnect"
                 phx-value-oauth-type={@type}
                 phx-target={@myself}
                 class={"bg-blue-700 hover:bg-blue-600 py-2 px-4 text-sm rounded transition duration-200 ease-in-out w-auto self-center"}
-                >
-                Disconnect
+              >
+                Disconnect <%= String.capitalize(@type) %>
+              </button>
+
+            <%= else %>
+              <button
+                phx-click="oauth_access"
+                phx-value-oauth-type={@type}
+                phx-target={@myself}
+                disabled={@has_oauth}
+                class={"bg-blue-700 hover:bg-blue-600 py-2 px-4 text-sm rounded transition duration-200 ease-in-out w-auto self-center"}
+              >
+                Connect <%= String.capitalize(@type) %>
               </button>
             <%= end %>
           </div>
@@ -134,8 +134,19 @@ defmodule LeafNodeWeb.Components.NodeIntegration do
   end
 
   def handle_event("oauth_disconnect", %{ "oauth-type" => oauth_type }, socket) do
-    # TODO
-    IO.inspect(oauth_type, label: "DISCONNECT")
+    %{ node: node, current_user: current_user} = socket.assigns || %{}
+    # Get the token id relative to the type
+    {status, _} = LeafNode.Repo.OAuthToken.remove_token(current_user.id, oauth_type)
+    # TODO: Update the oauth but we need to make sure the transaction is done as well removing the integration
+    socket = case status do
+      :ok ->
+        # We might need a check here based off the status in case this fails
+        LeafNode.Repo.Node.edit_node(%{ "id" => node.id, "integration_settings" => %{ "has_oauth" => false} })
+        assign(socket, has_oauth: false)
+      _ ->
+        socket
+    end
+
     {:noreply, socket}
   end
 

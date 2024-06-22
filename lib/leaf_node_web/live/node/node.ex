@@ -29,6 +29,9 @@ defmodule LeafNodeWeb.NodeLive do
       |> assign(:logs, log_list)
       |> assign(:expression, expr)
       |> assign(:live_action, nil)
+      |> assign(:current_user, socket.assigns.current_user)
+
+    send(self(), :sync_has_oauth)
 
     {:ok, socket}
   end
@@ -39,7 +42,7 @@ defmodule LeafNodeWeb.NodeLive do
     <div class="my-2" />
     <.live_component module={NodeClause} id="node_clause" expression={@expression} />
     <div class="my-2" />
-    <.live_component module={NodeIntegration} id="node_integrations" node={@node} />
+    <.live_component module={NodeIntegration} id="node_integrations" node={@node} current_user={@current_user} />
     <div class="my-2" />
     <.live_component module={NodeDetails} id="node_details" node={@node} />
     <div class="my-2" />
@@ -127,6 +130,18 @@ defmodule LeafNodeWeb.NodeLive do
 
         {:noreply, socket}
     end
+  end
+
+  @doc """
+    Sending an event to itself in order to async manage and compute some data
+  """
+  def handle_info(:sync_has_oauth, socket) do
+    %{current_user: current_user, node: node} = socket.assigns
+    token = LeafNode.Repo.OAuthToken.get_token(current_user.id, node.integration_settings["type"])
+
+    updated_integration_settings = Map.put(node.integration_settings, "has_oauth", !is_nil(token))
+    updated_node = Map.put(node, :integration_settings, updated_integration_settings)
+    {:noreply, assign(socket, :node, updated_node)}
   end
 
   defp update_node(node_partial, prev_node) do

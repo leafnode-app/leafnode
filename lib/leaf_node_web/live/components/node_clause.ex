@@ -29,7 +29,7 @@ defmodule LeafNodeWeb.Components.NodeClause do
     <div class="flex-1 bg-zinc-900 h-100% py-4 px-2 rounded-lg border border-stone-900">
       <div>
         <div class="flex flex-col p-4 h-full gap-1 justify-center flex-1">
-          <div class="node_block_wrapper box_input_inset_shadow cursor-pointer" phx-target={@myself} phx-click="open_modal">
+          <div class="node_block_wrapper box_input_inset_shadow cursor-pointer hover:bg-zinc-900" phx-target={@myself} phx-click="open_modal">
             <pre class="px-1 text-orange-300">
             when :: <%= empty_check(@input, "input") %> <%= empty_check(@cond, "condition") %> <%= empty_check(@value, "value") %> <%= "(type: #{empty_check(@type, "type")})" %> </pre>
           </div>
@@ -39,7 +39,7 @@ defmodule LeafNodeWeb.Components.NodeClause do
 
       <%= if @show_modal do %>
         <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div class="bg-zinc-800 p-6 rounded-lg shadow-lg w-1/2 max-w-lg">
+          <div class="bg-zinc-800 p-6 rounded-lg shadow-lg w-1/2 max-w-lg w-1/2">
             <h2 class="text-2xl text-white mb-4">Add Condition</h2>
             <form phx-submit="save_condition" phx-target={@myself}>
               <div class="mb-4">

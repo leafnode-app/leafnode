@@ -32,12 +32,14 @@ defmodule LeafNodeWeb.Components.NodeIntegration do
     <div class="flex-1 bg-zinc-900 h-100% py-4 px-2 rounded-lg border border-stone-900">
       <%!-- TODO: need to have a separate things for connecting integrations that could be next to it? --%>
       <div class="flex flex-col p-4 h-full gap-1 justify-center flex-1">
-        <div class="node_block_wrapper box_input_inset_shadow cursor-pointer mb-4" phx-target={@myself} phx-click="open_modal">
-          <%= if @type === "none" do %>
-            Add integration
-          <% else %>
-            <%= @type %> :: <%= @input %>
-          <% end %>
+        <div class="node_block_wrapper box_input_inset_shadow cursor-pointer mb-4 hover:bg-zinc-900" phx-target={@myself} phx-click="open_modal">
+          <p class="text-gray-500">
+            <%= if @type === "none" do %>
+              Add integration
+            <% else %>
+              click to view <%= String.capitalize(@type) %> settings
+            <% end %>
+          </p>
         </div>
 
         <%!-- We make sure the user selected an integration before we request to have the user connect --%>

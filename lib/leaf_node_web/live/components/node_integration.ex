@@ -43,15 +43,28 @@ defmodule LeafNodeWeb.Components.NodeIntegration do
 
         <%!-- We make sure the user selected an integration before we request to have the user connect --%>
         <%= if @type !== "none" do %>
-          <button
-            phx-click="oauth_access"
-            phx-value-oauth-type={@type}
-            phx-target={@myself}
-            disabled={@has_oauth}
-              class={"#{if @has_oauth, do: "bg-gray-800", else: "bg-blue-700 hover:bg-blue-600"} py-2 px-4 text-sm rounded transition duration-200 ease-in-out w-auto self-center"}
-            >
-            <%= if @has_oauth, do: "Connected", else: "Authorize integration" %>
-          </button>
+          <div class="flex align-items justify-center gap-2">
+            <button
+              phx-click="oauth_access"
+              phx-value-oauth-type={@type}
+              phx-target={@myself}
+              disabled={@has_oauth}
+                class={"#{if @has_oauth, do: "bg-gray-800", else: "bg-blue-700 hover:bg-blue-600"} py-2 px-4 text-sm rounded transition duration-200 ease-in-out w-auto self-center"}
+              >
+              <%= if @has_oauth, do: "Connected", else: "Authorize integration" %>
+            </button>
+
+            <%= if @has_oauth do %>
+              <button
+                phx-click="oauth_disconnect"
+                phx-value-oauth-type={@type}
+                phx-target={@myself}
+                class={"bg-blue-700 hover:bg-blue-600 py-2 px-4 text-sm rounded transition duration-200 ease-in-out w-auto self-center"}
+                >
+                Disconnect
+              </button>
+            <%= end %>
+          </div>
         <% end %>
       </div>
 
@@ -118,6 +131,12 @@ defmodule LeafNodeWeb.Components.NodeIntegration do
         Logger.error("Attempt to try and auth an integration that is not part of the list")
         {:noreply, socket}
     end
+  end
+
+  def handle_event("oauth_disconnect", %{ "oauth-type" => oauth_type }, socket) do
+    # TODO
+    IO.inspect(oauth_type, label: "DISCONNECT")
+    {:noreply, socket}
   end
 
   def handle_event("open_modal", _params, socket) do

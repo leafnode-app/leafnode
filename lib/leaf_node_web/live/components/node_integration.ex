@@ -19,7 +19,7 @@ defmodule LeafNodeWeb.Components.NodeIntegration do
      |> assign(:show_modal, false)
      |> assign(:node, assigns.node)
      |> assign(:input, Map.get(integration_settings, "input"))
-     |> assign(:type, Map.get(integration_settings, "type"))
+     |> assign(:service_type, Map.get(integration_settings, "type"))
      |> assign(:has_oauth, Map.get(integration_settings, "has_oauth"))
      |> assign(:integration_settings, integration_settings)
      |> assign(:form_opts, %{
@@ -30,40 +30,45 @@ defmodule LeafNodeWeb.Components.NodeIntegration do
   def render(assigns) do
     ~H"""
     <div class="flex-1 bg-zinc-900 h-100% py-4 px-2 rounded-lg border border-stone-900">
+      <%
+        integration_action = String.split(@service_type, "_") |> Enum.at(0)
+        integration_action_str = String.capitalize(integration_action) |> String.split("_") |> Enum.at(0)
+      %>
+
       <%!-- TODO: need to have a separate things for connecting integrations that could be next to it? --%>
       <div class="flex flex-col p-4 h-full gap-1 justify-center flex-1">
         <div class="node_block_wrapper box_input_inset_shadow cursor-pointer mb-4 hover:bg-zinc-900" phx-target={@myself} phx-click="open_modal">
           <p class="text-gray-500">
-            <%= if @type === "none" do %>
+            <%= if @service_type === "none" do %>
               Add integration
             <% else %>
-              click to view <%= String.capitalize(@type) %> settings
+              click to view <%= @service_type %> settings
             <% end %>
           </p>
         </div>
 
         <%!-- We make sure the user selected an integration before we request to have the user connect --%>
-        <%= if @type !== "none" do %>
+        <%= if @service_type !== "none" do %>
           <div class="flex align-items justify-center gap-2">
             <%= if @has_oauth do %>
               <button
                 phx-click="oauth_disconnect"
-                phx-value-oauth-type={@type}
+                phx-value-oauth-type={integration_action}
                 phx-target={@myself}
                 class={"bg-blue-700 hover:bg-blue-600 py-2 px-4 text-sm rounded transition duration-200 ease-in-out w-auto self-center"}
               >
-                Disconnect <%= String.capitalize(@type) %>
+                Disconnect <%= integration_action_str %>
               </button>
 
             <%= else %>
               <button
                 phx-click="oauth_access"
-                phx-value-oauth-type={@type}
+                phx-value-oauth-type={integration_action}
                 phx-target={@myself}
                 disabled={@has_oauth}
                 class={"bg-blue-700 hover:bg-blue-600 py-2 px-4 text-sm rounded transition duration-200 ease-in-out w-auto self-center"}
               >
-                Connect <%= String.capitalize(@type) %>
+                Connect <%= integration_action_str %>
               </button>
             <%= end %>
           </div>
@@ -82,17 +87,17 @@ defmodule LeafNodeWeb.Components.NodeIntegration do
                   phx-target={@myself}
                   class="focus:outline-none box_input_inset_shadow text-gray-900
                     text-sm rounded-lg border-stone-900 block w-full p-4 dark:text-gray-400">
-                  <%= for {action, integration} <- @form_opts.integrations do %>
-                    <option value={integration} selected={integration == @type}><%= action %></option>
+                  <%= for {action, _} <- @form_opts.integrations do %>
+                    <option value={action} selected={action == @service_type}><%= action %></option>
                   <% end %>
                 </select>
                 <small class="text-gray-500">Select the type of integration.</small>
               </div>
 
               <%!-- Input in order to store against the settings - this needs to be schema settings for type --%>
-              <%= if @type !== "none" do %>
+              <%= if @service_type !== "none" do %>
                 <div class="mb-4">
-                  <%= for {id, title, type, desc} <- render_integration_settings(@type) do %>
+                  <%= for {id, title, type, desc} <- render_integration_settings(@service_type) do %>
                     <div class="py-2">
                       <label class="block text-sm font-medium text-gray-300 text-xs"><%= title %></label>
                       <span class="text-gray-500 pb-5 text-xs"><%= desc %></span>
@@ -161,33 +166,33 @@ defmodule LeafNodeWeb.Components.NodeIntegration do
   end
 
   def handle_event("change_type", %{"type" => type}, socket) do
-    # here we check if the integration exists before we try update the state
-    # LeafNode.Repo.OAuthToken.get_token(2, "notion")
     node = socket.assigns.node
     user_id = node.user_id
 
     case LeafNode.Repo.OAuthToken.get_token(user_id, type) do
       nil ->
-        # user has no toke for the selected integration
+        # user has no take for the selected integration
         socket =
           socket
-          |> assign(:type, type)
+          |> assign(:service_type, type)
           |> assign(:has_oauth, false)
 
         {:noreply, socket}
 
       _ ->
-        {:noreply, assign(socket, :type, type)}
+        {:noreply, assign(socket, :service_type, type)}
     end
   end
 
   # The settings to render for the integration
-  defp render_integration_settings(type) do
-    case type do
-      @google ->
+  # TODO: we need to make the items part of the enum
+  def render_integration_settings(service_type) do
+    case service_type do
+      "google_send_mail" ->
+        LeafNode.Integrations.Google.Mail.input_info()
+      "google_sheet_write" ->
         LeafNode.Integrations.Google.Sheets.input_info()
-
-      @notion ->
+      "notion_page_write" ->
         LeafNode.Integrations.Notion.Pages.input_info()
     end
   end

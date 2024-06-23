@@ -4,7 +4,7 @@ defmodule LeafNode.Google.OAuth do
   """
   use OAuth2.Strategy
 
-  @scope Application.compile_env(:scopes, :spreadsheet_read_write)
+  @scope Application.compile_env(:scopes, :list)
   @client_secret Application.compile_env(:client_secrets_google, :client_secret)
   @client_id Application.compile_env(:client_secrets_google, :client_id)
   @site "https://accounts.google.com"
@@ -39,7 +39,7 @@ defmodule LeafNode.Google.OAuth do
     OAuth2.Client.authorize_url!(
       client,
       redirect_uri: redirect_uri,
-      scope: @scope,
+      scope: Enum.join(@scope, " "),
       access_type: @access_type,
       approval_prompt: @approval_prompt
     )
@@ -48,7 +48,7 @@ defmodule LeafNode.Google.OAuth do
     OAuth2.Client.authorize_url!(
       client,
       redirect_uri: redirect_uri,
-      scope: @scope,
+      scope: Enum.join(@scope, " "),
       access_type: @access_type,
       approval_prompt: @approval_prompt,
       state: Base.encode64(Jason.encode!(params))

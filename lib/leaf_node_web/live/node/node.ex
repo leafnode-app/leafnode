@@ -137,7 +137,9 @@ defmodule LeafNodeWeb.NodeLive do
   """
   def handle_info(:sync_has_oauth, socket) do
     %{current_user: current_user, node: node} = socket.assigns
-    token = LeafNode.Repo.OAuthToken.get_token(current_user.id, node.integration_settings["type"])
+    # Get the relevant integration
+    type = String.split(node.integration_settings["type"], "_") |> Enum.at(0)
+    token = LeafNode.Repo.OAuthToken.get_token(current_user.id, type)
 
     updated_integration_settings = Map.put(node.integration_settings, "has_oauth", !is_nil(token))
     updated_node = Map.put(node, :integration_settings, updated_integration_settings)

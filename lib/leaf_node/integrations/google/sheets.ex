@@ -2,7 +2,6 @@ defmodule LeafNode.Integrations.Google.Sheets do
   @moduledoc """
     The Google sheets integrations and helper functions in order to interact with it
   """
-  alias LeafNode.Google.OAuth
 
   @doc """
     The metadata to get information on how to render the fields in order to interact with the interaction
@@ -28,7 +27,6 @@ defmodule LeafNode.Integrations.Google.Sheets do
     # Specify the valueInputOption parameter
     # or "RAW" based on your requirement
 
-    IO.inspect(values, label: "WRITE TO SHEET")
     # Update the URL to include the valueInputOption parameter
     url =
       "https://sheets.googleapis.com/v4/spreadsheets/#{spreadsheet_id}/values/#{range}:append?valueInputOption=USER_ENTERED"

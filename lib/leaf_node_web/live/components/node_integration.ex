@@ -166,10 +166,11 @@ defmodule LeafNodeWeb.Components.NodeIntegration do
   end
 
   def handle_event("change_type", %{"type" => type}, socket) do
+    integration_type = String.split(type, "_") |> Enum.at(0)
     node = socket.assigns.node
     user_id = node.user_id
 
-    case LeafNode.Repo.OAuthToken.get_token(user_id, type) do
+    case LeafNode.Repo.OAuthToken.get_token(user_id, integration_type) do
       nil ->
         # user has no take for the selected integration
         socket =
@@ -180,7 +181,7 @@ defmodule LeafNodeWeb.Components.NodeIntegration do
         {:noreply, socket}
 
       _ ->
-        {:noreply, assign(socket, :service_type, type)}
+        {:noreply, assign(socket, :service_type, type) |> assign(:has_oauth, true) }
     end
   end
 

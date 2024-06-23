@@ -69,8 +69,6 @@ defmodule LeafNode.Repo.Node do
               Map.merge(struct.integration_settings, integrations_settings)
           )
 
-        IO.inspect(updated_struct, label: "updated_struct")
-
         # we need to add or update the node texts here
         case LeafNodeRepo.update(updated_struct) do
           {:ok, _} ->

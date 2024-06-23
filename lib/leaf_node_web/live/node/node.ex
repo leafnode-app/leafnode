@@ -75,7 +75,7 @@ defmodule LeafNodeWeb.NodeLive do
           type = integration_payload["type"]
 
           integration_token = if type !== "none" do
-            LeafNode.Repo.OAuthToken.get_token(user.id, type)
+            LeafNode.Repo.OAuthToken.get_token(user.id, String.split(type, "_") |> Enum.at(0))
           end
 
           has_oauth = if integration_token, do: true, else: false

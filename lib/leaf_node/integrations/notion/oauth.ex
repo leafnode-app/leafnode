@@ -4,8 +4,6 @@ defmodule LeafNode.Notion.OAuth do
   """
   use OAuth2.Strategy
 
-  @client_secret Application.compile_env(:client_secrets_notion, :client_secret)
-  @client_id Application.compile_env(:client_secrets_notion, :client_id)
   @authorize_url "https://api.notion.com/v1/oauth/authorize"
   @token_url "https://api.notion.com/v1/oauth/token"
   @access_type "offline"
@@ -19,8 +17,8 @@ defmodule LeafNode.Notion.OAuth do
     opts_strategy = if strategy, do: [strategy: strategy], else: []
 
     opts_default = [
-      client_id: @client_id,
-      client_secret: @client_secret,
+      client_id: config(:client_id),
+      client_secret: config(:client_secret),
       authorize_url: @authorize_url
     ]
 
@@ -54,7 +52,7 @@ defmodule LeafNode.Notion.OAuth do
     Get an auth token that can be stored along with a refresh token to use for reqeust against googer services
   """
   def get_token(code, redirect_uri) do
-    encoded = Base.encode64("#{@client_id}:#{@client_secret}")
+    encoded = Base.encode64("#{config(:client_id)}:#{config(:client_secret)}")
     body = %{
       code: code,
       redirect_uri: redirect_uri,
@@ -83,9 +81,13 @@ defmodule LeafNode.Notion.OAuth do
 
     OAuth2.Client.get_token!(client,
       refresh_token: refresh_token,
-      client_id: @client_id,
-      client_secret: @client_secret,
+      client_id: config(:client_id),
+      client_secret: config(:client_secret),
       grant_type: "refresh_token"
     )
   end
+
+  # config to get based off the application name
+  def config(), do: Application.get_env(:leaf_node, :client_secrets_notion)
+  def config(key, default \\ nil), do: Keyword.get(config(), key, default)
 end

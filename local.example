@@ -4,14 +4,14 @@ export DB_URL=
 export DB_NAME=
 export DB_USER=
 export DB_PASS=
-export DB_PORT=5432
+export DB_PORT=
 
 # Open AI
 export OPEN_AI=
 export OPEN_AI_MODEL=
 
-# phx host
-export PHX_HOST=localhost
+# phx host - this needs to be the domains allowed
+export PHX_HOST=
 export PORT=4000
 
 # mix phx.gen.secret

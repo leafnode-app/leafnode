@@ -4,9 +4,6 @@ defmodule LeafNode.Google.OAuth do
   """
   use OAuth2.Strategy
 
-  @scope Application.compile_env(:scopes, :list)
-  @client_secret Application.compile_env(:client_secrets_google, :client_secret)
-  @client_id Application.compile_env(:client_secrets_google, :client_id)
   @site "https://accounts.google.com"
   @authorize_url "https://accounts.google.com/o/oauth2/auth"
   @token_url "https://accounts.google.com/o/oauth2/token"
@@ -20,8 +17,8 @@ defmodule LeafNode.Google.OAuth do
   def client(strategy \\ nil) do
     opts_strategy = if strategy, do: [strategy: strategy], else: []
     opts_default = [
-      client_id: @client_id,
-      client_secret: @client_secret,
+      client_id: config(:client_id),
+      client_secret: config(:client_secret),
       site: @site,
       authorize_url: @authorize_url,
       token_url: @token_url
@@ -39,7 +36,7 @@ defmodule LeafNode.Google.OAuth do
     OAuth2.Client.authorize_url!(
       client,
       redirect_uri: redirect_uri,
-      scope: Enum.join(@scope, " "),
+      scope: Enum.join(config(:scopes_list), " "),
       access_type: @access_type,
       approval_prompt: @approval_prompt
     )
@@ -48,7 +45,7 @@ defmodule LeafNode.Google.OAuth do
     OAuth2.Client.authorize_url!(
       client,
       redirect_uri: redirect_uri,
-      scope: Enum.join(@scope, " "),
+      scope: Enum.join(config(:scopes_list), " "),
       access_type: @access_type,
       approval_prompt: @approval_prompt,
       state: Base.encode64(Jason.encode!(params))
@@ -62,8 +59,8 @@ defmodule LeafNode.Google.OAuth do
     OAuth2.Client.get_token!(client, [
       code: code,
       redirect_uri: redirect_uri,
-      client_id: @client_id,
-      client_secret: @client_secret,
+      client_id: config(:client_id),
+      client_secret: config(:client_secret),
       grant_type: "authorization_code"
     ])
   end
@@ -75,9 +72,13 @@ defmodule LeafNode.Google.OAuth do
     client = client(OAuth2.Strategy.Refresh)
     OAuth2.Client.get_token!(client, [
       refresh_token: refresh_token,
-      client_id: @client_id,
-      client_secret: @client_secret,
+      client_id: config(:client_id),
+      client_secret: config(:client_secret),
       grant_type: "refresh_token"
     ])
   end
+
+  # config to get based off the application name
+  def config(), do: Application.get_env(:leaf_node, :client_secrets_google)
+  def config(key, default \\ nil), do: Keyword.get(config(), key, default)
 end

@@ -74,9 +74,9 @@ defmodule LeafNodeWeb.Router do
 
     live_session :current_user,
       on_mount: [{LeafNodeWeb.UserAuth, :mount_current_user}] do
-      live "/dashboard", NodesLive
-      live "/dashboardnode/:id", NodeLive
-      live "/dashboardlog/:id", LogDetailsLive
+      live "/dashboard/", NodesLive
+      live "/dashboard/node/:id", NodeLive
+      live "/dashboard/log/:id", LogDetailsLive
 
       live "/auth/confirm/:token", UserConfirmationLive, :edit
       live "/auth/confirm", UserConfirmationInstructionsLive, :new

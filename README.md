@@ -29,7 +29,7 @@ This is a list that is relevant from the date of 27th June 2024 serviing as a ba
 - [ ] Process setting (enable/disable - async/sync)
 - [ ] Update output to caller to contain process result or reference to log id for data responses
 - [ ] String interpolation for inputs (abilit to use dynamic inputs and hard coded values as part of data to send)
-- [ ] Get Ngrok and project running on Raspberry PI for testing
+- [x] Get Ngrok and project running on Raspberry PI for testing
 - [ ] Basic website
 
 This will be the main steps that will then require assessing and looking at case studies in order to show how it will work or usages and planning for other integrations and updating the current ones to use more rich text and markup for bodies of some of the integrations.

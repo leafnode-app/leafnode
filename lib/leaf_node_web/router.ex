@@ -32,17 +32,6 @@ defmodule LeafNodeWeb.Router do
 
   # Landing Page
   scope "/", LeafNodeWeb do
-    pipe_through [:browser]
-
-    live "/", UserLoginLive
-
-    # TODO: privacy policy and terms of service - make sure to update google and services that need this
-    # live "/privacy-policy", GeneralLive, :privacy_policy
-    # live "/terms-of-service", GeneralLive, :terms_of_service
-  end
-
-  # Landing Page
-  scope "/", LeafNodeWeb do
     pipe_through [:browser, :redirect_if_user_is_authenticated]
 
     live "/", UserLoginLive
@@ -50,31 +39,6 @@ defmodule LeafNodeWeb.Router do
     # TODO: privacy policy and terms of service - make sure to update google and services that need this
     # live "/privacy-policy", GeneralLive, :privacy_policy
     # live "/terms-of-service", GeneralLive, :terms_of_service
-  end
-
-  # App dashboard - login
-  scope "/", LeafNodeWeb do
-    pipe_through [:browser]
-
-    delete "/auth/log_out", UserSessionController, :delete
-
-    live_session :current_user,
-      on_mount: [{LeafNodeWeb.UserAuth, :mount_current_user}] do
-      live "/dashboard", NodesLive
-      live "/dashboard/node/:id", NodeLive
-      live "/dashboard/log/:id", LogDetailsLive
-
-      live "/auth/confirm/:token", UserConfirmationLive, :edit
-      live "/auth/confirm", UserConfirmationInstructionsLive, :new
-
-      # Integrations and OAuth redirects
-      # Google
-      get "/auth/google/request/:node_id", GoogleController, :request
-      get "/auth/google/callback", GoogleController, :callback
-      # Notion
-      get "/auth/notion/request/:node_id", NotionController, :request
-      get "/auth/notion/callback", NotionController, :callback
-    end
   end
 
   ## Authentication routes
@@ -102,8 +66,33 @@ defmodule LeafNodeWeb.Router do
     end
   end
 
+  # App dashboard - login
+  scope "/", LeafNodeWeb do
+    pipe_through [:browser]
+
+    delete "/auth/log_out", UserSessionController, :delete
+
+    live_session :current_user,
+      on_mount: [{LeafNodeWeb.UserAuth, :mount_current_user}] do
+      live "/dashboard", NodesLive
+      live "/dashboard/node/:id", NodeLive
+      live "/dashboard/log/:id", LogDetailsLive
+
+      live "/auth/confirm/:token", UserConfirmationLive, :edit
+      live "/auth/confirm", UserConfirmationInstructionsLive, :new
+
+      # Integrations and OAuth redirects
+      # Google
+      get "/auth/google/request/:node_id", GoogleController, :request
+      get "/auth/google/callback", GoogleController, :callback
+      # Notion
+      get "/auth/notion/request/:node_id", NotionController, :request
+      get "/auth/notion/callback", NotionController, :callback
+    end
+  end
+
   # V1 for the nodes execution
-  scope "/api/v1/node" do
+  scope "/api/node" do
     pipe_through [:api, :validate_access_key]
     post "/:id", NodeController, :execute_node
   end

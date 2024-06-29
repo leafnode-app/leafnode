@@ -15,7 +15,7 @@ defmodule LeafNodeWeb.Components.NodeDetails do
             id="disabled-input"
             aria-label="disabled input"
             class="box_input_inset_shadow disabledmb-6 text-gray-900 text-sm rounded-lg border-stone-900 block w-full p-4 cursor-not-allowed dark:text-gray-400"
-            value={LeafNodeWeb.Endpoint.url() <> "/api/v1/node/" <> @node.id}
+            value={LeafNodeWeb.Endpoint.url() <> "/api/node/" <> @node.id}
             disabled
           />
           <div class="py-4">

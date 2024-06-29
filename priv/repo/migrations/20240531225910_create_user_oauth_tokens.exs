@@ -7,7 +7,7 @@ defmodule LeafNode.Repo.Migrations.CreateUserOauthTokens do
       add :integration_type, :string, null: false
       add :access_token, :string, null: false
       add :refresh_token, :string
-      add :expires_at, :utc_datetime
+      add :expires_at, :bigint
 
       timestamps()
     end

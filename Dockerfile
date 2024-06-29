@@ -8,6 +8,11 @@ RUN apt-get update && apt-get install -y \
     inotify-tools && \
     locale-gen en_US.UTF-8
 
+# Potentially install a gui monitoring tool for the terminal
+# sudo apt install nodejs
+# sudo apt install npm
+# sudo npm install -g vtop
+
 # Set environment variables
 ENV MIX_ENV=prod \
     LANG=en_US.UTF-8 \

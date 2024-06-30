@@ -8,6 +8,7 @@ defmodule LeafNode do
 
     Overall, the LeafNode module provides a set of useful functions for managing and manipulating nodes in a process, and can be used to build complex workflows in Elixir.
   """
+  alias LeafNode.Repo.Log
 
   # Constants
   @id "id"
@@ -69,5 +70,47 @@ defmodule LeafNode do
   """
   def init_entry_node_input(entry_node, input) do
     Map.put(entry_node, @input, input)
+  end
+
+  @doc """
+    Geet the integration action that is being executed for a given integration type
+  """
+  def get_integration_type(action) do
+    String.split(action, "_") |> Enum.at(0)
+  end
+
+  @doc """
+    Take th node input and get the relevant dynamic value to use as part of the payload
+    TODO - check if input data or not - this needs to be done better in future
+    Check syntax in order to know if we do a normal string write to integration or dynamic from input
+  """
+  def parse_node_input(value, payload) when is_list(value) do
+    # value - the entire string that is expected to be sent
+    Enum.map(value, fn item ->
+      get_potential_input_value(item, payload)
+    end)
+  end
+  def parse_node_input(value, payload) when is_binary(value) do
+    get_potential_input_value(value, payload)
+  end
+  def parse_node_input(_, _), do: raise("No Implementation to parse input to integration")
+
+  # Get the potential input value for given payload
+  defp get_potential_input_value(item, payload) do
+    path = Enum.at(String.split(item, "::"), 1)
+    if !is_nil(path) do
+      Kernel.get_in(payload, String.split(path, "."))
+    else
+      item
+    end
+  end
+
+  @doc """
+    Create a log based on node and it allowing logs to be persisted for it
+  """
+  def log_result(node, input, result, status) do
+    if node.should_log do
+      Log.create_log(node.id, input, result, status)
+    end
   end
 end

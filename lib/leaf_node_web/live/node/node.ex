@@ -42,6 +42,8 @@ defmodule LeafNodeWeb.NodeLive do
     <div class="my-2" />
     <.live_component module={NodeClause} id="node_clause" expression={@expression} />
     <div class="my-2" />
+    TODO: Setup the process input section here
+    <div class="my-2" />
     <.live_component module={NodeIntegration} id="node_integrations" node={@node} current_user={@current_user} />
     <div class="my-2" />
     <.live_component module={NodeDetails} id="node_details" node={@node} />

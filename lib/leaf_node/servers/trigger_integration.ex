@@ -33,7 +33,7 @@ defmodule LeafNode.Servers.TriggerIntegration do
     code = if success_check, do: 200, else: 500
     # async log
     # TODO: find a better result for the logs based off integration
-    LeafNode.Servers.ExecutionServer.log_result(
+    LeafNode.log_result(
       node,
       node,
       LeafNode.Utils.Helpers.http_resp(code, success_check, resp),
@@ -68,7 +68,7 @@ defmodule LeafNode.Servers.TriggerIntegration do
     code = if success_check, do: 200, else: 500
     # async log
     # TODO: find a better result for the logs based off integration
-    LeafNode.Servers.ExecutionServer.log_result(
+    LeafNode.log_result(
       node,
       node,
       LeafNode.Utils.Helpers.http_resp(code, success_check, resp),
@@ -97,7 +97,7 @@ defmodule LeafNode.Servers.TriggerIntegration do
     code = if success_check, do: 200, else: 500
     # async log
     # TODO: find a better result for the logs based off integration
-    LeafNode.Servers.ExecutionServer.log_result(
+    LeafNode.log_result(
       node,
       node,
       LeafNode.Utils.Helpers.http_resp(code, success_check, resp),

@@ -42,7 +42,7 @@ defmodule LeafNode.Google.OAuth do
     )
   end
   def authorize_url(client, redirect_uri, params) do
-    OAuth2.Client.authorize_url!(
+    url = OAuth2.Client.authorize_url!(
       client,
       redirect_uri: redirect_uri,
       scope: Enum.join(config(:scopes_list), " "),
@@ -50,6 +50,10 @@ defmodule LeafNode.Google.OAuth do
       approval_prompt: @approval_prompt,
       state: Base.encode64(Jason.encode!(params))
     )
+    IO.inspect(redirect_uri, label: "redirect_uri")
+    IO.inspect(url, label: "URL")
+
+    url
   end
 
   @doc """

@@ -1,4 +1,4 @@
-defmodule LeafNode do
+defmodule LeafNode.Servers.ExecutionServer do
   @moduledoc """
     The execution server that will be used to create instances when executing a node
   """

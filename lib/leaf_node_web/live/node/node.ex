@@ -1,7 +1,7 @@
 defmodule LeafNodeWeb.NodeLive do
   use LeafNodeWeb, :live_view
 
-  alias LeafNodeWeb.Components.{NodeHeader, NodeLogs, NodeDetails, NodeClause, NodeIntegration}
+  alias LeafNodeWeb.Components.{NodeHeader, NodeProcessing, NodeLogs, NodeDetails, NodeClause, NodeIntegration}
 
   @doc """
   Init func that is run on init of the view
@@ -42,7 +42,7 @@ defmodule LeafNodeWeb.NodeLive do
     <div class="my-2" />
     <.live_component module={NodeClause} id="node_clause" expression={@expression} />
     <div class="my-2" />
-    TODO: Setup the process input section here
+    <.live_component module={NodeProcessing} id="node_processing" node={@node} />
     <div class="my-2" />
     <.live_component module={NodeIntegration} id="node_integrations" node={@node} current_user={@current_user} />
     <div class="my-2" />
@@ -100,7 +100,7 @@ defmodule LeafNodeWeb.NodeLive do
     end
   end
 
-  def handle_event("toggle_enabled", _, %{assigns: assigns} = socket) do
+  def handle_event("toggle_node_enabled", _, %{assigns: assigns} = socket) do
     node = assigns.node || false
 
     case node do
@@ -117,7 +117,7 @@ defmodule LeafNodeWeb.NodeLive do
     end
   end
 
-  def handle_event("toggle_should_log", _, %{assigns: assigns} = socket) do
+  def handle_event("toggle_node_should_log", _, %{assigns: assigns} = socket) do
     node = assigns.node || false
 
     case node do

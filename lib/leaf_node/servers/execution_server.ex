@@ -95,12 +95,11 @@ defmodule LeafNode.Servers.ExecutionServer do
   defp execute_integration(node, node_payload, node_result) do
     if node_result do
       # TODO: here we do checks if the user is doing processing for the input
-      {_, processed_resp} = LeafNode.Servers.TriggerProcessing.processing_input(node_payload, node)
+      {_status, processed_resp} = LeafNode.Servers.TriggerAugmentation.processing_input(node_payload, node)
 
-      # check if we use the processed data or input data
-      # This can be a gaurded function clause
-      payload = if is_nil(processed_resp), do: node_payload, else: processed_resp
-
+      # We do a copy and join to payload if the user enabled AI so we can have the user select from the data
+      # TODO: this can or needs to change in future
+      payload = Map.put(node_payload, "augment_resp", processed_resp)
       LeafNode.Servers.TriggerIntegration.integration_action(node.integration_settings["type"], node, payload)
     end
   end

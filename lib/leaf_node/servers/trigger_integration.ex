@@ -66,7 +66,6 @@ defmodule LeafNode.Servers.TriggerIntegration do
 
     success_check = if status == :ok, do: true, else: false
     code = if success_check, do: 200, else: 500
-    # async log
     # TODO: find a better result for the logs based off integration
     LeafNode.log_result(
       node,
@@ -103,5 +102,9 @@ defmodule LeafNode.Servers.TriggerIntegration do
       LeafNode.Utils.Helpers.http_resp(code, success_check, resp),
       success_check
     )
+  end
+
+  def integration_action(type, _node, _payload) when type === "none" do
+    :none
   end
 end

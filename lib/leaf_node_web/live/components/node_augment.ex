@@ -59,7 +59,7 @@ defmodule LeafNodeWeb.Components.NodeAugment do
   @doc """
     Here we handle the update to input augmentation
   """
-  def handle_event("update_prompt", params, %{assigns: %{ augment: augment } = assigns} = socket) do
+  def handle_event("update_prompt", params, %{assigns: %{ augment: augment } = _assigns} = socket) do
     # Might get validation errors that we need to return
     update_prompt(%{
       "id" => augment.id,

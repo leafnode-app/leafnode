@@ -110,7 +110,10 @@ defmodule LeafNode do
   """
   def log_result(node, input, result, status) do
     if node.should_log do
-      Log.create_log(node.id, input, result, status)
+      {status, log} = Log.create_log(node.id, input, result, status)
+      if status === :ok do
+        log.id
+      end
     end
   end
 end

@@ -14,10 +14,10 @@ defmodule LeafNode.Schemas.Augmentation do
     timestamps()
   end
 
-  def changeset(log, attrs) do
-    log
+  def changeset(augment, attrs) do
+    augment
     |> cast(attrs, [:type, :value, :enabled, :node_id])
-    |> validate_required([:value, :enabled, :node_id])
+    |> validate_required([:enabled, :node_id])
     |> assoc_constraint(:node)
   end
 end

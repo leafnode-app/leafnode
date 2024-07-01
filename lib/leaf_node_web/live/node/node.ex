@@ -1,7 +1,7 @@
 defmodule LeafNodeWeb.NodeLive do
   use LeafNodeWeb, :live_view
 
-  alias LeafNodeWeb.Components.{NodeHeader, NodeProcessing, NodeLogs, NodeDetails, NodeClause, NodeIntegration}
+  alias LeafNodeWeb.Components.{NodeHeader, NodeAugment, NodeLogs, NodeDetails, NodeClause, NodeIntegration}
 
   @doc """
   Init func that is run on init of the view
@@ -9,6 +9,7 @@ defmodule LeafNodeWeb.NodeLive do
   def mount(params, _session, socket) do
     %{"id" => id} = params
 
+    # All of this can be async and we can update once we have the data for non blocking UI
     node =
       case LeafNode.Repo.Node.get_node(id) do
         {:ok, data} -> data
@@ -23,11 +24,15 @@ defmodule LeafNodeWeb.NodeLive do
     {status, expression} = LeafNode.Repo.Expression.get_expression_by_node(id)
     expr = if status === :ok, do: expression, else: %{}
 
+    {status, augment} = LeafNode.Repo.Augmentation.get_augment_by_node(id)
+    augment = if status === :ok, do: augment, else: %{}
+
     socket =
       assign(socket, :id, id)
       |> assign(:node, node)
       |> assign(:logs, log_list)
       |> assign(:expression, expr)
+      |> assign(:augment, augment)
       |> assign(:live_action, nil)
       |> assign(:current_user, socket.assigns.current_user)
 
@@ -42,7 +47,7 @@ defmodule LeafNodeWeb.NodeLive do
     <div class="my-2" />
     <.live_component module={NodeClause} id="node_clause" expression={@expression} />
     <div class="my-2" />
-    <.live_component module={NodeProcessing} id="node_processing" node={@node} />
+    <.live_component module={NodeAugment} id="node_augment" node={@node} augment={@augment} />
     <div class="my-2" />
     <.live_component module={NodeIntegration} id="node_integrations" node={@node} current_user={@current_user} />
     <div class="my-2" />

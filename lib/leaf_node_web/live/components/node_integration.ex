@@ -101,14 +101,27 @@ defmodule LeafNodeWeb.Components.NodeIntegration do
                     <div class="py-2">
                       <label class="block text-sm font-medium text-gray-300 text-xs"><%= title %></label>
                       <span class="text-gray-500 pb-5 text-xs"><%= desc %></span>
-                      <input
-                        autocomplete="false"
-                        type={type}
+
+                      <%= if type === "textarea" do %>
+                      <textarea
+                        type="text"
                         name={id}
-                        value={@integration_settings[id]}
                         phx-target={@myself}
-                        class="focus:outline-none box_input_inset_shadow
-                          text-gray-900 text-sm rounded-lg border-stone-900 block w-full p-4 dark:text-gray-400" />
+                        rows="5"
+                        class="
+                          box_input_inset_shadow disabledmb-6 text-gray-900 text-sm rounded-lg
+                          border-stone-900 block w-full p-4 dark:text-gray-400"
+                      ><%= @integration_settings[id] %></textarea>
+                      <% else %>
+                        <input
+                          autocomplete="false"
+                          type={type}
+                          name={id}
+                          value={@integration_settings[id]}
+                          phx-target={@myself}
+                          class="focus:outline-none box_input_inset_shadow
+                            text-gray-900 text-sm rounded-lg border-stone-900 block w-full p-4 dark:text-gray-400" />
+                      <% end %>
                     </div>
                   <% end %>
                 </div>

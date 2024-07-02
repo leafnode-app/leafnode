@@ -10,8 +10,8 @@ defmodule LeafNode.Integrations.Notion.Pages do
   # TODO: This could be changed to use json schema - we can then get this info based on selected type and render it
   def input_info() do
     [
-      {"page_id", "Page Id", "text", "The page id to write to"},
-      {"content", "Content", "text", "The content to write to Notion page. Use :: to then use dot notion to use payload values e.g ::some.input"}
+      {"page_id", "Page Id", "text", "The Notion page ID. Use [[input.payload.any_key]] for dynamic data. E.g., [[input.payload.some_id]]."},
+      {"content", "Content", "text", "Content for the Notion page. Use [[input.payload.any_key]] for dynamic data. E.g., [[input.payload.text_content]]."}
     ]
   end
 

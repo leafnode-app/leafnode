@@ -29,7 +29,7 @@ defmodule LeafNodeWeb.Components.NodeAugment do
           </div>
 
           <label class="flex items-center cursor-pointer px-2">
-            <span class="flex-1 font-medium text-gray-900 dark:text-gray-300">Enable</span>
+            <span class="flex-1 font-medium text-gray-900 dark:text-gray-300">Enable AI Processing</span>
             <div>
               <!-- Hidden input to represent the "off" state -->
               <input type="hidden" name="augmentation_toggle" value="off" />

@@ -9,12 +9,12 @@ defmodule LeafNode.Integrations.OpenAi.Gpt do
     Send through the payload and a string of augmentation or what you want to process against the payload
   """
   def prompt(payload, augmentation) do
-    if !is_nil(System.get_env("OPEN_AI")) do
+    if !is_nil(config(:token)) do
       body_payload = Map.put(
         %{
           "max_tokens" => 300,
           "temperature" => 0.5,
-          "model" => System.get_env("OPEN_AI_MODEL"),
+          "model" => config(:model),
           "response_format" => %{ "type" => "json_object"}
         }, "messages",
         [
@@ -26,11 +26,11 @@ defmodule LeafNode.Integrations.OpenAi.Gpt do
       )
 
       {status, resp} = HTTPoison.post(
-        "https://api.openai.com/v1/chat/completions",
+        config(:completions_url),
         Jason.encode!(body_payload),
         [
           {"Content-type", "application/json"},
-          {"Authorization", "Bearer #{System.get_env("OPEN_AI")}"}
+          {"Authorization", "Bearer #{config(:token)}"}
         ],
         recv_timeout: @timeout
       )
@@ -94,4 +94,8 @@ defmodule LeafNode.Integrations.OpenAi.Gpt do
     payload: #{Jason.encode!(payload)}
     augment: #{augment}"
   end
+
+  # config to get based off the application name
+  def config(), do: Application.get_env(:leaf_node, :open_ai)
+  def config(key, default \\ nil), do: Keyword.get(config(), key, default)
 end

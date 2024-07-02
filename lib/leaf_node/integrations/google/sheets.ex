@@ -9,13 +9,11 @@ defmodule LeafNode.Integrations.Google.Sheets do
   # TODO: This could be changed to use json schema - we can then get this info based on selected type and render it
   def input_info() do
     [
-      {"spreadsheet_id", "Spreadsheet Id", "text", "The spreadsheet id to write to"},
-      {"tab", "Tab", "text", "The tab of the associated spreadsheet"},
-      {"range_start", "Range Start", "text", "The starting range column i.e A1 etc"},
-      {"range_end", "Range End", "text",
-       "The ending column - needed along with starting range as this is the last column"},
-      {"input", "Input", "text",
-       "The comma separated values that will be inserted i.e this,is,a,test (It ideally maps to range coumns). Use :: to then use dot notion to use payload values e.g world,::some.input,hello"}
+      {"spreadsheet_id", "Spreadsheet Id", "text", "The ID of the spreadsheet. Use [[input.payload.any_key]] for dynamic data. E.g., [[input.payload.spreadsheet_id]]."},
+      {"tab", "Tab", "text", "The tab name of the associated spreadsheet. Use [[input.payload.any_key]] for dynamic data. E.g., [[input.payload.tab_name]]."},
+      {"range_start", "Range Start", "text", "The starting cell range (e.g., A1). Use [[input.payload.any_key]] for dynamic data. E.g., [[input.payload.start_cell]]."},
+      {"range_end", "Range End", "text", "The ending cell range (e.g., B10). Use [[input.payload.any_key]] for dynamic data. E.g., [[input.payload.end_cell]]."},
+      {"input", "Input", "text", "Comma-separated values to insert (e.g., this,is,a,test). Use [[input.payload.any_key]] for dynamic data. E.g., [[input.payload.values]]."}
     ]
   end
 

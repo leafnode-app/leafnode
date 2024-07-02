@@ -80,32 +80,6 @@ defmodule LeafNode do
   end
 
   @doc """
-    Take th node input and get the relevant dynamic value to use as part of the payload
-    TODO - check if input data or not - this needs to be done better in future
-    Check syntax in order to know if we do a normal string write to integration or dynamic from input
-  """
-  def parse_node_input(value, payload) when is_list(value) do
-    # value - the entire string that is expected to be sent
-    Enum.map(value, fn item ->
-      get_potential_input_value(item, payload)
-    end)
-  end
-  def parse_node_input(value, payload) when is_binary(value) do
-    get_potential_input_value(value, payload)
-  end
-  def parse_node_input(_, _), do: raise("No Implementation to parse input to integration")
-
-  # Get the potential input value for given payload
-  defp get_potential_input_value(item, payload) do
-    path = Enum.at(String.split(item, "::"), 1)
-    if !is_nil(path) do
-      Kernel.get_in(payload, String.split(path, "."))
-    else
-      item
-    end
-  end
-
-  @doc """
     Create a log based on node and it allowing logs to be persisted for it
   """
   def log_result(node, input, result, status) do

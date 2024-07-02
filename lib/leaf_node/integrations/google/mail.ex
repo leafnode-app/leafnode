@@ -9,9 +9,9 @@ defmodule LeafNode.Integrations.Google.Mail do
   # TODO: This could be changed to use json schema - we can then get this info based on selected type and render it
   def input_info() do
     [
-      {"recipient", "Recipient", "text", "The recipient to whom the email needs to be sent to. Use :: to then use dot notion to use payload values e.g world,::some.input,hello. Be aware, your email will be the sender!"},
-      {"subject", "Subject", "text", "The subject line to add to the email message. Use :: to then use dot notion to use payload values e.g world,::some.input,hello"},
-      {"body", "Body", "text", "The body of the email that will be sent to the recipient. Use :: to then use dot notion to use payload values e.g world,::some.input,hello"}
+      {"recipient", "Recipient", "text", "Email recipient. Use [[input.payload.any_key]] for dynamic data. E.g., [[input.payload.email]]."},
+      {"subject", "Subject", "text", "Email subject. Use [[input.payload.any_key]] for dynamic data. E.g., [[input.payload.title]]."},
+      {"body", "Body", "textarea", "Email body. Use [[input.payload.any_key]] for dynamic data. E.g., [[input.payload.message]]."}
     ]
   end
 
@@ -27,16 +27,19 @@ defmodule LeafNode.Integrations.Google.Mail do
     Create the email template that will be sent to the relevant
   """
   def create_email(from, recipient, subject, body) do
-    IO.inspect(String.split(from, "@") |> Enum.at(0))
     email_body =
       """
       From: #{String.split(from, "@") |> Enum.at(0)} <#{from}>
       To: #{recipient}
       Subject: #{subject}
       MIME-Version: 1.0
-      Content-Type: text/plain; charset="UTF-8"
+      Content-Type: text/html; charset="UTF-8"
 
       #{body}
+
+      <br />
+      <br />
+      Generated with <a href="https://leafnode.app" target="_blank">leafnode.app</a>.
       """
 
     # Gmail API requires URL-safe Base64 encoding

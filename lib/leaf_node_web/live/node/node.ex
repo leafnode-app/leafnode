@@ -45,13 +45,13 @@ defmodule LeafNodeWeb.NodeLive do
     ~H"""
     <.live_component module={NodeHeader} id="node_header" node={@node} />
     <div class="my-2" />
+    <.live_component module={NodeDetails} id="node_details" node={@node} />
+    <div class="my-2" />
     <.live_component module={NodeClause} id="node_clause" expression={@expression} />
     <div class="my-2" />
     <.live_component module={NodeAugment} id="node_augment" node={@node} augment={@augment} />
     <div class="my-2" />
     <.live_component module={NodeIntegration} id="node_integrations" node={@node} current_user={@current_user} />
-    <div class="my-2" />
-    <.live_component module={NodeDetails} id="node_details" node={@node} />
     <div class="my-2" />
     <.live_component module={NodeLogs} id="node_logs" logs={@logs} node={@node} />
     """

@@ -25,8 +25,8 @@ defmodule LeafNode.Servers.TriggerIntegration do
         LeafNode.Repo.OAuthToken.refresh_token_check(token_details, :google),
         email,
         recipient,
-        LeafNode.parse_node_input(subject, payload),
-        LeafNode.parse_node_input(body, payload)
+        LeafNode.Core.Interpolator.interpolate_string(subject, payload),
+        LeafNode.Core.Interpolator.interpolate_string(body, payload)
       )
 
     success_check = if status == :ok, do: true, else: false
@@ -61,7 +61,7 @@ defmodule LeafNode.Servers.TriggerIntegration do
         LeafNode.Repo.OAuthToken.refresh_token_check(token_details, :google),
         id,
         range_start <> ":" <> range_end,
-        [LeafNode.parse_node_input(String.split(input, ","), payload)]
+        [LeafNode.Core.Interpolator.interpolate_string(String.split(input, ","), payload)]
       )
 
     success_check = if status == :ok, do: true, else: false
@@ -89,7 +89,7 @@ defmodule LeafNode.Servers.TriggerIntegration do
       LeafNode.Integrations.Notion.Pages.append_content(
         page_id,
         token_details.access_token,
-        LeafNode.parse_node_input(content, payload)
+        LeafNode.Core.Interpolator.interpolate_string(content, payload)
       )
 
     success_check = if status == :ok, do: true, else: false

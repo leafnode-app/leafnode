@@ -28,7 +28,7 @@ This is a list that is relevant from the date of 27th June 2024 serviing as a ba
 - [ ] Log updates to have references or IDs displayed
 - [x] Process setting (enable/disable - async/sync) - always async for now
 - [ ] Update output to caller to contain process result or reference to log id for data responses
-- [ ] String interpolation for inputs (abilit to use dynamic inputs and hard coded values as part of data to send)
+- [x] String interpolation for inputs (abilit to use dynamic inputs and hard coded values as part of data to send)
 - [x] Get Ngrok and project running on Raspberry PI for testing
 - [ ] Basic website
 - [ ] Consider AI to have user generate data and able to edit and reuse and not query every call?

@@ -30,6 +30,7 @@ This is a list that is relevant from the date of 27th June 2024 serviing as a ba
 - [ ] Update output to caller to contain process result or reference to log id for data responses
 - [x] String interpolation for inputs (abilit to use dynamic inputs and hard coded values as part of data to send)
 - [x] Get Ngrok and project running on Raspberry PI for testing
+- [ ] Add "template" tag to the relevant fields that support it
 - [ ] Basic website
 - [ ] Consider AI to have user generate data and able to edit and reuse and not query every call?
 

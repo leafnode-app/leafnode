@@ -26,8 +26,9 @@ defmodule LeafNodeWeb.Router do
     plug :accepts, ["json"]
   end
 
-  pipeline :validate_access_key do
+  pipeline :endpoint_access_validation do
     plug LeafNodeWeb.Plugs.AccessKeyAuth
+    plug LeafNodeWeb.Plugs.CheckContentType
   end
 
   # Landing Page
@@ -93,7 +94,7 @@ defmodule LeafNodeWeb.Router do
 
   # V1 for the nodes execution
   scope "/api/node" do
-    pipe_through [:api, :validate_access_key]
+    pipe_through [:api, :endpoint_access_validation]
     post "/:id", NodeController, :execute_node
   end
 

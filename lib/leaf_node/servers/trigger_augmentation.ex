@@ -5,15 +5,6 @@ defmodule LeafNode.Servers.TriggerAugmentation do
   alias LeafNode
 
   @doc """
-    Trigger the augmentation that will be done against AI with relevant input data
-  """
-  def processing_input(payload, node) do
-    {status, augment} = LeafNode.Repo.Augmentation.get_augment_by_node(node.id)
-    query_ai(status, payload, augment, node)
-  end
-
-
-  @doc """
     Query AI with the
   """
   def query_ai(status, payload, %{value: augment_value, enabled: enabled} = _augment, node) when status === :ok do
@@ -39,6 +30,6 @@ defmodule LeafNode.Servers.TriggerAugmentation do
 
    # Add the log to the response to have the user debug if needed
    defp add_log_to_resp(resp, log) do
-     Map.put(resp, "response_log_id", log)
+     Map.put(resp, "log_id", log)
    end
 end

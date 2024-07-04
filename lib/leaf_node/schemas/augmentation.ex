@@ -9,6 +9,7 @@ defmodule LeafNode.Schemas.Augmentation do
     field :type, :string, default: ""
     field :value, :string, default: ""
     field :enabled, :boolean
+    field :async, :boolean
     belongs_to :node, LeafNode.Schemas.Node
 
     timestamps()
@@ -16,8 +17,8 @@ defmodule LeafNode.Schemas.Augmentation do
 
   def changeset(augment, attrs) do
     augment
-    |> cast(attrs, [:type, :value, :enabled, :node_id])
-    |> validate_required([:enabled, :node_id])
+    |> cast(attrs, [:type, :value, :enabled, :node_id, :async])
+    |> validate_required([:enabled, :node_id, :async])
     |> assoc_constraint(:node)
   end
 end

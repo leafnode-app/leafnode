@@ -9,7 +9,7 @@ defmodule LeafNode.Repo.Augmentation do
   @doc """
     Create an augmentation  for a given node
   """
-  def create_augment(node_id, type, enabled, value) do
+  def create_augment(node_id, type, enabled, value, async) do
     changeset =
       Schemas.Augmentation.changeset(
         %Schemas.Augmentation{},
@@ -17,7 +17,8 @@ defmodule LeafNode.Repo.Augmentation do
           node_id: node_id,
           type: type,
           value: value,
-          enabled: enabled
+          enabled: enabled,
+          async: async
         }
       )
 
@@ -52,7 +53,8 @@ defmodule LeafNode.Repo.Augmentation do
           Ecto.Changeset.change(struct,
             type: Map.get(data, "type", struct.type),
             value: Map.get(data, "value", struct.value),
-            enabled: Map.get(data, "enabled", struct.enabled)
+            enabled: Map.get(data, "enabled", struct.enabled),
+            async: Map.get(data, "async", struct.async)
           )
 
         case LeafNodeRepo.update(updated_struct) do
@@ -89,7 +91,8 @@ defmodule LeafNode.Repo.Augmentation do
                node_id: n.node_id,
                type: n.type,
                value: n.value,
-               enabled: n.enabled
+               enabled: n.enabled,
+               async: n.async
              }}
         end
       rescue

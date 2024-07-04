@@ -42,6 +42,8 @@ defmodule LeafNode.Servers.ExecutionServer do
       case status do
         :ok ->
           {status, result} = start_execution(node, payload)
+          # TODO: change this so its better, we can return the AI processed data
+
           {:stop, :normal, {status, result}, state}
 
         _ ->
@@ -78,30 +80,58 @@ defmodule LeafNode.Servers.ExecutionServer do
   end
 
   # The execution of the node expression against the payload
+  # TODO: clean up
   defp execute(node, payload, expression) do
     {_, result} = LeafNode.Core.Code.execute(payload, expression)
+    {augment_status, %{ async: async } = augment} = LeafNode.Repo.Augmentation.get_augment_by_node(node.id)
     LeafNode.log_result(node, payload, LeafNode.Utils.Helpers.http_resp(200, true, result), result)
 
-    # TODO: do we want to wait? we just let it run when it can
-    Task.start(fn ->
-      execute_integration(node, payload, result)
-    end)
+    base_resp = %{
+      cond: result,
+    }
+
+    data = if result do
+      if async do
+        # TODO: do we want to wait? we just let it run when it can
+        Task.start(fn ->
+          processed_data = process_augmented_input(node, payload, augment, augment_status)
+          execute_integration(node, processed_data)
+        end)
+
+        base_resp
+      else
+        processed_data = process_augmented_input(node, payload, augment, augment_status)
+
+        Task.start(fn ->
+          execute_integration(node, processed_data)
+        end)
+        %{
+          cond: result,
+          augment_resp: processed_data["augment_resp"]
+        }
+      end
+    else
+      base_resp
+    end
+
 
     # Always return the result, the other work will run when it can
-    {:ok, result}
+    {:ok, data}
   end
 
   # Here we do the integration if the node has and the relevant result and conditions are met
-  defp execute_integration(node, node_payload, node_result) do
-    if node_result do
-      # TODO: here we do checks if the user is doing processing for the input
-      {_status, processed_resp} = LeafNode.Servers.TriggerAugmentation.processing_input(node_payload, node)
+  defp execute_integration(node, payload) do
+      LeafNode.Servers.TriggerIntegration.integration_action(node.integration_settings["type"], node, payload)
+  end
+
+  # Process the input with augmented data
+  defp process_augmented_input(node, payload, augment_data, augment_status) do
+    # TODO: here we do checks if the user is doing processing for the input
+      {_status, processed_resp} =
+        LeafNode.Servers.TriggerAugmentation.query_ai(augment_status, payload, augment_data, node)
 
       # We do a copy and join to payload if the user enabled AI so we can have the user select from the data
       # TODO: this can or needs to change in future
-      payload = Map.put(node_payload, "augment_resp", processed_resp)
-      LeafNode.Servers.TriggerIntegration.integration_action(node.integration_settings["type"], node, payload)
-    end
+      Map.put(payload, "augment_resp", processed_resp)
   end
-
 end

@@ -2,6 +2,9 @@ defmodule LeafNode.Repo.Node do
   @moduledoc """
     Methods around the Documents and persistence/data management
   """
+
+  # TODO: add limit for nodes based off user account - dont delete, just prevent adding
+
   import Ecto.Query, only: [from: 2]
   alias LeafNode.Repo, as: LeafNodeRepo
   alias LeafNode.Schemas
@@ -28,7 +31,7 @@ defmodule LeafNode.Repo.Node do
         node_id = Map.get(result, :id)
         # attempt to make an init node expression - we rely on the schema to set defaults
         LeafNode.Repo.Expression.create_expression(node_id, "", "===", "string", "")
-        LeafNode.Repo.Augmentation.create_augment(node_id, "ai", false, "")
+        LeafNode.Repo.Augmentation.create_augment(node_id, "ai", false, "", true)
 
         {:ok,
          %{

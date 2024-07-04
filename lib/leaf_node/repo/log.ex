@@ -6,6 +6,8 @@ defmodule LeafNode.Repo.Log do
   alias LeafNode.Repo, as: LeafNodeRepo
   alias LeafNode.Schemas
 
+  @log_limit 5
+
   @doc """
     Create a log - genreate an id and pass payload to be persisted
   """
@@ -18,11 +20,19 @@ defmodule LeafNode.Repo.Log do
         status: status
       })
 
-    case {_, result} = LeafNodeRepo.insert(changeset) do
-      {:ok, _} ->
+    insertion = LeafNodeRepo.insert(changeset) |> case do
+      {:ok, entry} ->
+        LeafNodeRepo.enforce_limit(Schemas.Log, @log_limit)
+        {:ok, entry}
+
+      error -> {:error, error}
+    end
+
+    case insertion do
+      {:ok, log} ->
         {:ok,
          %{
-           id: Map.get(result, :id)
+           id: Map.get(log, :id)
          }}
 
       {:error, _} ->

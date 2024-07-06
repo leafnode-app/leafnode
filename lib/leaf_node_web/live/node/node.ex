@@ -1,7 +1,7 @@
 defmodule LeafNodeWeb.NodeLive do
   use LeafNodeWeb, :live_view
 
-  alias LeafNodeWeb.Components.{NodeHeader, NodeAugment, NodeLogs, NodeDetails, NodeClause, NodeIntegration}
+  alias LeafNodeWeb.Components.{NodeHeader, NodeInputProcess, NodeLogs, NodeDetails, NodeClause, NodeIntegration}
 
   @doc """
   Init func that is run on init of the view
@@ -24,15 +24,15 @@ defmodule LeafNodeWeb.NodeLive do
     {status, expression} = LeafNode.Repo.Expression.get_expression_by_node(id)
     expr = if status === :ok, do: expression, else: %{}
 
-    {status, augment} = LeafNode.Repo.Augmentation.get_augment_by_node(id)
-    augment = if status === :ok, do: augment, else: %{}
+    {status, input_process} = LeafNode.Repo.InputProcess.get_input_process_by_node(id)
+    input_process = if status === :ok, do: input_process, else: %{}
 
     socket =
       assign(socket, :id, id)
       |> assign(:node, node)
       |> assign(:logs, log_list)
       |> assign(:expression, expr)
-      |> assign(:augment, augment)
+      |> assign(:input_process, input_process)
       |> assign(:live_action, nil)
       |> assign(:current_user, socket.assigns.current_user)
 
@@ -49,7 +49,7 @@ defmodule LeafNodeWeb.NodeLive do
     <div class="my-2" />
     <.live_component module={NodeClause} id="node_clause" expression={@expression} />
     <div class="my-2" />
-    <.live_component module={NodeAugment} id="node_augment" node={@node} augment={@augment} />
+    <.live_component module={NodeInputProcess} id="node_input_process" node={@node} input_process={@input_process} />
     <div class="my-2" />
     <.live_component module={NodeIntegration} id="node_integrations" node={@node} current_user={@current_user} />
     <div class="my-2" />

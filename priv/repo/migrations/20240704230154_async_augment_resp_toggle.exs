@@ -1,8 +1,8 @@
-defmodule LeafNode.Repo.Migrations.AsyncAugmentRespToggle do
+defmodule LeafNode.Repo.Migrations.AsyncInputProcessesRespToggle do
   use Ecto.Migration
 
   def change do
-    alter table(:augmentations) do
+    alter table(:input_processes) do
       add :async, :boolean, null: false, default: true
     end
   end

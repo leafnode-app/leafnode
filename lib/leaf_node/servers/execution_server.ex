@@ -83,7 +83,7 @@ defmodule LeafNode.Servers.ExecutionServer do
   # TODO: clean up
   defp execute(node, payload, expression) do
     {_, result} = LeafNode.Core.Code.execute(payload, expression)
-    {augment_status, %{ async: async } = augment} = LeafNode.Repo.Augmentation.get_augment_by_node(node.id)
+    {input_process_status, %{ async: async,  enabled: process_enabled} = input_process} = LeafNode.Repo.InputProcess.get_input_process_by_node(node.id)
     LeafNode.log_result(node, payload, LeafNode.Utils.Helpers.http_resp(200, true, result), result)
 
     base_resp = %{
@@ -94,20 +94,28 @@ defmodule LeafNode.Servers.ExecutionServer do
       if async do
         # TODO: do we want to wait? we just let it run when it can
         Task.start(fn ->
-          processed_data = process_augmented_input(node, payload, augment, augment_status)
+          processed_data = if process_enabled do
+            process_input(node, payload, input_process, input_process_status)
+          else
+            %{}
+          end
           execute_integration(node, processed_data)
         end)
 
         base_resp
       else
-        processed_data = process_augmented_input(node, payload, augment, augment_status)
+        processed_data = if process_enabled do
+          process_input(node, payload, input_process, input_process_status)
+        else
+          %{}
+        end
 
         Task.start(fn ->
           execute_integration(node, processed_data)
         end)
         %{
           cond: result,
-          augment_resp: processed_data["augment_resp"]
+          input_process_resp: processed_data["input_process_resp"]
         }
       end
     else
@@ -124,14 +132,14 @@ defmodule LeafNode.Servers.ExecutionServer do
       LeafNode.Servers.TriggerIntegration.integration_action(node.integration_settings["type"], node, payload)
   end
 
-  # Process the input with augmented data
-  defp process_augmented_input(node, payload, augment_data, augment_status) do
+  # Process the input with input processed data
+  defp process_input(node, payload, input_process_data, input_process_status) do
     # TODO: here we do checks if the user is doing processing for the input
       {_status, processed_resp} =
-        LeafNode.Servers.TriggerAugmentation.query_ai(augment_status, payload, augment_data, node)
+        LeafNode.Servers.TriggerInputProcess.query_ai(input_process_status, payload, input_process_data, node)
 
       # We do a copy and join to payload if the user enabled AI so we can have the user select from the data
       # TODO: this can or needs to change in future
-      Map.put(payload, "augment_resp", processed_resp)
+      Map.put(payload, "input_process_resp", processed_resp)
   end
 end

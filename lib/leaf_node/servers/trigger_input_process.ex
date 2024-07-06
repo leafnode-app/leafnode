@@ -1,16 +1,16 @@
-defmodule LeafNode.Servers.TriggerAugmentation do
+defmodule LeafNode.Servers.TriggerInputProcess do
   @moduledoc """
-    Used to hold all of the functions that will be used for AI augmentation of input data
+    Used to hold all of the functions that will be used for AI input process of input data
   """
   alias LeafNode
 
   @doc """
     Query AI with the
   """
-  def query_ai(status, payload, %{value: augment_value, enabled: enabled} = _augment, node) when status === :ok do
+  def query_ai(status, payload, %{value: input_process_value, enabled: enabled} = _, node) when status === :ok do
     # Check if enabled to run
     if enabled do
-      {status, resp} = LeafNode.Integrations.OpenAi.Gpt.prompt(payload, augment_value)
+      {status, resp} = LeafNode.Integrations.OpenAi.Gpt.prompt(payload, input_process_value)
 
       decoded_resp = Jason.decode!(resp)
       case status do
@@ -24,7 +24,7 @@ defmodule LeafNode.Servers.TriggerAugmentation do
       {:error, %{}}
     end
   end
-  def query_ai(_status, _payload, _augment, _node) do
+  def query_ai(_status, _payload, _, _node) do
     {:error, "There was an error, unable to query AI"}
    end
 

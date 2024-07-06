@@ -1,18 +1,18 @@
-defmodule LeafNode.Repo.Augmentation do
+defmodule LeafNode.Repo.InputProcess do
   @moduledoc """
-    Methods around the Augmentation for the nodes and logic associated with them
+    Methods around the InputProcess for the nodes and logic associated with them
   """
   import Ecto.Query, only: [from: 2]
   alias LeafNode.Repo, as: LeafNodeRepo
   alias LeafNode.Schemas
 
   @doc """
-    Create an augmentation  for a given node
+    Create an Input Process  for a given node
   """
-  def create_augment(node_id, type, enabled, value, async) do
+  def create_input_process(node_id, type, enabled, value, async) do
     changeset =
-      Schemas.Augmentation.changeset(
-        %Schemas.Augmentation{},
+      Schemas.InputProcess.changeset(
+        %Schemas.InputProcess{},
         %{
           node_id: node_id,
           type: type,
@@ -30,21 +30,21 @@ defmodule LeafNode.Repo.Augmentation do
          }}
 
       {:error, _} ->
-        {:error, "There was a problem creating augmentation"}
+        {:error, "There was a problem creating input process"}
     end
   end
 
   @doc """
-    Edit an augmentation by id
+    Edit an input process by id
   """
-  def edit_augment(data) do
+  def edit_input_process(data) do
     result =
       try do
-        struct = LeafNodeRepo.get!(Schemas.Augmentation, Map.get(data, "id", nil))
+        struct = LeafNodeRepo.get!(Schemas.InputProcess, Map.get(data, "id", nil))
         {:ok, struct}
       rescue
         _e ->
-          {:error, "There was an error trying to get the augmentation #{Map.get(data, "id")}"}
+          {:error, "There was an error trying to get the InputProcess #{Map.get(data, "id")}"}
       end
 
     case result do
@@ -59,30 +59,30 @@ defmodule LeafNode.Repo.Augmentation do
 
         case LeafNodeRepo.update(updated_struct) do
           {:ok, _} ->
-            {:ok, "Successfully updated augmentation"}
+            {:ok, "Successfully updated InputProcess"}
 
           {:error, _e} ->
-            {:error, "There was a problem updating augmentation"}
+            {:error, "There was a problem updating InputProcess"}
         end
 
       _ ->
-        {:error, "Unable to find augmentation"}
+        {:error, "Unable to find InputProcess"}
     end
   end
 
   @doc """
-    Get the details of an augment by node_id
+    Get the details of an input_process by node_id
   """
-  def get_augment_by_node(node_id) do
+  def get_input_process_by_node(node_id) do
     result =
       try do
-        augmentation =
-          from(e in LeafNode.Schemas.Augmentation, where: e.node_id == ^node_id)
+        input_process =
+          from(e in LeafNode.Schemas.InputProcess, where: e.node_id == ^node_id)
           |> LeafNodeRepo.one()
 
-        case augmentation do
+        case input_process do
           nil ->
-            {:error, "Augmentation not found for node ID #{node_id}"}
+            {:error, "InputProcess not found for node ID #{node_id}"}
 
           n ->
             {:ok,
@@ -97,12 +97,12 @@ defmodule LeafNode.Repo.Augmentation do
         end
       rescue
         _e ->
-          {:error, "There was an error trying to get the augmentation #{node_id}"}
+          {:error, "There was an error trying to get the InputProcess #{node_id}"}
       end
 
     case result do
       {:ok, data} -> {:ok, data}
-      _ -> {:error, "There was an error getting the current augmentation"}
+      _ -> {:error, "There was an error getting the current InputProcess"}
     end
   end
 end

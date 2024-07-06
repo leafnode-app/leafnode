@@ -1,11 +1,11 @@
-defmodule LeafNodeWeb.Components.NodeAugment do
+defmodule LeafNodeWeb.Components.NodeInputProcess do
   @moduledoc """
     The details around interacting with the node and controls to set logging and node availibility
   """
   use Phoenix.LiveComponent
 
   attr(:node, :map, required: true)
-  attr(:augment, :map, required: true)
+  attr(:input_process, :map, required: true)
 
   def render(assigns) do
     ~H"""
@@ -14,8 +14,8 @@ defmodule LeafNodeWeb.Components.NodeAugment do
           <div class="flex flex-col p-4 h-full justify-center flex-1">
             <textarea
               type="text"
-              id="augmentation_input"
-              name="augmentation_input"
+              id="process_input"
+              name="process_input"
               phx-change="update_prompt"
               phx-target={@myself}
               phx-debounce="500"
@@ -24,9 +24,9 @@ defmodule LeafNodeWeb.Components.NodeAugment do
               class="
                 box_input_inset_shadow disabledmb-6 text-gray-900 text-sm rounded-lg
                 border-stone-900 block w-full p-4 dark:text-gray-400"
-            ><%= @augment.value %></textarea>
+            ><%= @input_process.value %></textarea>
             <small class="text-gray-500 text-center pt-2 px-2">Explain what you would like AI to change or do with the input.</small>
-            <small class="text-gray-500 text-center pt-2 px-2">To reference the AI processed data, use [[augment_resp.data]] in your inputs</small>
+            <small class="text-gray-500 text-center pt-2 px-2">To reference the AI processed data, use [[input_process.data]] in your inputs</small>
           </div>
 
           <label class="flex items-center cursor-pointer px-2">
@@ -40,7 +40,7 @@ defmodule LeafNodeWeb.Components.NodeAugment do
                 name="aug_enable_toggle"
                 phx-change="toggle_ai_enabled"
                 phx-target={@myself}
-                checked={@augment.enabled}
+                checked={@input_process.enabled}
                 class="sr-only peer"
               />
               <div class="
@@ -63,7 +63,7 @@ defmodule LeafNodeWeb.Components.NodeAugment do
                 name="aug_resp_toggle"
                 phx-change="toggle_ai_response"
                 phx-target={@myself}
-                checked={@augment.async}
+                checked={@input_process.async}
                 class="sr-only peer"
               />
               <div class="
@@ -81,12 +81,12 @@ defmodule LeafNodeWeb.Components.NodeAugment do
   end
 
   @doc """
-    Here we handle the update to input augmentation
+    Here we handle the update to input processing
   """
-  def handle_event("update_prompt", params, %{assigns: %{ augment: augment } = _assigns} = socket) do
+  def handle_event("update_prompt", params, %{assigns: %{ input_process: input_process } = _assigns} = socket) do
     # Might get validation errors that we need to return
     update_prompt(%{
-      "id" => augment.id,
+      "id" => input_process.id,
       "value" => form_item_name_value(params)
     })
 
@@ -96,10 +96,10 @@ defmodule LeafNodeWeb.Components.NodeAugment do
   @doc """
     Update the toggle state of if the prompt should run or not
   """
-  def handle_event("toggle_ai_enabled", params, %{assigns: %{ augment: augment } = _assigns} = socket) do
+  def handle_event("toggle_ai_enabled", params, %{assigns: %{ input_process: input_process } = _assigns} = socket) do
     enabled_state = if form_item_name_value(params) == "on", do: true, else: false
     update_prompt(%{
-      "id" => augment.id,
+      "id" => input_process.id,
       "enabled" => enabled_state
     })
     {:noreply, socket}
@@ -108,10 +108,10 @@ defmodule LeafNodeWeb.Components.NodeAugment do
   @doc """
     Update the toggle state of if the prompt should run or not
   """
-  def handle_event("toggle_ai_response", params, %{assigns: %{ augment: augment } = _assigns} = socket) do
+  def handle_event("toggle_ai_response", params, %{assigns: %{ input_process: input_process } = _assigns} = socket) do
     enabled_state = if form_item_name_value(params) == "on", do: true, else: false
     update_prompt(%{
-      "id" => augment.id,
+      "id" => input_process.id,
       "async" => enabled_state
     })
     {:noreply, socket}
@@ -120,8 +120,8 @@ defmodule LeafNodeWeb.Components.NodeAugment do
   @doc """
     Update the prompt data that we associate with nodes
   """
-  defp update_prompt(augment) do
-    LeafNode.Repo.Augmentation.edit_augment(augment)
+  defp update_prompt(input_process) do
+    LeafNode.Repo.InputProcess.edit_input_process(input_process)
   end
 
   # basic for now but the value of the form id element

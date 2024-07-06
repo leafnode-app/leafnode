@@ -6,7 +6,7 @@ defmodule LeafNodeWeb.NodesLive do
   """
   def mount(_params, _session, socket) do
 
-    %{ id: id, token: token } = LeafNode.Repo.ExtensionToken.get_token_by_user(socket.assigns.current_user.id) || ""
+    %{ id: id, token: token } = LeafNode.Repo.ExtensionToken.get_token_by_user(socket.assigns.current_user.id)
     socket = socket
       |> assign(:nodes, get_nodes(socket))
       |> assign(:extension_details, %{ id: id, token: token})
@@ -30,20 +30,23 @@ defmodule LeafNodeWeb.NodesLive do
             </div>
 
             <%!-- Here we show the relevant extension token --%>
-            <div class="w-auto flex justify-center gap-2">
-              <input
-                type="text"
-                id="disabled-input"
-                aria-label="disabled input"
-                class="box_input_inset_shadow disabled text-zinc-800 text-sm rounded-lg border-stone-900 block dark:text-gray-400"
-                value={@extension_details.token}
-                disabled
-              />
-              <button
-                phx-click="regenerate_extension_token"
-                class="bg-blue-700 hover:bg-blue-600 py-2 px-4 text-sm rounded transition duration-200 ease-in-out">
-                regenerate
-              </button>
+            <div>
+              <div class="w-auto flex justify-center gap-2">
+                <input
+                  type="text"
+                  id="disabled-input"
+                  aria-label="disabled input"
+                  class="box_input_inset_shadow disabled text-zinc-800 text-sm rounded-lg border-stone-900 block dark:text-gray-400"
+                  value={@extension_details.token}
+                  disabled
+                />
+                <button
+                  phx-click="regenerate_extension_token"
+                  class="bg-blue-700 hover:bg-blue-600 py-2 px-4 text-sm rounded transition duration-200 ease-in-out">
+                  regenerate
+                </button>
+              </div>
+              <p class="text-xs text-zinc-600 pt-2">Use with browser extention to access nodes</p>
             </div>
           </div>
         </div>

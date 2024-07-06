@@ -1,11 +1,11 @@
-defmodule LeafNode.Schemas.Augmentation do
+defmodule LeafNode.Schemas.InputProcess do
   use Ecto.Schema
   import Ecto.Changeset
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
 
-  schema "augmentations" do
+  schema "input_processes" do
     field :type, :string, default: ""
     field :value, :string, default: ""
     field :enabled, :boolean
@@ -15,8 +15,8 @@ defmodule LeafNode.Schemas.Augmentation do
     timestamps()
   end
 
-  def changeset(augment, attrs) do
-    augment
+  def changeset(input_process, attrs) do
+    input_process
     |> cast(attrs, [:type, :value, :enabled, :node_id, :async])
     |> validate_required([:enabled, :node_id, :async])
     |> assoc_constraint(:node)

@@ -6,21 +6,21 @@ defmodule LeafNode.Integrations.OpenAi.Gpt do
   @timeout 30_000
 
   @doc """
-    Send through the payload and a string of augmentation or what you want to process against the payload
+    Send through the payload and a string of process or what you want to process against the payload
   """
-  def prompt(payload, augmentation) do
+  def prompt(payload, process) do
     if !is_nil(config(:token)) do
       body_payload = Map.put(
         %{
           "max_tokens" => 300,
-          "temperature" => 0.5,
+          "temperature" => 0,
           "model" => config(:model),
           "response_format" => %{ "type" => "json_object"}
         }, "messages",
         [
           %{
             "role" => "system",
-            "content" => query(payload, augmentation)
+            "content" => query(payload, process)
           }
         ]
       )
@@ -67,23 +67,22 @@ defmodule LeafNode.Integrations.OpenAi.Gpt do
   @doc """
     The prompt function that we can call to get teh prompt
   """
-  def query(payload, augment) do
-    "You are a system that processes data and returns a concise, useful string. You will receive an input payload and an augment string. Use the augment to process and respond based on the payload. Always return a string as a response.
+  def query(payload, input_process) do
+    "You are a system that processes data and returns a concise, useful string. You will receive an input payload and an input_process string. Use the input_process to process and respond based on the payload. Always return a string as a response.
 
     Important notes:
-    - If the request in the augment makes no sense or cannot be fulfilled, return \"null\".
+    - If the request in the input_process makes no sense or cannot be fulfilled, return a short 20 word message of why.
     - Return only the answer; avoid verbose context. Provide clear, direct responses.
     - Return plain text only, no rich text, markup, or placeholders like [Your Name].
     - Never exceed 200 tokens in your response.
-    - Return a system error if the response would be \"null\" to the augment.
-    - Always attempt to generate a meaningful response using the payload as context for the augment.
+    - Always attempt to generate a meaningful response using the payload as context for the input_process.
 
     Final notes:
     Return a JSON response in the format of:
     {
-      data: [THE PROCESSED RESPONSE BASED ON THE PAYLOAD AND AUGMENT],
-      error: [ANY SYSTEM ERRORS THAT OCCURRED, providing a layperson explanation for updating the augment or processing prompt],
-      improvement: [A suggestion for improving the augment or processing prompt. If no suggestion is needed, return null]
+      data: [THE PROCESSED RESPONSE BASED ON THE PAYLOAD AND INPUT PROCESS],
+      error: [ANY SYSTEM ERRORS THAT OCCURRED, providing a layperson explanation for updating the input_process or processing prompt],
+      improvement: [A suggestion for improving the input_process or processing prompt. If no suggestion is needed, return null]
     }
 
     Ensure:
@@ -92,7 +91,7 @@ defmodule LeafNode.Integrations.OpenAi.Gpt do
     - The response should be specific and actionable if a template is requested, without any placeholders.
 
     payload: #{Jason.encode!(payload)}
-    augment: #{augment}"
+    input_process: #{input_process}"
   end
 
   # config to get based off the application name

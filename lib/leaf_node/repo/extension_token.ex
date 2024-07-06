@@ -81,7 +81,14 @@ defmodule LeafNode.Repo.ExtensionToken do
     Fetch the extension token by id
   """
   def get_token(id) do
-    Repo.get(ExtensionToken,id)
+    Repo.get(ExtensionToken, id)
+  end
+
+  @doc """
+    Fetch the extension token by user id
+  """
+  def get_token_by_generated_id(token) do
+    Repo.get_by(ExtensionToken, token: token)
   end
 
   @doc """

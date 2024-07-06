@@ -94,21 +94,13 @@ defmodule LeafNode.Servers.ExecutionServer do
       if async do
         # TODO: do we want to wait? we just let it run when it can
         Task.start(fn ->
-          processed_data = if process_enabled do
-            process_input(node, payload, input_process, input_process_status)
-          else
-            %{}
-          end
+          processed_data = process_input(node, payload, input_process, input_process_status, process_enabled)
           execute_integration(node, processed_data)
         end)
 
         base_resp
       else
-        processed_data = if process_enabled do
-          process_input(node, payload, input_process, input_process_status)
-        else
-          %{}
-        end
+        processed_data = process_input(node, payload, input_process, input_process_status, process_enabled)
 
         Task.start(fn ->
           execute_integration(node, processed_data)
@@ -133,7 +125,7 @@ defmodule LeafNode.Servers.ExecutionServer do
   end
 
   # Process the input with input processed data
-  defp process_input(node, payload, input_process_data, input_process_status) do
+  defp process_input(node, payload, input_process_data, input_process_status, enabled) when enabled == true do
     # TODO: here we do checks if the user is doing processing for the input
       {_status, processed_resp} =
         LeafNode.Servers.TriggerInputProcess.query_ai(input_process_status, payload, input_process_data, node)
@@ -141,5 +133,8 @@ defmodule LeafNode.Servers.ExecutionServer do
       # We do a copy and join to payload if the user enabled AI so we can have the user select from the data
       # TODO: this can or needs to change in future
       Map.put(payload, "input_process_resp", processed_resp)
+  end
+  defp process_input(_, payload, _, _, _) do
+    Map.put(payload, "input_process_resp", %{})
   end
 end

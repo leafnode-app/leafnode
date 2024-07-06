@@ -31,6 +31,10 @@ defmodule LeafNodeWeb.Router do
     plug LeafNodeWeb.Plugs.CheckContentType
   end
 
+  pipeline :extension_access do
+    plug LeafNodeWeb.Plugs.ExtensionKeyAuth
+  end
+
   # Landing Page
   scope "/", LeafNodeWeb do
     pipe_through [:browser, :redirect_if_user_is_authenticated]
@@ -92,10 +96,18 @@ defmodule LeafNodeWeb.Router do
     end
   end
 
-  # V1 for the nodes execution
+  # API for node execution
   scope "/api/node" do
     pipe_through [:api, :endpoint_access_validation]
     post "/:id", NodeController, :execute_node
+  end
+
+  # API for extension interactions with user data
+  # TODO: change this so the naming is better to make it easier to impport
+  scope "/api/extension" do
+    pipe_through [:api, :extension_access]
+
+    get "/nodes", LeafNodeWeb.ExtensionApi.NodeController, :get_nodes
   end
 
   # Publuc routes

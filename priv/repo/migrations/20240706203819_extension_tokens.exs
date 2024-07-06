@@ -10,7 +10,7 @@ defmodule LeafNode.Repo.Migrations.ExtensionTokens do
       timestamps()
     end
 
-    create index(:extension_tokens, [:id, :user_id])
-    create unique_index(:extension_tokens, [:user_id], name: :unique_user_extension)
+    create index(:extension_tokens, [:id, :user_id, :token])
+    create unique_index(:extension_tokens, [:user_id, :token], name: :unique_user_extension)
   end
 end

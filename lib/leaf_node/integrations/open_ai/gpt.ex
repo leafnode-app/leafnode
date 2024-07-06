@@ -80,9 +80,7 @@ defmodule LeafNode.Integrations.OpenAi.Gpt do
     Final notes:
     Return a JSON response in the format of:
     {
-      data: [THE PROCESSED RESPONSE BASED ON THE PAYLOAD AND INPUT PROCESS],
-      error: [ANY SYSTEM ERRORS THAT OCCURRED, providing a layperson explanation for updating the input_process or processing prompt],
-      improvement: [A suggestion for improving the input_process or processing prompt. If no suggestion is needed, return null]
+      data: [THE PROCESSED RESPONSE BASED ON THE PAYLOAD AND INPUT PROCESS]
     }
 
     Ensure:

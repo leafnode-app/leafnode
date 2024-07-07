@@ -12,8 +12,7 @@ defmodule LeafNode.Integrations.OpenAi.Gpt do
     if !is_nil(config(:token)) do
       body_payload = Map.put(
         %{
-          "max_tokens" => 250,
-          "temperature" => 0,
+          "temperature" => 0.25,
           "model" => config(:model),
           "response_format" => %{ "type" => "json_object"}
         }, "messages",
@@ -68,14 +67,14 @@ defmodule LeafNode.Integrations.OpenAi.Gpt do
     The prompt function that we can call to get teh prompt
   """
   def query(payload, input_process) do
-    "You are a system that processes data and returns a concise, useful string. You will receive an input payload and an input_process string. Use the input_process to process and respond based on the payload. Always return a string as a response.
+    "You are a system that processes data. You will receive an input payload and an input_process string. Use the input_process to process and respond based on the payload. Always return a string as a response.
 
     Important notes:
     - If the request in the input_process makes no sense or cannot be fulfilled, return a short 20 word message of why.
     - Return only the answer; avoid verbose context. Provide clear, direct responses.
-    - Return plain text only, no rich text, markup, or placeholders like [Your Name].
     - Always attempt to generate a meaningful response using the payload as context for the input_process.
-    - Instead of saying you cant do something if you cant, always suggest an improvement to the passed data or if there is no imporovement, return false.
+    - Instead of saying you cant do something, if you cant - always suggest an improvement to the passed data or if there is no imporovement, return false.
+
     Final notes:
     Return a JSON response in the format of:
     {
@@ -85,7 +84,6 @@ defmodule LeafNode.Integrations.OpenAi.Gpt do
 
     Ensure:
     - The response is useful and directly related to the payload.
-    - Avoid ending responses with placeholders like [Your Name].
     - The response should be specific and actionable if a template is requested, without any placeholders.
 
     payload: #{Jason.encode!(payload)}

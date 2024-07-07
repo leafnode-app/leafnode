@@ -158,7 +158,6 @@ defmodule LeafNode.Servers.ExecutionServer do
       base_resp
     else
       processed_data = process_input(node, payload, input_process, input_process_status, process_enabled)
-
       Task.start(fn ->
         execute_integration(node, processed_data)
       end)

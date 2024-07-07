@@ -30,7 +30,7 @@ defmodule LeafNode.Repo.Node do
       {:ok, _} ->
         node_id = Map.get(result, :id)
         # attempt to make an init node expression - we rely on the schema to set defaults
-        LeafNode.Repo.Expression.create_expression(node_id, "", "===", "string", "")
+        LeafNode.Repo.Expression.create_expression(node_id, "", "===", "string", "", true)
         LeafNode.Repo.InputProcess.create_input_process(node_id, "ai", false, "", true)
 
         {:ok,

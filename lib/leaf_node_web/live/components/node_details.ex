@@ -19,7 +19,7 @@ defmodule LeafNodeWeb.Components.NodeDetails do
             disabled
           />
           <div class="py-4">
-            <div class="text-xs px-2 text-gray-600"> x-api-token: </div>
+            <div class="text-xs px-2 text-gray-600"> x-api-key: </div>
             <div class="text-xs px-2 text-gray-600"> <%= @node.access_key %> </div>
           </div>
         </div>

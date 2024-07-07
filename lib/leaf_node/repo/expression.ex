@@ -9,14 +9,15 @@ defmodule LeafNode.Repo.Expression do
   @doc """
     Create an expression - generate an id and pass payload to be persisted
   """
-  def create_expression(node_id, input, expression, type, value) do
+  def create_expression(node_id, input, expression, type, value, enabled) do
     changeset = Schemas.Expression.changeset(%Schemas.Expression{},
       %{
         node_id: node_id,
         input: input,
         expression: expression,
         type: type,
-        value: value
+        value: value,
+        enabled: enabled,
       })
 
     case LeafNodeRepo.insert(changeset) do
@@ -51,7 +52,8 @@ defmodule LeafNode.Repo.Expression do
             input: Map.get(data, "input", struct.input),
             expression: Map.get(data, "expression", struct.expression),
             type: Map.get(data, "type", struct.type),
-            value: Map.get(data, "value", struct.value)
+            value: Map.get(data, "value", struct.value),
+            enabled: Map.get(data, "enabled", struct.enabled),
           )
 
         case LeafNodeRepo.update(updated_struct) do
@@ -112,7 +114,8 @@ defmodule LeafNode.Repo.Expression do
                input: n.input,
                expression: n.expression,
                type: n.type,
-               value: n.value
+               value: n.value,
+               enabled: n.enabled,
              }}
         end
       rescue

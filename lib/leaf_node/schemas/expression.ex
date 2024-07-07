@@ -10,6 +10,7 @@ defmodule LeafNode.Schemas.Expression do
     field :expression, :string
     field :type, :string
     field :value, :string
+    field :enabled, :boolean
     belongs_to :node, LeafNode.Schemas.Node
 
     timestamps()
@@ -17,8 +18,8 @@ defmodule LeafNode.Schemas.Expression do
 
   def changeset(log, attrs) do
     log
-    |> cast(attrs, [:node_id, :input, :expression, :type, :value])
-    |> validate_required([:node_id, :expression, :type])
+    |> cast(attrs, [:node_id, :input, :expression, :type, :value, :enabled])
+    |> validate_required([:node_id, :expression, :type, :enabled])
     |> unique_constraint(:node_id, message: "Each node can only have one expression")
     |> assoc_constraint(:node)
   end

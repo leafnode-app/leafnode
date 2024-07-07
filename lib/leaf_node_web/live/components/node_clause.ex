@@ -16,6 +16,7 @@ defmodule LeafNodeWeb.Components.NodeClause do
       |> assign(:value, Map.get(expression, :value, ""))
       |> assign(:type, Map.get(expression, :type, ""))
       |> assign(:node_id, Map.get(expression, :node_id))
+      |> assign(:enabled, Map.get(expression, :enabled))
       |> assign(:show_modal, false)
       |> assign(:form_opts, %{
           expressions_types: expression_types(),
@@ -35,6 +36,28 @@ defmodule LeafNodeWeb.Components.NodeClause do
           </div>
           <small class="text-gray-500 text-center pt-2 px-2">Select the box above to start adding logic to compare against based on the expected payload</small>
         </div>
+        <form class="flex flex-col gap-3">
+          <label class="flex items-center cursor-pointer px-2">
+            <span class="flex-1 font-medium text-gray-900 dark:text-gray-300">Enable Expression</span>
+            <div>
+              <input type="hidden" name="expression_enabled" value="off" />
+              <input
+                type="checkbox"
+                id="expression_enabled"
+                name="expression_enabled"
+                phx-target={@myself}
+                phx-change="toggle_expression_enabled"
+                checked={@enabled} class="sr-only peer" />
+              <div class="
+                relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4
+                peer-focus:ring-grey-300 dark:peer-focus:ring-zinc-800 rounded-full peer
+                dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full
+                peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px]
+                after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5
+                after:transition-all dark:border-gray-600 peer-checked:bg-green-700"></div>
+            </div>
+          </label>
+        </form>
       </div>
 
       <%= if @show_modal do %>
@@ -150,6 +173,19 @@ defmodule LeafNodeWeb.Components.NodeClause do
     {:noreply, assign(socket, :value, value)}
   end
 
+  @doc """
+    Update the toggle state of if the prompt should run or not
+  """
+  def handle_event("toggle_expression_enabled", params, %{assigns: _assigns} = socket) do
+    enabled_state = if form_item_name_value(params) == "on", do: true, else: false
+    update_expression(%{
+      "id" => socket.assigns.id,
+      "enabled" => enabled_state
+    })
+
+    {:noreply, socket}
+  end
+
   defp empty_check(value, type) when value == "" do
     "[#{type}]"
   end
@@ -162,5 +198,12 @@ defmodule LeafNodeWeb.Components.NodeClause do
       {:ok, _} -> :ok
       {:error, err} -> IO.inspect("There was a problem updating the expression: #{err}")
     end
+  end
+
+  # basic for now but the value of the form id element
+  defp form_item_name_value(params) do
+    %{"_target" => [item]} = params
+    %{"_target" => _, ^item => text_value} = params
+    text_value
   end
 end

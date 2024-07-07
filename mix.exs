@@ -57,7 +57,8 @@ defmodule LeafNode.MixProject do
       {:ex_heroicons, "~> 2.0.0"},
       {:ex_json_schema, "~> 0.10.1"},
       {:ecto_enum, "~> 1.4"},
-      {:oauth2, "2.1.0"}
+      {:oauth2, "2.1.0"},
+      {:cors_plug, "~> 3.0"}
     ]
   end
 

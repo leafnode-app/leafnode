@@ -37,25 +37,6 @@ defmodule LeafNodeWeb.ExtensionApi.NodeController do
     end
   end
 
-  @doc """
-    Trigger Node
-  """
-  def execute_node(conn, params) do
-    id = Map.get(params, "id")
-    payload = Map.drop(params, ["id"])
-
-    # Start the server if not already running
-    LeafNode.Servers.ExecutionServer.start_link(id)
-
-    {status, resp} =
-      GenServer.call(String.to_atom("execution_process_" <> id), {:execute, id, payload})
-
-    case status do
-      :ok -> return(conn, 200, Helpers.http_resp(200, true, resp))
-      _ -> return(conn, 404, Helpers.http_resp(404, false, resp))
-    end
-  end
-
   # JSON returned response helper method for the controller functions
   defp return(conn, status, data) do
     conn

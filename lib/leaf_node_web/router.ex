@@ -3,7 +3,6 @@ defmodule LeafNodeWeb.Router do
   import Phoenix.LiveView.Router
 
   # Auth
-  alias LeafNodeWeb.LogLive
   alias LeafNodeWeb
   # API
   alias LeafNodeWeb.Api.{NodeController}
@@ -23,6 +22,8 @@ defmodule LeafNodeWeb.Router do
   end
 
   pipeline :api do
+    # Cors setup for all routes, need to restrict this later if needed
+    plug CORSPlug, origin: "*"
     plug :accepts, ["json"]
   end
 

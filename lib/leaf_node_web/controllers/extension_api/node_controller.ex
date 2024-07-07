@@ -37,6 +37,14 @@ defmodule LeafNodeWeb.ExtensionApi.NodeController do
     end
   end
 
+  @doc """
+    Execute node
+    TODO: This can move or potentially we can reuse the one in the general controller?
+  """
+  def execute_node(conn, params) do
+    LeafNodeWeb.Api.NodeController.execute_node(conn, params)
+  end
+
   # JSON returned response helper method for the controller functions
   defp return(conn, status, data) do
     conn

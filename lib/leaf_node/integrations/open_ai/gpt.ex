@@ -12,7 +12,7 @@ defmodule LeafNode.Integrations.OpenAi.Gpt do
     if !is_nil(config(:token)) do
       body_payload = Map.put(
         %{
-          "max_tokens" => 300,
+          "max_tokens" => 250,
           "temperature" => 0,
           "model" => config(:model),
           "response_format" => %{ "type" => "json_object"}
@@ -74,13 +74,13 @@ defmodule LeafNode.Integrations.OpenAi.Gpt do
     - If the request in the input_process makes no sense or cannot be fulfilled, return a short 20 word message of why.
     - Return only the answer; avoid verbose context. Provide clear, direct responses.
     - Return plain text only, no rich text, markup, or placeholders like [Your Name].
-    - Never exceed 200 tokens in your response.
     - Always attempt to generate a meaningful response using the payload as context for the input_process.
-
+    - Instead of saying you cant do something if you cant, always suggest an improvement to the passed data or if there is no imporovement, return false.
     Final notes:
     Return a JSON response in the format of:
     {
-      data: [THE PROCESSED RESPONSE BASED ON THE PAYLOAD AND INPUT PROCESS]
+      data: [THE PROCESSED RESPONSE BASED ON THE PAYLOAD AND INPUT PROCESS],
+      improvement: [THE SUGGESTED IMPROVEMENT IF THERE IS OR NILL]
     }
 
     Ensure:

@@ -107,8 +107,11 @@ defmodule LeafNodeWeb.Router do
   # TODO: change this so the naming is better to make it easier to impport
   scope "/api/extension" do
     pipe_through [:api, :extension_access]
-
     get "/nodes", LeafNodeWeb.ExtensionApi.NodeController, :get_nodes
+  end
+  scope "/api/extension" do
+    pipe_through [:api, :extension_access, :endpoint_access_validation]
+    post "/node/:id", LeafNodeWeb.ExtensionApi.NodeController, :execute_node
   end
 
   # Publuc routes

@@ -146,7 +146,7 @@ defmodule LeafNode.Servers.ExecutionServer do
   defp compute_expression_check(node, payload, expression) do
     {input_process_status, %{ async: async,  enabled: process_enabled} = input_process} = LeafNode.Repo.InputProcess.get_input_process_by_node(node.id)
     base_resp = %{}
-    LeafNode.log_result(node, payload, LeafNode.Utils.Helpers.http_resp(200, true, base_resp), base_resp)
+    LeafNode.log_result(node, payload, LeafNode.Utils.Helpers.http_resp(200, true, base_resp), true)
 
     data = if async do
       # TODO: do we want to wait? we just let it run when it can

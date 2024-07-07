@@ -27,7 +27,6 @@ defmodule LeafNodeWeb.ExtensionApi.NodeController do
           end
         end)
 
-        IO.inspect(simple_nodes, label: "NODES LIST")
         return(conn, 200, Helpers.http_resp(200, true, %{
           data: simple_nodes
         }))

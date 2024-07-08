@@ -30,7 +30,7 @@ defmodule LeafNodeWeb.Components.NodeInputProcess do
           </div>
 
           <label class="flex items-center cursor-pointer px-2">
-            <span class="flex-1 font-medium text-gray-900 dark:text-gray-300">Enable AI Processing</span>
+            <span class="flex-1 font-medium">Enable AI Processing</span>
             <div>
               <!-- Hidden input to represent the "off" state -->
               <input type="hidden" name="aug_enable_toggle" value="off" />
@@ -53,7 +53,7 @@ defmodule LeafNodeWeb.Components.NodeInputProcess do
             </div>
           </label>
           <label class="flex items-center cursor-pointer px-2">
-            <span class="flex-1 font-medium text-gray-900 dark:text-gray-300">Run Async</span>
+            <span class="flex-1 font-medium ">Run Async</span>
             <div>
               <!-- Hidden input to represent the "off" state -->
               <input type="hidden" name="aug_resp_toggle" value="off" />

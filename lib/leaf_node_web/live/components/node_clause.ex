@@ -38,7 +38,7 @@ defmodule LeafNodeWeb.Components.NodeClause do
         </div>
         <form class="flex flex-col gap-3">
           <label class="flex items-center cursor-pointer px-2">
-            <span class="flex-1 font-medium text-gray-900 dark:text-gray-300">Enable Expression</span>
+            <span class="flex-1 font-medium">Enable Expression</span>
             <div>
               <input type="hidden" name="expression_enabled" value="off" />
               <input

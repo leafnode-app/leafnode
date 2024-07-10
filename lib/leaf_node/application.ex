@@ -17,7 +17,9 @@ defmodule LeafNode.Application do
       # Start Finch
       {Finch, name: LeafNode.Finch},
       # Start the Endpoint (http/https)
-      LeafNodeWeb.Endpoint
+      LeafNodeWeb.Endpoint,
+      # Start the Cloak Vault
+      LeafNode.Cloak.Vault
     ]
 
     # init the demo processes on startup

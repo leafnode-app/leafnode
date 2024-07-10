@@ -28,6 +28,20 @@ config :leaf_node, :client_secrets_notion,
 
 # Open AI token
 config :leaf_node, :open_ai,
-  token: System.get_env("OPEN_AI_TOKEN"),
-  model: System.get_env("OPEN_AI_MODEL"),
+  token: "",
+  model: "",
   completions_url: ""
+
+# Cloak configuration
+config :leaf_node, LeafNode.Cloak.Vault,
+  json_library: Jason,
+  ciphers: [
+    # In AES.GCM, it is important to specify 12-byte IV length for
+    # interoperability with other encryption software. See this GitHub issue
+    # for more details: https://github.com/danielberkompas/cloak/issues/93
+    #
+    # In Cloak 2.0, this will be the default iv length for AES.GCM.
+    # ---
+    # For the key we need to take 32 random strongly randomised bytes, encode it so we dont have escaped or special characters
+    aes_gcm: {Cloak.Ciphers.AES.GCM, tag: "AES.GCM.V1", key: Base.decode64!("SOME KEY")}
+  ]

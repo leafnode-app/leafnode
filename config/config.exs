@@ -72,6 +72,11 @@ config :leaf_node, :acc_access,
     node_limit: 10
   }
 
+# Configure Cloak - see secret.exs for more info
+config :leaf_node, LeafNode.Cloak.Vault,
+  json_library: Jason,
+  ciphers: []
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"

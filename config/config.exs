@@ -77,6 +77,10 @@ config :leaf_node, LeafNode.Cloak.Vault,
   json_library: Jason,
   ciphers: []
 
+config :leaf_node, :cors_plug,
+  origin: ["*"],
+  headers: ["x-api-key", "x-extension-key", "content-type"]
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"

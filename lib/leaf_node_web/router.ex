@@ -22,8 +22,6 @@ defmodule LeafNodeWeb.Router do
   end
 
   pipeline :api do
-    # Cors setup for all routes, need to restrict this later if needed
-    plug CORSPlug, origin: "*"
     plug :accepts, ["json"]
   end
 
@@ -110,7 +108,7 @@ defmodule LeafNodeWeb.Router do
     get "/nodes", LeafNodeWeb.ExtensionApi.NodeController, :get_nodes
   end
   scope "/api/extension" do
-    pipe_through [:api, :extension_access, :endpoint_access_validation]
+    pipe_through [:api, :extension_access]
     post "/node/:id", LeafNodeWeb.ExtensionApi.NodeController, :execute_node
   end
 

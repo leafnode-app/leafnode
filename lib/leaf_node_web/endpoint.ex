@@ -13,6 +13,11 @@ defmodule LeafNodeWeb.Endpoint do
 
   socket "/live", Phoenix.LiveView.Socket, websocket: [connect_info: [session: @session_options]]
 
+  # Cors setup for all routes, need to restrict this later if needed
+  plug CORSPlug,
+    origin: ["*"], # Replace "*" with your allowed origins
+    headers: ["x-api-key", "x-extension-key", "content-type"]
+
   # Serve at "/" the static files from "priv/static" directory.
   #
   # You should set gzip to true if you are running phx.digest

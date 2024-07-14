@@ -10,7 +10,7 @@ defmodule LeafNode.Schemas.EncryptedTypes do
 
   schema "encrypted_types" do
     field(:encrypted_binary, Binary)
-    field(:encrypted_binary_hash, SHA256) # Change to :binary
+    # field(:encrypted_binary_hash, SHA256) # Change to :binary
     field(:encrypted_string, Binary)
     # field(:encrypted_string_hash, :binary)
     field(:encrypted_map, Map)

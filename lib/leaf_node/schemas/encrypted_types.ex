@@ -6,11 +6,11 @@ defmodule LeafNode.Schemas.EncryptedTypes do
   import Ecto.Changeset
 
   alias LeafNode.Cloak.EctoTypes.{Binary, Integer, Map}
-  alias Cloak.Ecto.SHA256
+  alias LeafNode.Hashed.HMAC
 
   schema "encrypted_types" do
     field(:encrypted_binary, Binary)
-    # field(:encrypted_binary_hash, SHA256) # Change to :binary
+    field(:encrypted_binary_hash, HMAC)
     field(:encrypted_string, Binary)
     # field(:encrypted_string_hash, :binary)
     field(:encrypted_map, Map)
@@ -28,16 +28,17 @@ defmodule LeafNode.Schemas.EncryptedTypes do
     encrypted_types
     |> cast(attrs, [
       :encrypted_binary,
+      :encrypted_binary_hash,
       :encrypted_string,
       :encrypted_map,
       :encrypted_integer,
       :encrypted_boolean
     ])
+    |> put_hashed_binary()
 
   end
 
-  def put_hashed_values(changeset) do
+  def put_hashed_binary(changeset) do
     changeset |> put_change(:encrypted_binary_hash, get_field(changeset, :encrypted_binary))
-    IO.inspect(changeset)
   end
 end

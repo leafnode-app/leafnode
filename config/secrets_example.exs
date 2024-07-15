@@ -43,5 +43,13 @@ config :leaf_node, LeafNode.Cloak.Vault,
     # In Cloak 2.0, this will be the default iv length for AES.GCM.
     # ---
     # For the key we need to take 32 random strongly randomised bytes, encode it so we dont have escaped or special characters
-    aes_gcm: {Cloak.Ciphers.AES.GCM, tag: "AES.GCM.V1", key: Base.decode64!("SOME KEY")}
+    # 32 |> :crypto.strong_rand_bytes() |> Base.encode64()
+    aes_gcm:
+      {Cloak.Ciphers.AES.GCM,
+       tag: "AES.GCM.V1", key: Base.decode64!("SOME KEY")}
   ]
+
+config :leaf_node, LeafNode.Hashed.HMAC,
+  algorithm: :sha512,
+  # 32 |> :crypto.strong_rand_bytes() |> Base.encode64()
+  secret: "secret"

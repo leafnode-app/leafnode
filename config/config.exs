@@ -77,6 +77,10 @@ config :leaf_node, LeafNode.Cloak.Vault,
   json_library: Jason,
   ciphers: []
 
+config :leaf_node, LeafNode.Hashed.HMAC,
+  algorithm: :sha512,
+  secret: ""
+
 config :leaf_node, :cors_plug,
   origin: ["*"],
   headers: ["x-api-key", "x-extension-key", "content-type"]

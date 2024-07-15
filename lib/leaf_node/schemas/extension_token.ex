@@ -6,7 +6,7 @@ defmodule LeafNode.Schemas.ExtensionToken do
   @foreign_key_type :binary_id
 
   schema "extension_tokens" do
-    field :token, :string
+    field :token, :string # TODO: encrypt
     belongs_to :user, LeafNode.Accounts.User, foreign_key: :user_id, type: :integer
 
     timestamps()

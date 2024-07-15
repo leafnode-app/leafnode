@@ -9,7 +9,7 @@ defmodule LeafNode.Schemas.Expression do
     field :input, :string
     field :expression, :string
     field :type, :string
-    field :value, :string
+    field :value, :string # TODO: encrypt
     field :enabled, :boolean
     belongs_to :node, LeafNode.Schemas.Node
 

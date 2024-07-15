@@ -7,7 +7,7 @@ defmodule LeafNode.Schemas.InputProcess do
 
   schema "input_processes" do
     field :type, :string, default: ""
-    field :value, :string, default: ""
+    field :value, :string, default: ""  # TODO: encrypt
     field :enabled, :boolean
     field :async, :boolean
     belongs_to :node, LeafNode.Schemas.Node

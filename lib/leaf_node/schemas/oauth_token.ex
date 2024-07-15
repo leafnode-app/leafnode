@@ -4,8 +4,8 @@ defmodule LeafNode.Schemas.OAuthToken do
 
   schema "oauth_tokens" do
     field :integration_type, :string # we need to use an enum type here of the integrations
-    field :access_token, :string
-    field :refresh_token, :string
+    field :access_token, :string # TODO: encrypt
+    field :refresh_token, :string # TODO: encrypt
     field :expires_at, :integer
     belongs_to :user, LeafNode.Accounts.User, foreign_key: :user_id, type: :integer
 

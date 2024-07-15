@@ -11,8 +11,8 @@ defmodule LeafNode.Schemas.Node do
     field :description, :string, default: "Node - Description"
     field :enabled, :boolean, default: true
     field :should_log, :boolean, default: true
-    field :access_key, :string
-    field :integration_settings, :map, default: %{}
+    field :access_key, :string # TODO: encrypt
+    field :integration_settings, :map, default: %{} # TODO: encrypt
     belongs_to :user, LeafNode.Accounts.User, foreign_key: :user_id, type: :integer
 
     timestamps()

@@ -6,8 +6,8 @@ defmodule LeafNode.Schemas.Log do
   @foreign_key_type :binary_id
 
   schema "logs" do
-    field :input, :map, default: %{}
-    field :result, :map, default: %{}
+    field :input, :map, default: %{} # TODO: encrypt
+    field :result, :map, default: %{} # TODO: encrypt
     field :status, :boolean
     belongs_to :node, LeafNode.Schemas.Node
 

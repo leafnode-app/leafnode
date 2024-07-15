@@ -25,13 +25,15 @@ If there is an issue running with the docker, I recommend having the postgres db
 This is a list that is relevant from the date of 27th June 2024 serviing as a baseline for a todo list for a basic test release.
 
 - [x] GPT Input process setting
-- [ ] Log updates to have references or IDs displayed
+- [x] Log updates to have references or IDs displayed
 - [x] Process setting (enable/disable - async/sync) - always async for now
-- [ ] Update output to caller to contain process result or reference to log id for data responses
+- [x] Update output to caller to contain process result or reference to log id for data responses
 - [x] String interpolation for inputs (abilit to use dynamic inputs and hard coded values as part of data to send)
 - [x] Get Ngrok and project running on Raspberry PI for testing
-- [ ] Add "template" tag to the relevant fields that support it
-- [ ] Basic website
-- [ ] Consider AI to have user generate data and able to edit and reuse and not query every call?
+- [x] Add "template" tag to the relevant fields that support it
+- [x] Basic website
+- [ ] Data encryption
+- [ ] Node Types (API / Extension). The Extension uses the nodes associated
+- [ ] Bug with creating a new user and extension token render on dashboard
 
 This will be the main steps that will then require assessing and looking at case studies in order to show how it will work or usages and planning for other integrations and updating the current ones to use more rich text and markup for bodies of some of the integrations.

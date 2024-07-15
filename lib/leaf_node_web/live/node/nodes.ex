@@ -6,10 +6,14 @@ defmodule LeafNodeWeb.NodesLive do
   """
   def mount(_params, _session, socket) do
 
-    %{ id: id, token: token } = LeafNode.Repo.ExtensionToken.get_token_by_user(socket.assigns.current_user.id)
+    toke_data = case resp = LeafNode.Repo.ExtensionToken.get_token_by_user(socket.assigns.current_user.id) do
+      nil -> %{ id: nil, token: nil}
+      _ -> %{ id: resp.id, token: resp.token}
+    end
+
     socket = socket
       |> assign(:nodes, get_nodes(socket))
-      |> assign(:extension_details, %{ id: id, token: token})
+      |> assign(:extension_details, toke_data)
     {:ok, socket}
   end
 
@@ -37,13 +41,13 @@ defmodule LeafNodeWeb.NodesLive do
                   id="disabled-input"
                   aria-label="disabled input"
                   class="box_input_inset_shadow disabled text-zinc-800 text-sm rounded-lg border-stone-900 block dark:text-gray-400"
-                  value={@extension_details.token}
+                  value={@extension_details.token || "No token"}
                   disabled
                 />
                 <button
                   phx-click="regenerate_extension_token"
                   class="bg-blue-700 hover:bg-blue-600 py-2 px-4 text-sm rounded transition duration-200 ease-in-out">
-                  regenerate
+                  Generate
                 </button>
               </div>
               <p class="text-xs text-zinc-600 pt-2">Use with browser extention to access nodes</p>
@@ -111,7 +115,8 @@ defmodule LeafNodeWeb.NodesLive do
           updated_token = LeafNode.Repo.ExtensionToken.get_token(extension_id)
           socket |> assign(:extension_details, updated_token)
         {:error, _err} ->
-          socket
+          token = LeafNode.Repo.ExtensionToken.generate_token(socket.assigns.current_user.id, UUID.uuid4())
+          socket |> assign(:extension_details, %{ id: token.id, token: token.token})
       end
 
     {:noreply, socket}

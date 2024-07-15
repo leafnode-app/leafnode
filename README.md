@@ -35,7 +35,6 @@ This is a list that is relevant from the date of 27th June 2024 serviing as a ba
 - [ ] Data encryption
 - [ ] Node Types (API / Extension). The Extension uses the nodes associated
 - [ ] Lock nodes from deletion
-- [ ] Import/Export of nodes
-- [ ] Bug with creating a new user and extension token render on dashboard
+- [x] Bug with creating a new user and extension token render on dashboard
 
 This will be the main steps that will then require assessing and looking at case studies in order to show how it will work or usages and planning for other integrations and updating the current ones to use more rich text and markup for bodies of some of the integrations.

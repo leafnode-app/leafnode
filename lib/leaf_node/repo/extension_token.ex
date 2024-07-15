@@ -13,7 +13,7 @@ defmodule LeafNode.Repo.ExtensionToken do
       token: token
     })
 
-    Repo.insert!(changeset)
+    Repo.insert_or_update!(changeset)
   end
 
   @doc """

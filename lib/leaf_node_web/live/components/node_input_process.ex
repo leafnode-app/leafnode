@@ -24,7 +24,7 @@ defmodule LeafNodeWeb.Components.NodeInputProcess do
               class="
                 box_input_inset_shadow disabledmb-6 text-gray-900 text-sm rounded-lg
                 border-stone-900 block w-full p-4 dark:text-gray-400"
-            ><%= @input_process.value %></textarea>
+            ><%= if !is_nil(@input_process.value), do: @input_process.value, else: "" %></textarea>
             <small class="text-gray-500 text-center pt-2 px-2">Explain what you would like AI to change or do with the input.</small>
             <small class="text-gray-500 text-center pt-2 px-2">To reference the AI processed data, use [[input_process_resp.data]] in your inputs</small>
           </div>

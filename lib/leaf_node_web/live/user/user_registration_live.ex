@@ -62,6 +62,9 @@ defmodule LeafNodeWeb.UserRegistrationLive do
             &url(~p"/auth/confirm/#{&1}")
           )
 
+        # Generate the extension token for the user when an account is made
+        LeafNode.Repo.ExtensionToken.generate_token(user.id, UUID.uuid4())
+
         changeset = Accounts.change_user_registration(user)
         {:noreply, socket |> assign(trigger_submit: true) |> assign_form(changeset)}
 

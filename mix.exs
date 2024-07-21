@@ -73,7 +73,11 @@ defmodule LeafNode.MixProject do
     [
       setup: ["deps.get", "assets.setup", "assets.build"],
       setup: ["deps.get", "ecto.setup", "assets.setup", "assets.build"],
-      "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
+      "ecto.setup": [
+        "ecto.create",
+        "ecto.load -d priv/repo/init_db_dump.sql -f --skip-if-loaded",
+        "ecto.migrate",
+        "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
       test: ["test"],

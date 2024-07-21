@@ -14,7 +14,7 @@
 import Ecto.Query, only: [from: 2]
 
 # add User needed extension tokens
-query = Ecto.Query.from(n in LeafNode.Accounts.User, select: n.id)
+query = from(n in LeafNode.Accounts.User, select: n.id)
 LeafNode.Repo.all(query) |> Enum.each(fn user_id ->
   user_token = LeafNode.Repo.ExtensionToken.get_token_by_user(user_id)
   if is_nil(user_token) do

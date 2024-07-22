@@ -7,11 +7,12 @@ defmodule LeafNode.Repo.ExtensionToken do
     Store and generate a token for the user to have and use
   """
   def generate_token(user_id, token) do
-    changeset = %ExtensionToken{}
-    |> ExtensionToken.changeset(%{
-      user_id: user_id,
-      token: token
-    })
+    changeset =
+      %ExtensionToken{}
+      |> ExtensionToken.changeset(%{
+        user_id: user_id,
+        token: token
+      })
 
     Repo.insert_or_update!(changeset)
   end
@@ -20,24 +21,24 @@ defmodule LeafNode.Repo.ExtensionToken do
     Regenerate a token to get a new one made
   """
   def regenerate_token(id) do
-    token_data = try do
-      struct = get_token(id)
-      {:ok, struct}
-    rescue
-      _e ->
-        {:error, "There was an error trying to get the extension token #{id}"}
-    end
+    token_data =
+      try do
+        struct = Repo.get_by!(ExtensionToken, id: id)
+        {:ok, struct}
+      rescue
+        _e ->
+          {:error, "There was an error trying to get the extension token #{id}"}
+      end
 
     case token_data do
       {:ok, %LeafNode.Schemas.ExtensionToken{user_id: user_id, id: id}} ->
         update_token = %{
           "id" => id,
-          "token" => UUID.uuid4(),
-          "user_id" => user_id
+          "token" => UUID.uuid4()
         }
 
-        updated_token = edit_token(update_token)
-        {:ok, updated_token}
+        edit_token(update_token)
+
       _ ->
         {:error, "There was a problem trying to regenerate a token"}
     end
@@ -49,7 +50,7 @@ defmodule LeafNode.Repo.ExtensionToken do
   def edit_token(data) do
     result =
       try do
-        struct = Repo.get!(ExtensionToken, Map.get(data, "id", nil))
+        struct = get_token_by_generated_id(Map.get(data, "id", nil))
         {:ok, struct}
       rescue
         _e ->
@@ -60,8 +61,8 @@ defmodule LeafNode.Repo.ExtensionToken do
       {:ok, struct} ->
         updated_struct =
           Ecto.Changeset.change(struct,
-            user_id: Map.get(data, "user_id", struct.user_id),
-            token: Map.get(data, "token", struct.token)
+            token: Map.get(data, "token", struct.token),
+            token_hash: Map.get(data, "token", struct.token),
           )
 
         case Repo.update(updated_struct) do
@@ -80,15 +81,15 @@ defmodule LeafNode.Repo.ExtensionToken do
   @doc """
     Fetch the extension token by id
   """
-  def get_token(id) do
-    Repo.get(ExtensionToken, id)
+  def get_token(token) do
+    Repo.get_by(ExtensionToken, token_hash: token)
   end
 
   @doc """
-    Fetch the extension token by user id
+    Fetch by the generated id of the token
   """
   def get_token_by_generated_id(token) do
-    Repo.get_by(ExtensionToken, token: token)
+    Repo.get_by(ExtensionToken, id: token)
   end
 
   @doc """

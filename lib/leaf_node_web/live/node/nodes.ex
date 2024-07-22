@@ -6,14 +6,15 @@ defmodule LeafNodeWeb.NodesLive do
   """
   def mount(_params, _session, socket) do
 
-    toke_data = case resp = LeafNode.Repo.ExtensionToken.get_token_by_user(socket.assigns.current_user.id) do
+    token_data = case resp = LeafNode.Repo.ExtensionToken.get_token_by_user(socket.assigns.current_user.id) do
       nil -> %{ id: nil, token: nil}
       _ -> %{ id: resp.id, token: resp.token}
     end
 
+    IO.inspect(token_data)
     socket = socket
       |> assign(:nodes, get_nodes(socket))
-      |> assign(:extension_details, toke_data)
+      |> assign(:extension_details, token_data)
     {:ok, socket}
   end
 
@@ -112,8 +113,8 @@ defmodule LeafNodeWeb.NodesLive do
     socket =
       case LeafNode.Repo.ExtensionToken.regenerate_token(extension_id) do
         {:ok, _} ->
-          updated_token = LeafNode.Repo.ExtensionToken.get_token(extension_id)
-          socket |> assign(:extension_details, updated_token)
+          updated_token = LeafNode.Repo.ExtensionToken.get_token_by_user(socket.assigns.current_user.id)
+          socket |> assign(:extension_details, %{ id: updated_token.id, token: updated_token.token})
         {:error, _err} ->
           token = LeafNode.Repo.ExtensionToken.generate_token(socket.assigns.current_user.id, UUID.uuid4())
           socket |> assign(:extension_details, %{ id: token.id, token: token.token})

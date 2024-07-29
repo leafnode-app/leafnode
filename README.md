@@ -1,13 +1,5 @@
 # Leafnode
 
-## Overview
-Document based API gateway that allows creation of documents and having the documuments be run through endpoints - With this you are able to express what you want to do with the payload coming in using text and AI has it expressed in code based on whitelist options the system understands as relevant and the data can be selected and mutated sequencually through blocks with the entire document output able to be selected as the result of the endpoint.
-
-## Installation and Usage
-The application is built with Elixir(Phoenix) and Erlang. It is packaged with Docker but is able to be started without. This assumes you already have Elixir up and running on the current machine.
-
-NOTE: You will need to have a postgres database up and running in order to have the documents and the psuedo code persisted along with the blocks the system creates. 
-
 1. Copy the `app.example` and rename it to `app.env`, Copy the `db.example` and rename it to `db.env` 
 2. Update the environment files with your relevant tokens and values
 3. Look at the `docker-compose.yml` to make sure the values are good

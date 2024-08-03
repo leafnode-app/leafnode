@@ -36,7 +36,7 @@ defmodule LeafNodeWeb.NodesLive do
 
             <%!-- Here we show the relevant extension token --%>
             <div>
-              <div class="w-auto flex justify-center gap-2">
+              <div class="premium-border w-auto flex justify-center gap-2 p-1">
                 <input
                   type="text"
                   id="disabled-input"

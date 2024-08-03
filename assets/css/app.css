@@ -176,3 +176,10 @@
   cursor: pointer;
 }
 
+
+/* rainbow border */
+.premium-border {
+  border-image: linear-gradient(to right, #3a93d55c 0%, #3a4ed55e 100%) 1;
+  border-width: 2px;
+  border-style: solid;
+}

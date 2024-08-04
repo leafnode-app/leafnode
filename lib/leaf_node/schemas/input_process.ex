@@ -24,5 +24,12 @@ defmodule LeafNode.Schemas.InputProcess do
     |> cast(attrs, [:type, :type_hash, :value, :value_hash, :enabled, :node_id, :async])
     |> validate_required([:enabled, :node_id, :async])
     |> assoc_constraint(:node)
+    |> put_hashed_binary()
+  end
+
+  defp put_hashed_binary(changeset) do
+    changeset
+      |> put_change(:type_hash, get_field(changeset, :type))
+      |> put_change(:value_hash, get_field(changeset, :value))
   end
 end

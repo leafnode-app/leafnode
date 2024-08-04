@@ -15,16 +15,19 @@ defmodule LeafNode.Repo.Node do
     Create a node - genreate an id and pass payload to be persisted
   """
   def create_node(user_id) do
+    access_key = UUID.uuid4()
     changeset =
       Schemas.Node.changeset(
         %Schemas.Node{},
         %{
           user_id: user_id,
-          access_key: UUID.uuid4(),
+          access_key: access_key,
+          access_key_hash: access_key,
           integration_settings: %{type: "none", input: nil, has_oauth: false}
         }
       )
     # TODO: Use the flag to check if valid
+    IO.inspect(changeset, label: "create_node changeset")
 
     case {_, result} = LeafNodeRepo.insert(changeset) do
       {:ok, _} ->
@@ -128,6 +131,7 @@ defmodule LeafNode.Repo.Node do
           should_log: n.should_log,
           expected_payload: n.expected_payload,
           access_key: n.access_key,
+          access_key_hash: n.access_key_hash,
           integration_settings: n.integration_settings
         }
       )
@@ -156,6 +160,7 @@ defmodule LeafNode.Repo.Node do
            should_log: n.should_log,
            expected_payload: n.expected_payload,
            access_key: n.access_key,
+           access_key_hash: n.access_key_hash,
            integration_settings: n.integration_settings,
            user_id: n.user_id
          }}

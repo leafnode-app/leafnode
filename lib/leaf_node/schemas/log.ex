@@ -1,13 +1,14 @@
 defmodule LeafNode.Schemas.Log do
   use Ecto.Schema
   import Ecto.Changeset
+  alias LeafNode.Cloak.EctoTypes.{Map}
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
 
   schema "logs" do
-    field :input, :map, default: %{} # TODO: encrypt
-    field :result, :map, default: %{} # TODO: encrypt
+    field :input, Map
+    field :result, Map
     field :status, :boolean
     belongs_to :node, LeafNode.Schemas.Node
 

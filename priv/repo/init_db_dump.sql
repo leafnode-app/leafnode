@@ -144,9 +144,9 @@ ALTER TABLE public.input_processes OWNER TO postgres;
 CREATE TABLE public.logs (
     id uuid NOT NULL,
     node_id uuid NOT NULL,
-    input jsonb DEFAULT '{}'::jsonb,
-    result jsonb DEFAULT '{}'::jsonb,
-    status boolean NOT NULL,
+    input bytea,
+    result bytea,
+    status boolean,
     inserted_at timestamp(0) without time zone NOT NULL,
     updated_at timestamp(0) without time zone NOT NULL
 );
@@ -164,12 +164,13 @@ CREATE TABLE public.nodes (
     title character varying(255) NOT NULL,
     description character varying(255) NOT NULL,
     enabled boolean DEFAULT true NOT NULL,
-    inserted_at timestamp(0) without time zone NOT NULL,
-    updated_at timestamp(0) without time zone NOT NULL,
     should_log boolean DEFAULT true,
-    expected_payload jsonb DEFAULT '{}'::jsonb,
-    access_key character varying(255),
-    integration_settings jsonb DEFAULT '{}'::jsonb
+    expected_payload bytea,
+    access_key bytea,
+    access_key_hash bytea,
+    integration_settings bytea,
+    inserted_at timestamp(0) without time zone NOT NULL,
+    updated_at timestamp(0) without time zone NOT NULL
 );
 
 
@@ -493,35 +494,11 @@ CREATE INDEX users_tokens_user_id_index ON public.users_tokens USING btree (user
 
 
 --
--- Name: expressions expressions_node_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.expressions
-    ADD CONSTRAINT expressions_node_id_fkey FOREIGN KEY (node_id) REFERENCES public.nodes(id) ON DELETE CASCADE;
-
-
---
 -- Name: extension_tokens extension_tokens_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.extension_tokens
     ADD CONSTRAINT extension_tokens_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
-
-
---
--- Name: input_processes input_processes_node_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.input_processes
-    ADD CONSTRAINT input_processes_node_id_fkey FOREIGN KEY (node_id) REFERENCES public.nodes(id) ON DELETE CASCADE;
-
-
---
--- Name: logs logs_node_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.logs
-    ADD CONSTRAINT logs_node_id_fkey FOREIGN KEY (node_id) REFERENCES public.nodes(id) ON DELETE CASCADE;
 
 
 --

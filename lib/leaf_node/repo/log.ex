@@ -70,10 +70,10 @@ defmodule LeafNode.Repo.Log do
   @doc """
     Get the details of a log by id
   """
-  def get_log(node_id) do
+  def get_log(log_id) do
     result =
       try do
-        n = LeafNodeRepo.get!(Schemas.Log, node_id)
+        n = LeafNodeRepo.get!(Schemas.Log, log_id)
 
         {:ok,
          %{
@@ -87,7 +87,7 @@ defmodule LeafNode.Repo.Log do
          }}
       rescue
         _e ->
-          {:error, "There was an error trying to get the log #{node_id}"}
+          {:error, "There was an error trying to get the log #{log_id}"}
       end
 
     case result do

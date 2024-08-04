@@ -50,9 +50,13 @@ defmodule LeafNode.Repo.Expression do
         updated_struct =
           Ecto.Changeset.change(struct,
             input: Map.get(data, "input", struct.input),
+            input_hash: Map.get(data, "input", struct.input),
             expression: Map.get(data, "expression", struct.expression),
+            expression_hash: Map.get(data, "expression", struct.expression),
             type: Map.get(data, "type", struct.type),
+            type_hash: Map.get(data, "type", struct.type),
             value: Map.get(data, "value", struct.value),
+            value_hash: Map.get(data, "value", struct.value),
             enabled: Map.get(data, "enabled", struct.enabled),
           )
 

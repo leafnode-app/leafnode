@@ -62,7 +62,7 @@ defmodule LeafNode.Repo.ExtensionToken do
         updated_struct =
           Ecto.Changeset.change(struct,
             token: Map.get(data, "token", struct.token),
-            token_hash: Map.get(data, "token", struct.token),
+            token_hash: Map.get(data, "token", struct.token)
           )
 
         case Repo.update(updated_struct) do

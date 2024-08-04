@@ -16,7 +16,9 @@ defmodule LeafNode.Repo.InputProcess do
         %{
           node_id: node_id,
           type: type,
+          type_hash: type,
           value: value,
+          value_hash: value,
           enabled: enabled,
           async: async
         }
@@ -52,7 +54,9 @@ defmodule LeafNode.Repo.InputProcess do
         updated_struct =
           Ecto.Changeset.change(struct,
             type: Map.get(data, "type", struct.type),
+            type_hash: Map.get(data, "type", struct.type),
             value: Map.get(data, "value", struct.value),
+            value_hash: Map.get(data, "value", struct.value),
             enabled: Map.get(data, "enabled", struct.enabled),
             async: Map.get(data, "async", struct.async)
           )

@@ -57,7 +57,7 @@ defmodule LeafNode.Repo.Expression do
             type_hash: Map.get(data, "type", struct.type),
             value: Map.get(data, "value", struct.value),
             value_hash: Map.get(data, "value", struct.value),
-            enabled: Map.get(data, "enabled", struct.enabled),
+            enabled: Map.get(data, "enabled", struct.enabled)
           )
 
         case LeafNodeRepo.update(updated_struct) do

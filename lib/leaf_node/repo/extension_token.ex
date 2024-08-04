@@ -31,7 +31,7 @@ defmodule LeafNode.Repo.ExtensionToken do
       end
 
     case token_data do
-      {:ok, %LeafNode.Schemas.ExtensionToken{user_id: user_id, id: id}} ->
+      {:ok, %LeafNode.Schemas.ExtensionToken{user_id: _user_id, id: id}} ->
         update_token = %{
           "id" => id,
           "token" => UUID.uuid4()

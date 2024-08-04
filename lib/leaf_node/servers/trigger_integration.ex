@@ -35,7 +35,7 @@ defmodule LeafNode.Servers.TriggerIntegration do
     # TODO: find a better result for the logs based off integration
     LeafNode.log_result(
       node,
-      node,
+      payload,
       LeafNode.Utils.Helpers.http_resp(code, success_check, resp),
       success_check
     )
@@ -69,7 +69,7 @@ defmodule LeafNode.Servers.TriggerIntegration do
     # TODO: find a better result for the logs based off integration
     LeafNode.log_result(
       node,
-      node,
+      payload,
       LeafNode.Utils.Helpers.http_resp(code, success_check, resp),
       success_check
     )
@@ -98,7 +98,7 @@ defmodule LeafNode.Servers.TriggerIntegration do
     # TODO: find a better result for the logs based off integration
     LeafNode.log_result(
       node,
-      node,
+      payload,
       LeafNode.Utils.Helpers.http_resp(code, success_check, resp),
       success_check
     )

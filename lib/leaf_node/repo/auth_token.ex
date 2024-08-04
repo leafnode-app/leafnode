@@ -10,7 +10,9 @@ defmodule LeafNode.Repo.OAuthToken do
       user_id: user_id,
       integration_type: type,
       access_token: access_token,
+      access_token_hash: access_token,
       refresh_token: refresh_token,
+      refresh_token_hash: refresh_token,
       expires_at: expires_at
     })
 
@@ -23,7 +25,9 @@ defmodule LeafNode.Repo.OAuthToken do
   def update_token(oauth_struct, access_token, refresh_token, expires_at) do
     Ecto.Changeset.change(oauth_struct, %{
       access_token: access_token,
+      access_token_hash: access_token,
       refresh_token: refresh_token,
+      refresh_token_hash: refresh_token,
       expires_at: expires_at
     })
   end

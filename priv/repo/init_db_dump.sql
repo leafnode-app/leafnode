@@ -183,9 +183,11 @@ ALTER TABLE public.nodes OWNER TO postgres;
 CREATE TABLE public.oauth_tokens (
     id bigint NOT NULL,
     user_id bigint NOT NULL,
-    integration_type character varying(255) NOT NULL,
-    access_token character varying(255) NOT NULL,
-    refresh_token character varying(255),
+    integration_type character varying(255),
+    access_token bytea,
+    access_token_hash bytea,
+    refresh_token bytea,
+    refresh_token_hash bytea,
     expires_at bigint,
     inserted_at timestamp(0) without time zone NOT NULL,
     updated_at timestamp(0) without time zone NOT NULL
@@ -193,6 +195,27 @@ CREATE TABLE public.oauth_tokens (
 
 
 ALTER TABLE public.oauth_tokens OWNER TO postgres;
+
+--
+-- Name: oauth_tokens_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.oauth_tokens_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.oauth_tokens_id_seq OWNER TO postgres;
+
+--
+-- Name: oauth_tokens_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.oauth_tokens_id_seq OWNED BY public.oauth_tokens.id;
+
 
 --
 -- Name: schema_migrations; Type: TABLE; Schema: public; Owner: postgres
@@ -205,27 +228,6 @@ CREATE TABLE public.schema_migrations (
 
 
 ALTER TABLE public.schema_migrations OWNER TO postgres;
-
---
--- Name: user_oauth_tokens_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.user_oauth_tokens_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.user_oauth_tokens_id_seq OWNER TO postgres;
-
---
--- Name: user_oauth_tokens_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.user_oauth_tokens_id_seq OWNED BY public.oauth_tokens.id;
-
 
 --
 -- Name: users; Type: TABLE; Schema: public; Owner: postgres
@@ -312,7 +314,7 @@ ALTER TABLE ONLY public.encrypted_types ALTER COLUMN id SET DEFAULT nextval('pub
 -- Name: oauth_tokens id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.oauth_tokens ALTER COLUMN id SET DEFAULT nextval('public.user_oauth_tokens_id_seq'::regclass);
+ALTER TABLE ONLY public.oauth_tokens ALTER COLUMN id SET DEFAULT nextval('public.oauth_tokens_id_seq'::regclass);
 
 
 --
@@ -378,19 +380,19 @@ ALTER TABLE ONLY public.nodes
 
 
 --
+-- Name: oauth_tokens oauth_tokens_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.oauth_tokens
+    ADD CONSTRAINT oauth_tokens_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: schema_migrations schema_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.schema_migrations
     ADD CONSTRAINT schema_migrations_pkey PRIMARY KEY (version);
-
-
---
--- Name: oauth_tokens user_oauth_tokens_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.oauth_tokens
-    ADD CONSTRAINT user_oauth_tokens_pkey PRIMARY KEY (id);
 
 
 --
@@ -438,6 +440,20 @@ CREATE INDEX nodes_user_id_index ON public.nodes USING btree (user_id);
 
 
 --
+-- Name: oauth_tokens_user_id_index; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX oauth_tokens_user_id_index ON public.oauth_tokens USING btree (user_id);
+
+
+--
+-- Name: oauth_tokens_user_id_integration_type_index; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE UNIQUE INDEX oauth_tokens_user_id_integration_type_index ON public.oauth_tokens USING btree (user_id, integration_type);
+
+
+--
 -- Name: unique_node_expression; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -456,20 +472,6 @@ CREATE UNIQUE INDEX unique_node_input_process ON public.input_processes USING bt
 --
 
 CREATE UNIQUE INDEX unique_user_extension ON public.extension_tokens USING btree (user_id, token_hash);
-
-
---
--- Name: user_oauth_tokens_user_id_index; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE INDEX user_oauth_tokens_user_id_index ON public.oauth_tokens USING btree (user_id);
-
-
---
--- Name: user_oauth_tokens_user_id_integration_type_index; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE UNIQUE INDEX user_oauth_tokens_user_id_integration_type_index ON public.oauth_tokens USING btree (user_id, integration_type);
 
 
 --
@@ -510,11 +512,11 @@ ALTER TABLE ONLY public.nodes
 
 
 --
--- Name: oauth_tokens user_oauth_tokens_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: oauth_tokens oauth_tokens_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.oauth_tokens
-    ADD CONSTRAINT user_oauth_tokens_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+    ADD CONSTRAINT oauth_tokens_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
 
 
 --

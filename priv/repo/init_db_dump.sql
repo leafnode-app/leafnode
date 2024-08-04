@@ -84,14 +84,18 @@ ALTER SEQUENCE public.encrypted_types_id_seq OWNED BY public.encrypted_types.id;
 
 CREATE TABLE public.expressions (
     id uuid NOT NULL,
-    input character varying(255) DEFAULT ''::character varying,
-    expression character varying(255) NOT NULL,
-    type character varying(255) NOT NULL,
-    value character varying(255) DEFAULT ''::character varying,
+    input bytea,
+    input_hash bytea,
+    expression bytea,
+    expression_hash bytea,
+    type bytea,
+    type_hash bytea,
+    value bytea,
+    value_hash bytea,
+    enabled boolean,
     node_id uuid NOT NULL,
     inserted_at timestamp(0) without time zone NOT NULL,
-    updated_at timestamp(0) without time zone NOT NULL,
-    enabled boolean DEFAULT true NOT NULL
+    updated_at timestamp(0) without time zone NOT NULL
 );
 
 
@@ -104,9 +108,10 @@ ALTER TABLE public.expressions OWNER TO postgres;
 CREATE TABLE public.extension_tokens (
     id uuid NOT NULL,
     user_id bigint NOT NULL,
-    token character varying(255) NOT NULL,
+    token bytea NOT NULL,
     inserted_at timestamp(0) without time zone NOT NULL,
-    updated_at timestamp(0) without time zone NOT NULL
+    updated_at timestamp(0) without time zone NOT NULL,
+    token_hash bytea
 );
 
 
@@ -119,12 +124,14 @@ ALTER TABLE public.extension_tokens OWNER TO postgres;
 CREATE TABLE public.input_processes (
     id uuid NOT NULL,
     node_id uuid NOT NULL,
-    type character varying(255) DEFAULT 'ai'::character varying,
-    value text DEFAULT ''::character varying,
+    type bytea,
+    type_hash bytea,
+    value bytea,
+    value_hash bytea,
     enabled boolean NOT NULL,
+    async boolean NOT NULL,
     inserted_at timestamp(0) without time zone NOT NULL,
-    updated_at timestamp(0) without time zone NOT NULL,
-    async boolean DEFAULT true NOT NULL
+    updated_at timestamp(0) without time zone NOT NULL
 );
 
 
@@ -322,132 +329,6 @@ ALTER TABLE ONLY public.users_tokens ALTER COLUMN id SET DEFAULT nextval('public
 
 
 --
--- Data for Name: encrypted_types; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.encrypted_types (id, encrypted_binary, encrypted_string, encrypted_map, encrypted_integer, encrypted_boolean, inserted_at, updated_at, encrypted_binary_hash, encrypted_string_hash, encrypted_map_hash, encrypted_integer_hash, encrypted_boolean_hash) FROM stdin;
-\.
-
-
---
--- Data for Name: expressions; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.expressions (id, input, expression, type, value, node_id, inserted_at, updated_at, enabled) FROM stdin;
-\.
-
-
---
--- Data for Name: extension_tokens; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.extension_tokens (id, user_id, token, inserted_at, updated_at) FROM stdin;
-\.
-
-
---
--- Data for Name: input_processes; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.input_processes (id, node_id, type, value, enabled, inserted_at, updated_at, async) FROM stdin;
-\.
-
-
---
--- Data for Name: logs; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.logs (id, node_id, input, result, status, inserted_at, updated_at) FROM stdin;
-\.
-
-
---
--- Data for Name: nodes; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.nodes (id, user_id, title, description, enabled, inserted_at, updated_at, should_log, expected_payload, access_key, integration_settings) FROM stdin;
-\.
-
-
---
--- Data for Name: oauth_tokens; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.oauth_tokens (id, user_id, integration_type, access_token, refresh_token, expires_at, inserted_at, updated_at) FROM stdin;
-\.
-
-
---
--- Data for Name: schema_migrations; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.schema_migrations (version, inserted_at) FROM stdin;
-20240511145355	2024-07-21 21:58:55
-20240511182349	2024-07-21 21:58:55
-20240511211425	2024-07-21 21:58:55
-20240511212151	2024-07-21 21:58:55
-20240513205055	2024-07-21 21:58:55
-20240527234142	2024-07-21 21:58:55
-20240528230032	2024-07-21 21:58:55
-20240531225910	2024-07-21 21:58:55
-20240531231304	2024-07-21 21:58:55
-20240602210928	2024-07-21 21:58:55
-20240602214837	2024-07-21 21:58:55
-20240630172918	2024-07-21 21:58:55
-20240704230154	2024-07-21 21:58:55
-20240706203819	2024-07-21 21:58:55
-20240706222414	2024-07-21 21:58:55
-20240707132306	2024-07-21 21:58:55
-20240710102718	2024-07-21 21:58:55
-20240710113840	2024-07-21 21:58:55
-\.
-
-
---
--- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.users (id, email, hashed_password, confirmed_at, inserted_at, updated_at) FROM stdin;
-\.
-
-
---
--- Data for Name: users_tokens; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.users_tokens (id, user_id, token, context, sent_to, inserted_at) FROM stdin;
-\.
-
-
---
--- Name: encrypted_types_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.encrypted_types_id_seq', 1, false);
-
-
---
--- Name: user_oauth_tokens_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.user_oauth_tokens_id_seq', 1, false);
-
-
---
--- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.users_id_seq', 1, false);
-
-
---
--- Name: users_tokens_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.users_tokens_id_seq', 1, false);
-
-
---
 -- Name: encrypted_types encrypted_types_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -528,10 +409,10 @@ ALTER TABLE ONLY public.users_tokens
 
 
 --
--- Name: extension_tokens_id_user_id_token_index; Type: INDEX; Schema: public; Owner: postgres
+-- Name: extension_tokens_id_user_id_token_hash_index; Type: INDEX; Schema: public; Owner: postgres
 --
 
-CREATE INDEX extension_tokens_id_user_id_token_index ON public.extension_tokens USING btree (id, user_id, token);
+CREATE INDEX extension_tokens_id_user_id_token_hash_index ON public.extension_tokens USING btree (id, user_id, token_hash);
 
 
 --
@@ -573,7 +454,7 @@ CREATE UNIQUE INDEX unique_node_input_process ON public.input_processes USING bt
 -- Name: unique_user_extension; Type: INDEX; Schema: public; Owner: postgres
 --
 
-CREATE UNIQUE INDEX unique_user_extension ON public.extension_tokens USING btree (user_id, token);
+CREATE UNIQUE INDEX unique_user_extension ON public.extension_tokens USING btree (user_id, token_hash);
 
 
 --

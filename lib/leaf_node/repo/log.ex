@@ -6,7 +6,7 @@ defmodule LeafNode.Repo.Log do
   alias LeafNode.Repo, as: LeafNodeRepo
   alias LeafNode.Schemas
 
-  @log_limit 5
+  @log_limit 10
 
   @doc """
     Create a log - genreate an id and pass payload to be persisted

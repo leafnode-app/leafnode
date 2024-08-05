@@ -11,7 +11,6 @@ defmodule LeafNodeWeb.NodesLive do
       _ -> %{ id: resp.id, token: resp.token}
     end
 
-    IO.inspect(token_data)
     socket = socket
       |> assign(:nodes, get_nodes(socket))
       |> assign(:extension_details, token_data)

@@ -59,7 +59,7 @@ defmodule LeafNode.Repo.OAuthToken do
       %{ expires_at: expires_at, refresh_token: refresh_token, access_token: access_token } = oauth_struct,
       type
     ) when type === :google do
-    if (System.os_time(:seconds) > expires_at) do
+    if (System.os_time(:second) > expires_at) do
       %OAuth2.Client{ token: token} = LeafNode.Google.OAuth.refresh_token(refresh_token)
 
       # attempt to store token - the rescue will run if this fails for some reason

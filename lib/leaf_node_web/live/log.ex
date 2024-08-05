@@ -30,7 +30,7 @@ defmodule LeafNodeWeb.LogDetailsLive do
 
     ~H"""
     <div class="text-gray-300">
-      <div class="container mx-auto py-8">
+      <div class="container mx-auto">
         <div phx-click="back_to_node" phx-value-parent_node={@log.node_id} class="text-white cursor-pointer mb-4">
           &larr; Back
         </div>
@@ -53,12 +53,12 @@ defmodule LeafNodeWeb.LogDetailsLive do
 
           <div class="mb-6">
             <h4 class="text-l font-semibold mb-2">Input Received:</h4>
-            <pre class="bg-zinc-800 rounded-lg p-4 overflow-auto whitespace-pre-wrap"><%= input_json %></pre>
+            <pre class="box_input_inset_shadow rounded-lg p-4 overflow-auto whitespace-pre-wrap" style="max-height: 500px"><%= input_json %></pre>
           </div>
 
           <div class="mb-6">
             <h4 class="text-l font-semibold mb-2">Node Result:</h4>
-            <pre class="bg-zinc-800 rounded-lg p-4 overflow-auto whitespace-pre-wrap"><%= result_json %></pre>
+            <pre class="box_input_inset_shadow rounded-lg p-4 overflow-auto whitespace-pre-wrap" style="max-height: 500px"><%= result_json %></pre>
           </div>
         </div>
       </div>

@@ -9,22 +9,3 @@
 
 ## Note
 A lot of the app does not have tests as things are a POC but still working and managed to prove what an idea but and usable as a MVP.
-
-If there is an issue running with the docker, I recommend having the postgres db start and stop the app, then run the app locally to point to the running container DB instance. This would mean changing the `app.env` and change the line `DB_HOSTNAME` to be `localhost` and `PORT` to be what ever the exposed port on the docker postgress instance.
-
-## Road to MVP (update with basic features list once mvp is released) 🎉
-
-This is a list that is relevant from the date of 27th June 2024 serviing as a baseline for a todo list for a basic test release.
-
-- [x] GPT Input process setting
-- [x] Log updates to have references or IDs displayed
-- [x] Process setting (enable/disable - async/sync) - always async for now
-- [x] Update output to caller to contain process result or reference to log id for data responses
-- [x] String interpolation for inputs (abilit to use dynamic inputs and hard coded values as part of data to send)
-- [x] Get Ngrok and project running on Raspberry PI for testing
-- [x] Add "template" tag to the relevant fields that support it
-- [x] Basic website
-- [ ] Data encryption
-- [ ] Node Types (API / Extension). The Extension uses the nodes associated
-- [ ] Lock nodes from deletion
-- [x] Bug with creating a new user and extension token render on dashboard

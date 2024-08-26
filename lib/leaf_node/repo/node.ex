@@ -18,7 +18,6 @@ defmodule LeafNode.Repo.Node do
     access_key = UUID.uuid4()
     # This generates a random email using a UUID for the node
     email = UUID.uuid4() <> "@" <> config(:domain)
-    IO.inspect(email, label: "MAIL_DOMAIN")
     changeset =
       Schemas.Node.changeset(
         %Schemas.Node{},
@@ -136,7 +135,6 @@ defmodule LeafNode.Repo.Node do
           should_log: n.should_log,
           expected_payload: n.expected_payload,
           access_key: n.access_key,
-          access_key_hash: n.access_key_hash,
           integration_settings: n.integration_settings
         }
       )
@@ -165,9 +163,7 @@ defmodule LeafNode.Repo.Node do
            should_log: n.should_log,
            expected_payload: n.expected_payload,
            access_key: n.access_key,
-           access_key_hash: n.access_key_hash,
-           email_key: n.email_key,
-           email_hash: n.email_hash,
+           email: n.email,
            integration_settings: n.integration_settings,
            user_id: n.user_id
          }}

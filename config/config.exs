@@ -85,6 +85,9 @@ config :leaf_node, :cors_plug,
   origin: ["*"],
   headers: ["x-api-key", "x-extension-key", "content-type"]
 
+config :leaf_node, :node_mail,
+  domain: "node.leafnode.app"
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"

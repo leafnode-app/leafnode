@@ -16,6 +16,9 @@ defmodule LeafNode.Repo.Node do
   """
   def create_node(user_id) do
     access_key = UUID.uuid4()
+    # This generates a random email using a UUID for the node
+    email = UUID.uuid4() <> "@" <> config(:domain)
+    IO.inspect(email, label: "MAIL_DOMAIN")
     changeset =
       Schemas.Node.changeset(
         %Schemas.Node{},
@@ -23,7 +26,9 @@ defmodule LeafNode.Repo.Node do
           user_id: user_id,
           access_key: access_key,
           access_key_hash: access_key,
-          integration_settings: %{type: "none", input: nil, has_oauth: false}
+          integration_settings: %{type: "none", input: nil, has_oauth: false},
+          email: email,
+          email_hash: email,
         }
       )
     # TODO: Use the flag to check if valid
@@ -161,6 +166,8 @@ defmodule LeafNode.Repo.Node do
            expected_payload: n.expected_payload,
            access_key: n.access_key,
            access_key_hash: n.access_key_hash,
+           email_key: n.email_key,
+           email_hash: n.email_hash,
            integration_settings: n.integration_settings,
            user_id: n.user_id
          }}
@@ -201,6 +208,13 @@ defmodule LeafNode.Repo.Node do
       i_type = Enum.at(String.split(item, "_"), 0)
       {item, i_type}
     end)
+  end
+
+  defp config() do
+    Application.get_env(:leaf_node, :node_mail, nil)
+  end
+  defp config(key) do
+    config()[key]
   end
 
 end

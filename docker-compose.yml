@@ -12,6 +12,7 @@ services:
     ports:
       - "3001:5432"
   app:
+    # TODO: change this to be the image and not directory
     restart: always
     build: 
       context: ./

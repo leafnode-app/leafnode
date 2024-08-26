@@ -16,6 +16,8 @@ defmodule LeafNode.Schemas.Node do
     field :access_key, Binary
     field :access_key_hash, HMAC
     field :integration_settings, Map
+    field :email, Binary
+    field :email_hash, HMAC
     belongs_to :user, LeafNode.Accounts.User, foreign_key: :user_id, type: :integer
 
     timestamps()
@@ -23,7 +25,7 @@ defmodule LeafNode.Schemas.Node do
 
   def changeset(node, attrs) do
     node
-    |> cast(attrs, [:title, :description, :enabled, :should_log, :expected_payload, :user_id, :access_key, :access_key_hash, :integration_settings])
+    |> cast(attrs, [:title, :description, :enabled, :should_log, :expected_payload, :user_id, :access_key, :access_key_hash, :email, :email_hash, :integration_settings])
     |> validate_required([:title, :description, :enabled, :should_log, :user_id])
     |> validate_settings()
     |> assoc_constraint(:user)
@@ -33,6 +35,7 @@ defmodule LeafNode.Schemas.Node do
   defp put_hashed_binary(changeset) do
     changeset
       |> put_change(:access_key_hash, get_field(changeset, :access_key))
+      |> put_change(:email_hash, get_field(changeset, :email))
   end
 
   defp validate_settings(changeset) do

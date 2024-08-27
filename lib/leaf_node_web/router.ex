@@ -1,13 +1,9 @@
 defmodule LeafNodeWeb.Router do
   use Phoenix.Router
   import Phoenix.LiveView.Router
-
-  # Auth
-  alias LeafNodeWeb
-  # API
-  alias LeafNodeWeb.Api.{NodeController}
-
   import LeafNodeWeb.UserAuth
+  alias LeafNodeWeb
+  alias LeafNodeWeb.Api.{NodeController}
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -32,6 +28,10 @@ defmodule LeafNodeWeb.Router do
 
   pipeline :extension_access do
     plug LeafNodeWeb.Plugs.ExtensionKeyAuth
+  end
+
+  pipeline :node_email_check do
+    plug LeafNodeWeb.Plugs.NodeEmailCheck
   end
 
   # Landing Page
@@ -60,19 +60,6 @@ defmodule LeafNodeWeb.Router do
     post "/log_in", UserSessionController, :create
   end
 
-  scope "/", LeafNodeWeb do
-    pipe_through [:browser, :require_authenticated_user]
-
-    live_session :require_authenticated_user,
-      on_mount: [{LeafNodeWeb.UserAuth, :ensure_authenticated}] do
-      live "/dashboard/", NodesLive
-      live "/dashboard/node/:id", NodeLive
-      live "/dashboard/log/:id", LogDetailsLive
-      live "/auth/settings", UserSettingsLive, :edit
-      live "/auth/settings/confirm_email/:token", UserSettingsLive, :confirm_email
-    end
-  end
-
   # App dashboard - login
   scope "/", LeafNodeWeb do
     pipe_through [:browser]
@@ -94,6 +81,19 @@ defmodule LeafNodeWeb.Router do
     end
   end
 
+  scope "/", LeafNodeWeb do
+    pipe_through [:browser, :require_authenticated_user]
+
+    live_session :require_authenticated_user,
+      on_mount: [{LeafNodeWeb.UserAuth, :ensure_authenticated}] do
+      live "/dashboard/", NodesLive
+      live "/dashboard/node/:id", NodeLive
+      live "/dashboard/log/:id", LogDetailsLive
+      live "/auth/settings", UserSettingsLive, :edit
+      live "/auth/settings/confirm_email/:token", UserSettingsLive, :confirm_email
+    end
+  end
+
   # API for node execution
   scope "/api/node" do
     pipe_through [:api, :endpoint_access_validation]
@@ -111,7 +111,12 @@ defmodule LeafNodeWeb.Router do
     post "/node/:id", LeafNodeWeb.ExtensionApi.NodeController, :execute_node
   end
 
-  # Publuc routes
+  # Internal routes to trigger and execute nodes
+  scope "/internal", LeafNodeWeb do
+    # TODO: add plug to confirm keys between services
+    pipe_through [:node_email_check, :api]
+    post "/trigger/:email", InternalController, :trigger
+  end
 
   # ---- API ---- #
   # Enable LiveDashboard and Swoosh mailbox preview in development

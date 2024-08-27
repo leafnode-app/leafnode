@@ -7,7 +7,6 @@ defmodule LeafNodeWeb.Components.NodeDetails do
   attr :node, :map, required: true
 
   def render(assigns) do
-    IO.inspect(assigns)
     ~H"""
       <div class="premium-border bg-zinc-900 py-4 px-2 h-100% rounded-lg border border-stone-900">
         <div>

@@ -18,20 +18,21 @@ defmodule LeafNode.Integrations.Google.Mail do
   @doc """
     Send email function that sets up the body, details and sends off the email
   """
-  def send_email(token, from, recipient, subject, body) do
-    email = create_email(from, recipient, subject, body)
+  def send_email(token, from, recipient, reply_to, subject, body) do
+    email = create_email(from, recipient, reply_to, subject, body)
     send_request(token, email)
   end
 
   @doc """
     Create the email template that will be sent to the relevant
   """
-  def create_email(from, recipient, subject, body) do
+  def create_email(from, recipient, reply_to, subject, body) do
     email_body =
       """
       From: #{String.split(from, "@") |> Enum.at(0)} <#{from}>
       To: #{recipient}
       Subject: #{subject}
+      Reply-To: #{reply_to}
       MIME-Version: 1.0
       Content-Type: text/html; charset="UTF-8"
 
@@ -39,7 +40,7 @@ defmodule LeafNode.Integrations.Google.Mail do
 
       <br />
       <br />
-      Generated with <a href="https://leafnode.app" target="_blank">leafnode.app</a>.
+      Generated with <a href="https://use.leafnode.app" target="_blank">leafnode.app</a>.
       """
 
     # Gmail API requires URL-safe Base64 encoding

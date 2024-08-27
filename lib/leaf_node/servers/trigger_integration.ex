@@ -17,14 +17,15 @@ defmodule LeafNode.Servers.TriggerIntegration do
     token_details =
       LeafNode.Repo.OAuthToken.get_token(user_id, LeafNode.get_integration_type(type))
 
-    %{email: email} = LeafNode.Accounts.get_user!(user_id)
+    %{email: user_email} = LeafNode.Accounts.get_user!(user_id)
     # call the function here
     # TODO: add other google services and integration functions here?
     {status, resp} =
       LeafNode.Integrations.Google.Mail.send_email(
         LeafNode.Repo.OAuthToken.refresh_token_check(token_details, :google),
-        email,
+        user_email,
         recipient,
+        node.email,
         LeafNode.Core.Interpolator.interpolate_string(subject, payload),
         LeafNode.Core.Interpolator.interpolate_string(body, payload)
       )

@@ -7,6 +7,7 @@ defmodule LeafNodeWeb.Components.NodeDetails do
   attr :node, :map, required: true
 
   def render(assigns) do
+    IO.inspect(assigns)
     ~H"""
       <div class="premium-border bg-zinc-900 py-4 px-2 h-100% rounded-lg border border-stone-900">
         <div>
@@ -19,6 +20,9 @@ defmodule LeafNodeWeb.Components.NodeDetails do
             disabled
           />
           <div class="py-4">
+            <div class="text-xs px-2 text-gray-600"> email: </div>
+            <div class="text-xs px-2 text-gray-600"> <%= @node.email %> </div>
+            <hr class="m-2 border-zinc-700"/>
             <div class="text-xs px-2 text-gray-600"> x-api-key: </div>
             <div class="text-xs px-2 text-gray-600"> <%= @node.access_key %> </div>
           </div>

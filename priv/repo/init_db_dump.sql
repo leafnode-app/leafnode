@@ -170,7 +170,9 @@ CREATE TABLE public.nodes (
     access_key_hash bytea,
     integration_settings bytea,
     inserted_at timestamp(0) without time zone NOT NULL,
-    updated_at timestamp(0) without time zone NOT NULL
+    updated_at timestamp(0) without time zone NOT NULL,
+    email bytea,
+    email_hash bytea
 );
 
 
@@ -235,11 +237,14 @@ ALTER TABLE public.schema_migrations OWNER TO postgres;
 
 CREATE TABLE public.users (
     id bigint NOT NULL,
-    email public.citext NOT NULL,
+    email bytea NOT NULL,
     hashed_password character varying(255) NOT NULL,
     confirmed_at timestamp(0) without time zone,
     inserted_at timestamp(0) without time zone NOT NULL,
-    updated_at timestamp(0) without time zone NOT NULL
+    updated_at timestamp(0) without time zone NOT NULL,
+    email_hash bytea,
+    type character varying(255),
+    advanced boolean DEFAULT false
 );
 
 

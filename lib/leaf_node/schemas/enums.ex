@@ -4,3 +4,4 @@ import EctoEnum
 defenum(IntegrationsEnum, ["none", "google", "notion"])
 defenum(ExpressionsEnum, ["===", "!=", ">", ">=", "<", "<="])
 defenum(CondEnum, ["string", "integer", "boolean"])
+defenum(AccountTypesEnum, ["free", "paid"])

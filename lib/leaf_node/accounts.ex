@@ -23,7 +23,7 @@ defmodule LeafNode.Accounts do
 
   """
   def get_user_by_email(email) when is_binary(email) do
-    Repo.get_by(User, email: email)
+    Repo.get_by(User, email_hash: email)
   end
 
   @doc """
@@ -40,7 +40,7 @@ defmodule LeafNode.Accounts do
   """
   def get_user_by_email_and_password(email, password)
       when is_binary(email) and is_binary(password) do
-    user = Repo.get_by(User, email: email)
+    user = Repo.get_by(User, email_hash: email)
     if User.valid_password?(user, password), do: user
   end
 
@@ -76,7 +76,8 @@ defmodule LeafNode.Accounts do
   """
   def register_user(attrs) do
     %User{}
-    |> User.registration_changeset(attrs)
+    # Defaulting the user to free for now, this opt will not be exposed to the user, system level
+    |> User.registration_changeset(attrs, type: :free)
     |> Repo.insert()
   end
 
@@ -90,7 +91,7 @@ defmodule LeafNode.Accounts do
 
   """
   def change_user_registration(%User{} = user, attrs \\ %{}) do
-    User.registration_changeset(user, attrs, hash_password: false, validate_email: false)
+    User.registration_changeset(user, attrs, hash_password: false, validate_email: false, type: :free)
   end
 
   ## Settings
@@ -114,10 +115,10 @@ defmodule LeafNode.Accounts do
 
   ## Examples
 
-      iex> apply_user_email(user, "valid password", %{email: ...})
+      iex> apply_user_email(user, "valid password", %{email_hash: ...})
       {:ok, %User{}}
 
-      iex> apply_user_email(user, "invalid password", %{email: ...})
+      iex> apply_user_email(user, "invalid password", %{email_hash: ...})
       {:error, %Ecto.Changeset{}}
 
   """
@@ -149,7 +150,7 @@ defmodule LeafNode.Accounts do
   defp user_email_multi(user, email, context) do
     changeset =
       user
-      |> User.email_changeset(%{email: email})
+      |> User.email_changeset(%{email_hash: email})
       |> User.confirm_changeset()
 
     Ecto.Multi.new()

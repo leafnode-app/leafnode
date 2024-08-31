@@ -64,12 +64,14 @@ config :leaf_node, :acc_access,
   free: %{
     log_limit: 5,
     rate_limit: 10,
-    node_limit: 3
+    node_limit: 3,
+    advnaced: false,
   },
   paid: %{
     log_limit: 10,
     rate_limit: 5,
-    node_limit: 10
+    node_limit: 10,
+    advanced: true
   }
 
 # Configure Cloak - see secret.exs for more info
@@ -81,10 +83,12 @@ config :leaf_node, LeafNode.Hashed.HMAC,
   algorithm: :sha512,
   secret: ""
 
+# External access to nodes and API header detail requirements
 config :leaf_node, :cors_plug,
   origin: ["*"],
   headers: ["x-api-key", "x-extension-key", "content-type"]
 
+# The emails to be generated per node
 config :leaf_node, :node_mail,
   domain: "leafnode.xyz"
 

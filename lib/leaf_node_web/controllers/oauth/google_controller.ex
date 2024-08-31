@@ -22,11 +22,11 @@ defmodule LeafNodeWeb.GoogleController do
     Callback that takes the granted token after access grant to use to make a token request.
     If the user has a token already check expiry and maybe try generate a new one if needed
   """
-  def callback(conn, %{"code" => code, "state" => state} = params) do
+  def callback(conn, %{"code" => code, "state" => state} = _params) do
     state = Base.decode64!(state) |> Jason.decode!()
     user_id = conn.assigns.current_user.id
 
-    url = %OAuth2.Client{ token: token_data} =
+    %OAuth2.Client{ token: token_data} =
       GoogleOAuth.get_token(
         GoogleOAuth.client(),
         code,

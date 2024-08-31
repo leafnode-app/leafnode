@@ -1,12 +1,16 @@
 defmodule LeafNode.Accounts.User do
   use Ecto.Schema
   import Ecto.Changeset
+  alias LeafNode.Cloak.EctoTypes.{Binary}
+  alias LeafNode.Hashed.HMAC
 
   schema "users" do
-    field :email, :string
+    field :email, Binary
+    field :email_hash, HMAC
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
     field :confirmed_at, :naive_datetime
+    field :type, :string
 
     timestamps()
   end
@@ -35,10 +39,14 @@ defmodule LeafNode.Accounts.User do
       Defaults to `true`.
   """
   def registration_changeset(user, attrs, opts \\ []) do
+    IO.inspect(attrs, label: "attrs")
+    IO.inspect(user, label: "user")
+    IO.inspect(opts, label: "opts")
     user
-    |> cast(attrs, [:email, :password])
+    |> cast(attrs, [:email, :email_hash, :password, :type])
     |> validate_email(opts)
     |> validate_password(opts)
+    |> validate_type(opts)
   end
 
   defp validate_email(changeset, opts) do
@@ -47,6 +55,7 @@ defmodule LeafNode.Accounts.User do
     |> validate_format(:email, ~r/^[^\s]+@[^\s]+$/, message: "must have the @ sign and no spaces")
     |> validate_length(:email, max: 160)
     |> maybe_validate_unique_email(opts)
+    |> put_hashed_binary()
   end
 
   defp validate_password(changeset, opts) do
@@ -58,6 +67,32 @@ defmodule LeafNode.Accounts.User do
     # |> validate_format(:password, ~r/[A-Z]/, message: "at least one upper case character")
     # |> validate_format(:password, ~r/[!?@#$%^&*_0-9]/, message: "at least one digit or punctuation character")
     |> maybe_hash_password(opts)
+  end
+
+  defp validate_type(changeset, opts) do
+    # confirm against types
+    {status, result} = try do
+      {_, type} = AccountTypesEnum.dump(opts[:type])
+      {:ok, type}
+    rescue
+      _ -> {:error, "Invalid type"}
+    end
+
+    IO.inspect(status, label: "status")
+    IO.inspect(result, label: "result")
+    # check status and make sure to set the relevant type to the users
+    case status do
+      :ok ->
+        changeset
+        |> put_change(:type, result)
+      _ ->
+        changeset
+    end
+  end
+
+  defp put_hashed_binary(changeset) do
+    changeset
+      |> put_change(:email_hash, get_field(changeset, :email))
   end
 
   defp maybe_hash_password(changeset, opts) do

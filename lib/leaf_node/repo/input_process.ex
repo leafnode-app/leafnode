@@ -9,7 +9,7 @@ defmodule LeafNode.Repo.InputProcess do
   @doc """
     Create an Input Process  for a given node
   """
-  def create_input_process(node_id, type, enabled, value, async) do
+  def create_input_process(node_id, type, value, async, enabled) do
     changeset =
       Schemas.InputProcess.changeset(
         %Schemas.InputProcess{},

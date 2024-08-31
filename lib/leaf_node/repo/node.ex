@@ -6,6 +6,7 @@ defmodule LeafNode.Repo.Node do
   # TODO: add limit for nodes based off user account - dont delete, just prevent adding
 
   import Ecto.Query, only: [from: 2]
+  require Logger
   alias LeafNode.Repo, as: LeafNodeRepo
   alias LeafNode.Schemas
 
@@ -31,7 +32,7 @@ defmodule LeafNode.Repo.Node do
         }
       )
     # TODO: Use the flag to check if valid
-    IO.inspect(changeset, label: "create_node changeset")
+    Logger.debug(changeset, label: "create_node changeset")
 
     case {_, result} = LeafNodeRepo.insert(changeset) do
       {:ok, _} ->

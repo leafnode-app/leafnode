@@ -3,6 +3,7 @@ defmodule LeafNodeWeb.Components.NodeClause do
     General node conditions
   """
   use Phoenix.LiveComponent
+  require Logger
   import LeafNode.Repo.Node, only: [expression_types: 0, condition_types: 0]
 
   def update(assigns, socket) do
@@ -196,7 +197,7 @@ defmodule LeafNodeWeb.Components.NodeClause do
   defp update_expression(expression) do
     case LeafNode.Repo.Expression.edit_expression(expression) do
       {:ok, _} -> :ok
-      {:error, err} -> IO.inspect("There was a problem updating the expression: #{err}")
+      {:error, err} -> Logger.debug("There was a problem updating the expression: #{err}")
     end
   end
 

@@ -3,6 +3,7 @@ defmodule LeafNode.Google.OAuth do
     The Oatuh module for google to auth the details for the client secret
   """
   use OAuth2.Strategy
+  require Logger
 
   @site "https://accounts.google.com"
   @authorize_url "https://accounts.google.com/o/oauth2/auth"
@@ -50,8 +51,8 @@ defmodule LeafNode.Google.OAuth do
       approval_prompt: @approval_prompt,
       state: Base.encode64(Jason.encode!(params))
     )
-    IO.inspect(redirect_uri, label: "redirect_uri")
-    IO.inspect(url, label: "URL")
+    Logger.debug(redirect_uri, label: "redirect_uri")
+    Logger.debug(url, label: "URL")
 
     url
   end

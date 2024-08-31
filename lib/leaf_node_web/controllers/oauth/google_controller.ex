@@ -12,13 +12,9 @@ defmodule LeafNodeWeb.GoogleController do
   @doc """
     Request access url for the user to grant access to the scoped services
   """
-  def request(conn, %{"node_id" => node_id} = params) do
-    # IO.inspect(redirect_uri , label: "conn")
+  def request(conn, %{"node_id" => node_id} = _params) do
     redirect_uri = Routes.google_url(conn, :callback)
-    # IO.inspect(redirect_uri , label: "redirect_uri ")
     auth_url = GoogleOAuth.authorize_url(GoogleOAuth.client(), redirect_uri, %{ node_id: node_id})
-    # IO.inspect(auth_url , label: "auth_url")
-    # raise "STOP"
     redirect(conn, external: auth_url)
   end
 
@@ -36,8 +32,6 @@ defmodule LeafNodeWeb.GoogleController do
         code,
         Routes.google_url(conn, :callback)
       )
-
-      IO.inspect(url)
 
     try do
       {_, value} = IntegrationsEnum.dump(@integration_type)

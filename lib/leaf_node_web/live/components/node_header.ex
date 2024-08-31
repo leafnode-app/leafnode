@@ -3,6 +3,7 @@ defmodule LeafNodeWeb.Components.NodeHeader do
     The base component to manage the node header seciton
   """
   use Phoenix.LiveComponent
+  require Logger
   alias LeafNodeWeb.Router.Helpers, as: Routes
 
   attr :node, :map, required: true
@@ -86,7 +87,7 @@ defmodule LeafNodeWeb.Components.NodeHeader do
             data
 
           {:error, err} ->
-            IO.inspect(
+            Logger.debug(
               "There was a problem getting the node: #{node_id} with error: #{err}"
             )
 
@@ -94,7 +95,7 @@ defmodule LeafNodeWeb.Components.NodeHeader do
         end
 
       {:error, err} ->
-        IO.inspect(
+        Logger.debug(
           "There was a problem getting the node to update: #{node_id} with error: #{err}"
         )
 

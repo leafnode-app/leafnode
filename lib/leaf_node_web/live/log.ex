@@ -1,5 +1,6 @@
 defmodule LeafNodeWeb.LogDetailsLive do
   use LeafNodeWeb, :live_view
+  require Logger
   alias LeafNodeWeb.Router.Helpers, as: Routes
 
   @doc """
@@ -12,7 +13,7 @@ defmodule LeafNodeWeb.LogDetailsLive do
           data
 
         {:error, err} ->
-          IO.inspect("There was a problem getting the log: #{id} with error: #{err}")
+          Logger.debug("There was a problem getting the log: #{id} with error: #{err}")
           %{}
       end
 

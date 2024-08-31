@@ -18,7 +18,7 @@ defmodule LeafNode.Core.Code do
           {:ok, converted_value} ->
             # Compare the payload value against the converted value using the expression
             result = compare(payload_value, converted_value, expression)
-            IO.inspect(result, label: "Comparison Result")
+            Logger.debug(result, label: "Comparison Result")
             {:ok, result}
 
           {:error, reason} ->

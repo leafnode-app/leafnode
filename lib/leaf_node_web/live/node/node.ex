@@ -1,6 +1,6 @@
 defmodule LeafNodeWeb.NodeLive do
   use LeafNodeWeb, :live_view
-
+  require Logger
   alias LeafNodeWeb.Components.{NodeHeader, NodeInputProcess, NodeLogs, NodeDetails, NodeClause, NodeIntegration}
 
   @doc """
@@ -14,7 +14,7 @@ defmodule LeafNodeWeb.NodeLive do
       case LeafNode.Repo.Node.get_node(id) do
         {:ok, data} -> data
         {:error, err} ->
-          IO.inspect("There was a problem getting the node: #{id} with error: #{err}")
+          Logger.debug("There was a problem getting the node: #{id} with error: #{err}")
           %{}
       end
 
@@ -166,11 +166,11 @@ defmodule LeafNodeWeb.NodeLive do
           {:ok, data} ->
             {:ok, data}
           {:error, err} ->
-            IO.inspect("There was a problem getting the node: #{node_id} with error: #{err}")
+            Logger.debug("There was a problem getting the node: #{node_id} with error: #{err}")
             {:error, prev_node}
         end
       {:error, err} ->
-        IO.inspect("There was a problem getting the node to update: #{node_id} with error: #{err}")
+        Logger.debug("There was a problem getting the node to update: #{node_id} with error: #{err}")
         {:error, prev_node}
     end
   end

@@ -1,9 +1,11 @@
 defmodule LeafNodeWeb.NodesLive do
-  use LeafNodeWeb, :live_view
-
   @doc """
     Init func that is run on init of the view
   """
+
+  use LeafNodeWeb, :live_view
+  require Logger
+
   def mount(_params, _session, socket) do
 
     token_data = case resp = LeafNode.Repo.ExtensionToken.get_token_by_user(socket.assigns.current_user.id) do
@@ -150,7 +152,7 @@ defmodule LeafNodeWeb.NodesLive do
         data
 
       {:error, _err} ->
-        IO.inspect("There was an error getting the nodes")
+        Logger.error("There was an error getting the nodes")
         []
     end
   end

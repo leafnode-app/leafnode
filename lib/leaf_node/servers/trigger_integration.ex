@@ -49,20 +49,22 @@ defmodule LeafNode.Servers.TriggerIntegration do
       "range_end" => range_end,
       "range_start" => range_start,
       "spreadsheet_id" => id,
-      "tab" => _tab
+      "tab" => tab
     } = node.integration_settings
 
     token_details =
       LeafNode.Repo.OAuthToken.get_token(user_id, LeafNode.get_integration_type(type))
 
-    # call the function here
+    # check if we should use AI response
+    resp = if payload["input_process_resp"]["data"], do: payload["input_process_resp"]["data"], else: input
     # TODO: add other google services and integration functions here?
     {status, resp} =
       LeafNode.Integrations.Google.Sheets.write_to_sheet(
         LeafNode.Repo.OAuthToken.refresh_token_check(token_details, :google),
         id,
+        tab,
         range_start <> ":" <> range_end,
-        [LeafNode.Core.Interpolator.interpolate_string(String.split(input, ","), payload)]
+        [LeafNode.Core.Interpolator.interpolate_string(String.split(resp, ","), payload)]
       )
 
     success_check = if status == :ok, do: true, else: false

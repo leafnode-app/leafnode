@@ -11,6 +11,7 @@ defmodule LeafNode.Accounts.User do
     field :hashed_password, :string, redact: true
     field :confirmed_at, :naive_datetime
     field :type, :string
+    field :advanced, :boolean, default: false
 
     timestamps()
   end
@@ -39,11 +40,8 @@ defmodule LeafNode.Accounts.User do
       Defaults to `true`.
   """
   def registration_changeset(user, attrs, opts \\ []) do
-    IO.inspect(attrs, label: "attrs")
-    IO.inspect(user, label: "user")
-    IO.inspect(opts, label: "opts")
     user
-    |> cast(attrs, [:email, :email_hash, :password, :type])
+    |> cast(attrs, [:email, :email_hash, :password, :type, :advanced])
     |> validate_email(opts)
     |> validate_password(opts)
     |> validate_type(opts)
@@ -78,8 +76,6 @@ defmodule LeafNode.Accounts.User do
       _ -> {:error, "Invalid type"}
     end
 
-    IO.inspect(status, label: "status")
-    IO.inspect(result, label: "result")
     # check status and make sure to set the relevant type to the users
     case status do
       :ok ->

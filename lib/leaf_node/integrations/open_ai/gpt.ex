@@ -90,6 +90,17 @@ defmodule LeafNode.Integrations.OpenAi.Gpt do
     input_process: #{input_process}"
   end
 
+  # Get user nodes
+  def get_nodes(user_id) do
+    case LeafNode.Repo.Node.list_nodes(user_id) do
+      {:ok, nodes} ->
+        Enum.filter(nodes, fn node -> node.enabled end)
+      {:error, _err} ->
+        Logger.error("There was an error getting the nodes")
+        []
+    end
+  end
+
   # config to get based off the application name
   def config(), do: Application.get_env(:leaf_node, :open_ai)
   def config(key, default \\ nil), do: Keyword.get(config(), key, default)

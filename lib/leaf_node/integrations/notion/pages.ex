@@ -4,6 +4,8 @@ defmodule LeafNode.Integrations.Notion.Pages do
   """
   @notion_version "2021-05-13"
   @block_limit 50
+  @block_text_str_limit 200
+
   # We dont need to process these keys for now
   @keys_to_remove [
     "archived",
@@ -42,7 +44,7 @@ defmodule LeafNode.Integrations.Notion.Pages do
           if is_nil(item["text"]) do
             acc
           else
-            [item | acc]
+            [item["text"] | acc]
           end
         end)
         {:ok, data}
@@ -71,6 +73,8 @@ defmodule LeafNode.Integrations.Notion.Pages do
   defp extract_plain_text(nil), do: nil
   defp extract_plain_text([]), do: nil
   defp extract_plain_text(data) do
-    Enum.at(data, 0)["plain_text"]
+    str = Enum.at(data, 0)["plain_text"]
+    # we need to shorted the string of the text per block for token size
+    str |> String.slice(0, @block_text_str_limit)
   end
 end

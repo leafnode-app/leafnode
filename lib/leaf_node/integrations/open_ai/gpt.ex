@@ -92,28 +92,30 @@ defmodule LeafNode.Integrations.OpenAi.Gpt do
   @doc """
     The prompt function that we can call to get teh prompt
   """
-  defp query_node(payload, input_process) do
-    "You are a system that processes data. You will receive an input payload and an input_process string. Use the input_process to process and respond based on the payload. Always return a string as a response.
+  defp query_node(question, database) do
+    """
+    Provide valid JSON output.
+    You will be posed a question, the question will be very specific and while this happens, you will also be given data associated with the topic.
+    The data will be a list of data and you need to formulate a answer based on the provided question and passed relevant data.
 
-    Important notes:
-    - If the request in the input_process makes no sense or cannot be fulfilled, return a short 20 word message of why.
-    - Return only the answer; avoid verbose context. Provide clear, direct responses.
-    - Always attempt to generate a meaningful response using the payload as context for the input_process.
-    - Instead of saying you cant do something, if you cant - always suggest an improvement to the passed data or if there is no imporovement, return false.
+    - If there is no answer you can give based off the data, return a short user friendly response that you need someone to give more information so you can answer.
+    - If you can answer, make sure to return a answer that is polite and concise and dont change topics, if you have some annswer better than the data provided,
+    you are allowed to return a answer but always, ALWAYS opt to use the data provided as a base for you answer.
+    - If you cant answer for some reason, return a short user friendly response that you need need someone to give more information so you can answer only if there is no information at all, not all the time.
 
-    Final notes:
-    Return a json response in the format of:
+    Question: #{question}
+
+    Database for you to try provide an answer: #{Jason.encode!(database)}
+
+    Response format:
     {
-      data: [THE PROCESSED RESPONSE BASED ON THE PAYLOAD AND INPUT PROCESS],
-      improvement: [THE SUGGESTED IMPROVEMENT IF THERE IS OR NILL]
+      "message": "[Your response]"
     }
 
-    Ensure:
-    - The response is useful and directly related to the payload.
-    - The response should be specific and actionable if a template is requested, without any placeholders.
+    Please follow these instructions carefully, and avoid making assumptions beyond the provided data. You will always return some answer even if it doesnt answer.
+    Make sure to onle return node information if there is a node that could work based on the title and description, IT IS FALSE OTHERWISE!
+    """
 
-    payload: #{Jason.encode!(payload)}
-    input_process: #{input_process}"
   end
 
   @doc """

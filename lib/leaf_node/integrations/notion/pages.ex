@@ -3,8 +3,8 @@ defmodule LeafNode.Integrations.Notion.Pages do
   The Notion integrations and helper functions in order to interact with it
   """
   @notion_version "2021-05-13"
-  @block_limit 50
-  @block_text_str_limit 200
+  @block_limit 200
+  @block_text_str_limit 500
 
   # We dont need to process these keys for now
   @keys_to_remove [
@@ -44,7 +44,7 @@ defmodule LeafNode.Integrations.Notion.Pages do
           if is_nil(item["text"]) do
             acc
           else
-            [item["text"] | acc]
+            acc ++ [item["text"]]
           end
         end)
         {:ok, data}

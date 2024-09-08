@@ -18,6 +18,7 @@ defmodule LeafNodeWeb.Api.NodeController do
     # Start the server if not already running
     LeafNode.Servers.ExecutionServer.start_link(id)
 
+    # TODO: this needs to change so that its user email and not node email
     {status, resp} =
       GenServer.call(String.to_atom("execution_process_" <> id), {:execute, id, payload})
 

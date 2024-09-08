@@ -73,8 +73,8 @@ defmodule LeafNodeWeb.Router do
 
       # Integrations and OAuth redirects
       # Google
-      get "/auth/google/request/:node_id", GoogleController, :request
-      get "/auth/google/callback", GoogleController, :callback
+      # get "/auth/google/request/:node_id", GoogleController, :request
+      # get "/auth/google/callback", GoogleController, :callback
       # Notion
       get "/auth/notion/request/:node_id", NotionController, :request
       get "/auth/notion/callback", NotionController, :callback
@@ -95,21 +95,21 @@ defmodule LeafNodeWeb.Router do
   end
 
   # API for node execution
-  scope "/api/node" do
-    pipe_through [:api, :endpoint_access_validation]
-    post "/:id", NodeController, :execute_node
-  end
+  # scope "/api/node" do
+  #   pipe_through [:api, :endpoint_access_validation]
+  #   post "/:id", NodeController, :execute_node
+  # end
 
   # API for extension interactions with user data
   # TODO: change this so the naming is better to make it easier to impport
-  scope "/api/extension" do
-    pipe_through [:api, :extension_access]
-    get "/nodes", LeafNodeWeb.ExtensionApi.NodeController, :get_nodes
-  end
-  scope "/api/extension" do
-    pipe_through [:api, :extension_access]
-    post "/node/:id", LeafNodeWeb.ExtensionApi.NodeController, :execute_node
-  end
+  # scope "/api/extension" do
+  #   pipe_through [:api, :extension_access]
+  #   get "/nodes", LeafNodeWeb.ExtensionApi.NodeController, :get_nodes
+  # end
+  # scope "/api/extension" do
+  #   pipe_through [:api, :extension_access]
+  #   post "/node/:id", LeafNodeWeb.ExtensionApi.NodeController, :execute_node
+  # end
 
   # Internal routes to trigger and execute nodes
   scope "/internal", LeafNodeWeb do

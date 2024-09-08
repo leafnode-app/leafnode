@@ -10,25 +10,29 @@ defmodule LeafNode.Integrations.OpenAi.Gpt do
   """
   def prompt(payload, process, :node) do
     if !is_nil(config(:token)) do
-      body_payload = Map.put(
-        model_settings(), "messages",
-        [
-          %{
-            "role" => "system",
-            "content" => query_node(payload, process)
-          }
-        ]
-      )
+      body_payload =
+        Map.put(
+          model_settings(),
+          "messages",
+          [
+            %{
+              "role" => "system",
+              "content" => query_node(payload, process)
+            }
+          ]
+        )
 
-      {status, resp} = HTTPoison.post(
-        config(:completions_url),
-        Jason.encode!(body_payload),
-        [
-          {"Content-type", "application/json"},
-          {"Authorization", "Bearer #{config(:token)}"}
-        ],
-        recv_timeout: @timeout
-      )
+      {status, resp} =
+        HTTPoison.post(
+          config(:completions_url),
+          Jason.encode!(body_payload),
+          [
+            {"Content-type", "application/json"},
+            {"Authorization", "Bearer #{config(:token)}"}
+          ],
+          recv_timeout: @timeout
+        )
+
       case status do
         :ok -> handle_response(resp)
         :error -> {:error, "There was an error: #{resp}"}
@@ -40,25 +44,29 @@ defmodule LeafNode.Integrations.OpenAi.Gpt do
 
   def prompt(payload, user_id, :assistant) do
     if !is_nil(config(:token)) do
-      body_payload = Map.put(
-        model_settings(), "messages",
-        [
-          %{
-            "role" => "system",
-            "content" => query_assistant(payload, user_id)
-          }
-        ]
-      )
+      body_payload =
+        Map.put(
+          model_settings(),
+          "messages",
+          [
+            %{
+              "role" => "system",
+              "content" => query_assistant(payload, user_id)
+            }
+          ]
+        )
 
-      {status, resp} = HTTPoison.post(
-        config(:completions_url),
-        Jason.encode!(body_payload),
-        [
-          {"Content-type", "application/json"},
-          {"Authorization", "Bearer #{config(:token)}"}
-        ],
-        recv_timeout: @timeout
-      )
+      {status, resp} =
+        HTTPoison.post(
+          config(:completions_url),
+          Jason.encode!(body_payload),
+          [
+            {"Content-type", "application/json"},
+            {"Authorization", "Bearer #{config(:token)}"}
+          ],
+          recv_timeout: @timeout
+        )
+
       case status do
         :ok -> handle_response(resp)
         :error -> {:error, "There was an error: #{resp}"}
@@ -75,6 +83,7 @@ defmodule LeafNode.Integrations.OpenAi.Gpt do
         resp = Jason.decode!(resp.body)
         {_status, data} = return_choice_by_index(resp, 0)
         {:ok, Jason.decode!(data)}
+
       _ ->
         {
           :error,
@@ -115,7 +124,6 @@ defmodule LeafNode.Integrations.OpenAi.Gpt do
     Please follow these instructions carefully, and avoid making assumptions beyond the provided data. You will always return some answer even if it doesnt answer.
     Make sure to onle return node information if there is a node that could work based on the title and description, IT IS FALSE OTHERWISE!
     """
-
   end
 
   @doc """
@@ -125,15 +133,15 @@ defmodule LeafNode.Integrations.OpenAi.Gpt do
     """
     Provide valid JSON output.
     You will be given a thread of data representing a conversation or a series of messages.
-    Your task is to determine whether the conversation includes a question specifically directed at you.
-    Your question needs to be generated as if someone asked and you are going to ask on behalf of them, it shouldnt be vague but based
-    off the conversations, a question you can ask the node.
+    Your task is to determine whether the last message in the conversation is a question specifically directed at you, "Leafnode AI".
 
-    When you identify a question, compare it against the list of nodes provided below. Each node has a title and description to help you decide which node is most relevant to the question.
+    Your name is "Leafnode AI". You should only respond when directly asked to do so; you are not a chatbot and should ignore general chat messages that do not require your input.
+
+    When you identify a question directed at you, compare it against the list of nodes provided below. Each node has a title and description to help you decide which node is most relevant to the question.
 
     - If a relevant node is found, formulate a question that could be asked of that node to obtain an answer.
-    - If there are nodes available but none are relevant, return 'false'.
-    - If no nodes are available or you cannot determine the relevance, politely say that you cannot help and suggest that nodes need to be added.
+    - If the last message is not directed at you, or if there are nodes available but none are relevant, return 'false'.
+    - If no nodes are available, or you cannot determine the relevance, politely say that you cannot help and suggest that nodes need to be added.
 
     Input Data (Conversation): #{Jason.encode!(payload)}
 
@@ -141,29 +149,27 @@ defmodule LeafNode.Integrations.OpenAi.Gpt do
 
     Your response should follow one of these formats:
 
-    **Failure (no relevant node found):**
+    **Failure (no relevant node found or last message is not directed at you):**
     {
       "message": false
     }
 
-    **Success (relevant node found):**
+    **Success (relevant node found and last message is directed at you):**
     {
-      "message": "[your formulated question based on the input data]",
+      "message": "[formulated question based on the input data]",
       "node": "[the relevant node ID]"
     }
 
-    Please follow these instructions carefully, and avoid making assumptions beyond the provided data. Make sure to onle return
-    node information if there is a node that could work based on the title and description, IT IS FALSE OTHERWISE!
+    Please follow these instructions carefully. Ensure that you only return node information if there is a node that could work based on the title and description. IT IS FALSE OTHERWISE!
     """
   end
-
 
   # Get the model settings for the prompt
   defp model_settings() do
     %{
       "temperature" => 0,
       "model" => config(:model),
-      "response_format" => %{ "type" => "json_object"}
+      "response_format" => %{"type" => "json_object"}
     }
   end
 
@@ -172,11 +178,14 @@ defmodule LeafNode.Integrations.OpenAi.Gpt do
     case LeafNode.Repo.Node.list_nodes(user_id) do
       {:ok, nodes} ->
         Enum.filter(nodes, fn node -> node.enabled end)
-        |> Enum.map(fn node -> %{
-          title: node.title,
-          description: node.description,
-          id: node.id
-        } end)
+        |> Enum.map(fn node ->
+          %{
+            title: node.title,
+            description: node.description,
+            id: node.id
+          }
+        end)
+
       {:error, _err} ->
         Logger.error("No nodes to add")
         "No thing found"

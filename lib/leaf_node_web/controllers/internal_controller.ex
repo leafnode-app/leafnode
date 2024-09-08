@@ -21,7 +21,20 @@ defmodule LeafNodeWeb.InternalController do
       "bcc" => Map.get(params, "Bcc"),
     }
 
+    IO.inspect(payload, label: "payload")
+    IO.inspect(clean_conversation_data(payload["text_body"]), label: "body")
+    raise "STOP!"
+    #  We need to make sure we get the body in the correct format and pass that along
     LeafNodeWeb.Api.NodeController.execute_node(conn, payload)
+
+    # TODO: take the result and pass it back to get it sent off as a response with the context
   end
+
+  # clean up the conversation for a consistent format
+  # We only care about latest message and not the whole conversation
+  defp clean_conversation_data(string) do
+    string |> String.split("\n") |> Enum.at(0)
+  end
+
 
 end

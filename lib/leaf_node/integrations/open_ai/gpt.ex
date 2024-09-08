@@ -95,9 +95,12 @@ defmodule LeafNode.Integrations.OpenAi.Gpt do
     case LeafNode.Repo.Node.list_nodes(user_id) do
       {:ok, nodes} ->
         Enum.filter(nodes, fn node -> node.enabled end)
+          |> Enum.reduce("",fn node, acc ->
+            acc <> "title: #{node.title} \ndescription: #{node.description} \nid: #{node.id}\n\n"
+          end)
       {:error, _err} ->
-        Logger.error("There was an error getting the nodes")
-        []
+        Logger.error("No nodes to add")
+        "No thing found"
     end
   end
 

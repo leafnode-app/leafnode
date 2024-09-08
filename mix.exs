@@ -59,7 +59,7 @@ defmodule LeafNode.MixProject do
       {:ecto_enum, "~> 1.4"},
       {:oauth2, "2.1.0"},
       {:cors_plug, "~> 3.0"},
-      {:cloak_ecto, "~> 1.3.0"}
+      {:cloak_ecto, "~> 1.3.0"},
     ]
   end
 

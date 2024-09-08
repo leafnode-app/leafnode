@@ -10,7 +10,7 @@ defmodule LeafNode.Repo.Node do
   alias LeafNode.Repo, as: LeafNodeRepo
   alias LeafNode.Schemas
 
-  @integration_list ["none", "google_sheet_write", "google_send_mail" ,"notion_page_write"]
+  @integration_list ["none" , "notion_page_read"]
 
   @doc """
     Create a node - genreate an id and pass payload to be persisted

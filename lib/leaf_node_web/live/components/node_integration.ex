@@ -6,7 +6,7 @@ defmodule LeafNodeWeb.Components.NodeIntegration do
   import LeafNode.Repo.Node, only: [integrations_list: 0]
   require Logger
 
-  @google "google"
+  # @google "google"
   @notion "notion"
 
   # TODO: THIS NEEDS TO BE MORE GENERIC TO MANAGE THE DIFFERENT TYPES FOR EACH INTEGRATION SETTINGS
@@ -144,8 +144,8 @@ defmodule LeafNodeWeb.Components.NodeIntegration do
       @notion ->
         {:noreply, redirect(socket, to: "/auth/notion/request/#{socket.assigns.node.id}")}
 
-      @google ->
-        {:noreply, redirect(socket, to: "/auth/google/request/#{socket.assigns.node.id}")}
+      # @google ->
+      #   {:noreply, redirect(socket, to: "/auth/google/request/#{socket.assigns.node.id}")}
 
       _ ->
         Logger.error("Attempt to try and auth an integration that is not part of the list")
@@ -202,11 +202,7 @@ defmodule LeafNodeWeb.Components.NodeIntegration do
   # TODO: we need to make the items part of the enum
   def render_integration_settings(service_type) do
     case service_type do
-      "google_send_mail" ->
-        LeafNode.Integrations.Google.Mail.input_info()
-      "google_sheet_write" ->
-        LeafNode.Integrations.Google.Sheets.input_info()
-      "notion_page_write" ->
+      "notion_page_read" ->
         LeafNode.Integrations.Notion.Pages.input_info()
     end
   end

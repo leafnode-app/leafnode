@@ -1,61 +1,76 @@
 defmodule LeafNode.Integrations.Notion.Pages do
   @moduledoc """
-    The Notion integrations and helper functions in order to interact with it
+  The Notion integrations and helper functions in order to interact with it
   """
   @notion_version "2021-05-13"
+  @block_limit 50
+  # We dont need to process these keys for now
+  @keys_to_remove [
+    "archived",
+    "created_by",
+    "created_time",
+    "has_children",
+    "id",
+    "in_trash",
+    "last_edited_by",
+    "last_edited_time",
+    "object",
+    "parent",
+  ]
 
-  @doc """
-    The metadata to get information on how to render the fields in order to interact with the interaction
-  """
-  # TODO: This could be changed to use json schema - we can then get this info based on selected type and render it
+  # Form details
   def input_info() do
     [
-      {"page_id", "Page Id", "text", "The Notion page ID. Use [[input.payload.any_key]] for dynamic data. E.g., [[input.payload.some_id]]."},
-      {"content", "Content", "text", "Content for the Notion page. Use [[input.payload.any_key]] for dynamic data. E.g., [[input.payload.text_content]]."}
+      {"page_id", "Page Id", "text", "The notion page id you will grant access for"},
+      # {"content", "Content", "text", "Content for the Notion page. Use [[input.payload.any_key]] for dynamic data. E.g., [[input.payload.text_content]]."}
     ]
   end
 
-  @spec append_content(any(), any(), any()) :: {:error, any()} | {:ok, any()}
-  @doc """
-    Append values to notion page - this is a basic block, it can be changed later
-  """
-  def append_content(page_id, token, content) do
-    url = "https://api.notion.com/v1/blocks/#{page_id}/children"
+  def read_content(page_id, token) do
+    url = "https://api.notion.com/v1/blocks/#{page_id}/children?page_size=#{@block_limit}"
 
     headers = [
       {"Authorization", "Bearer #{token}"},
-      {"Notion-Version", @notion_version},
-      {"Content-Type", "application/json"}
+      {"Notion-Version", @notion_version}
     ]
 
-    body = %{
-      children: [
-        %{
-          object: "block",
-          type: "paragraph",
-          paragraph: %{
-            text: [
-              %{
-                type: "text",
-                text: %{
-                  content: content
-                }
-              }
-            ]
-          }
-        }
-      ]
-    }
-
-    # TODO: cleanup how we render the data for the responses
-    case HTTPoison.patch(url, Jason.encode!(body), headers) do
-      {:ok, %HTTPoison.Response{status_code: status, body: body}} ->
-        if status === 200 do
-          {:ok, Jason.decode!(body)}
-        else
-          {:error, Jason.decode!(body)}
-        end
+    case HTTPoison.get(url, headers) do
+      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
+        # We extract text or plain text if possible
+        # We only return type and text value for the non nil types
+        data = Enum.reduce(drop_keys(Jason.decode!(body)["results"]), [], fn item, acc ->
+          if is_nil(item["text"]) do
+            acc
+          else
+            [item | acc]
+          end
+        end)
+        {:ok, data}
       _ -> {:error, "There was an error"}
     end
+  end
+
+  # Drop keyys we dont need and refute non relevant strings
+  defp drop_keys([]), do: %{}
+  defp drop_keys(data) do
+    Enum.map(data, fn item ->
+      type_data =
+        Map.get(item, item["type"], %{})
+
+      text_list = Map.get(type_data, "text")
+      extracted_text = extract_plain_text(text_list)
+
+      Map.drop(item, @keys_to_remove)
+        |> Map.delete(item["type"])
+        |> Map.put("text", extracted_text)
+    end)
+  end
+
+  # We try get the text out the blocks
+  # TODO: we can make this better and not check index?
+  defp extract_plain_text(nil), do: nil
+  defp extract_plain_text([]), do: nil
+  defp extract_plain_text(data) do
+    Enum.at(data, 0)["plain_text"]
   end
 end

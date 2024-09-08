@@ -31,7 +31,7 @@ defmodule LeafNodeWeb.NodesLive do
               <button
                 phx-click="node_create"
                 class="bg-blue-700 hover:bg-blue-600 py-2 px-4 text-sm rounded transition duration-200 ease-in-out">
-                Create
+                <%= gettext("Create a new node") %>
               </button>
             </div>
 
@@ -49,15 +49,15 @@ defmodule LeafNodeWeb.NodesLive do
                 <button
                   phx-click="regenerate_extension_token"
                   class="bg-blue-700 hover:bg-blue-600 py-2 px-4 text-sm rounded transition duration-200 ease-in-out">
-                  Generate
+                  <%= gettext("Generate") %>
                 </button>
               </div>
-              <p class="text-xs text-zinc-600 pt-2">Use with browser extention to access nodes</p>
+              <p class="text-xs text-zinc-600 pt-2"><%= gettext("Use with browser extention to access nodes") %></p>
             </div>
           </div>
         </div>
         <%= if is_nil(@nodes) or Kernel.length(@nodes) < 1 do %>
-          <p class="text-gray-500"> There are no nodes, create a new one to get started</p>
+          <p class="text-gray-500"> <%= gettext("There are no nodes, create a new one to get started") %></p>
         <% else %>
           <ul class="space-y-4">
             <%= for node <- @nodes do %>
@@ -78,7 +78,7 @@ defmodule LeafNodeWeb.NodesLive do
                     <div class="space-x-2">
                       <!-- Destructive Button -->
                       <button phx-click="node_delete" phx-value-id={node.id} class="bg-red-700 hover:bg-red-600 text-white py-1 px-3 rounded text-sm transition duration-200 ease-in-out">
-                        Delete
+                        <%= gettext("Delete") %>
                       </button>
                     </div>
                   </div>

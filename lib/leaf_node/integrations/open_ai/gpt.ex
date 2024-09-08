@@ -8,18 +8,44 @@ defmodule LeafNode.Integrations.OpenAi.Gpt do
   @doc """
     Send through the payload and a string of process or what you want to process against the payload
   """
-  def prompt(payload, process) do
+  def prompt(payload, process, :node) do
     if !is_nil(config(:token)) do
       body_payload = Map.put(
-        %{
-          "temperature" => 0.25,
-          "model" => config(:model),
-          "response_format" => %{ "type" => "json_object"}
-        }, "messages",
+        model_settings(), "messages",
         [
           %{
             "role" => "system",
-            "content" => query(payload, process)
+            "content" => query_node(payload, process)
+          }
+        ]
+      )
+
+      {status, resp} = HTTPoison.post(
+        config(:completions_url),
+        Jason.encode!(body_payload),
+        [
+          {"Content-type", "application/json"},
+          {"Authorization", "Bearer #{config(:token)}"}
+        ],
+        recv_timeout: @timeout
+      )
+      case status do
+        :ok -> handle_response(resp)
+        :error -> {:error, "There was an error: #{resp}"}
+      end
+    else
+      {:error, "There was an error getting the OPEN_AI key, check env variables"}
+    end
+  end
+
+  def prompt(payload, user_id, :assistant) do
+    if !is_nil(config(:token)) do
+      body_payload = Map.put(
+        model_settings(), "messages",
+        [
+          %{
+            "role" => "system",
+            "content" => query_assistant(payload, user_id)
           }
         ]
       )
@@ -48,7 +74,7 @@ defmodule LeafNode.Integrations.OpenAi.Gpt do
       200 ->
         resp = Jason.decode!(resp.body)
         {_status, data} = return_choice_by_index(resp, 0)
-        {:ok, data}
+        {:ok, Jason.decode!(data)}
       _ ->
         {
           :error,
@@ -66,7 +92,7 @@ defmodule LeafNode.Integrations.OpenAi.Gpt do
   @doc """
     The prompt function that we can call to get teh prompt
   """
-  def query(payload, input_process) do
+  defp query_node(payload, input_process) do
     "You are a system that processes data. You will receive an input payload and an input_process string. Use the input_process to process and respond based on the payload. Always return a string as a response.
 
     Important notes:
@@ -76,7 +102,7 @@ defmodule LeafNode.Integrations.OpenAi.Gpt do
     - Instead of saying you cant do something, if you cant - always suggest an improvement to the passed data or if there is no imporovement, return false.
 
     Final notes:
-    Return a JSON response in the format of:
+    Return a json response in the format of:
     {
       data: [THE PROCESSED RESPONSE BASED ON THE PAYLOAD AND INPUT PROCESS],
       improvement: [THE SUGGESTED IMPROVEMENT IF THERE IS OR NILL]
@@ -90,14 +116,65 @@ defmodule LeafNode.Integrations.OpenAi.Gpt do
     input_process: #{input_process}"
   end
 
+  @doc """
+    Query the assistant to get the nodes and the question if applicable
+  """
+  defp query_assistant(payload, user_id) do
+    """
+    Provide valid JSON output.
+    You will be given a thread of data representing a conversation or a series of messages.
+    Your task is to determine whether the conversation includes a question specifically directed at you.
+    Your question needs to be generated as if someone asked and you are going to ask on behalf of them, it shouldnt be vague but based
+    off the conversations, a question you can ask the node.
+
+    When you identify a question, compare it against the list of nodes provided below. Each node has a title and description to help you decide which node is most relevant to the question.
+
+    - If a relevant node is found, formulate a question that could be asked of that node to obtain an answer.
+    - If there are nodes available but none are relevant, return 'false'.
+    - If no nodes are available or you cannot determine the relevance, politely say that you cannot help and suggest that nodes need to be added.
+
+    Input Data (Conversation): #{Jason.encode!(payload)}
+
+    Nodes List: #{Jason.encode!(get_nodes(user_id))}
+
+    Your response should follow one of these formats:
+
+    **Failure (no relevant node found):**
+    {
+      "message": false
+    }
+
+    **Success (relevant node found):**
+    {
+      "message": "[your formulated question based on the input data]",
+      "node": "[the relevant node ID]"
+    }
+
+    Please follow these instructions carefully, and avoid making assumptions beyond the provided data. Make sure to onle return
+    node information if there is a node that could work based on the title and description, IT IS FALSE OTHERWISE!
+    """
+  end
+
+
+  # Get the model settings for the prompt
+  defp model_settings() do
+    %{
+      "temperature" => 0,
+      "model" => config(:model),
+      "response_format" => %{ "type" => "json_object"}
+    }
+  end
+
   # Get user nodes
-  def get_nodes(user_id) do
+  defp get_nodes(user_id) do
     case LeafNode.Repo.Node.list_nodes(user_id) do
       {:ok, nodes} ->
         Enum.filter(nodes, fn node -> node.enabled end)
-          |> Enum.reduce("",fn node, acc ->
-            acc <> "title: #{node.title} \ndescription: #{node.description} \nid: #{node.id}\n\n"
-          end)
+        |> Enum.map(fn node -> %{
+          title: node.title,
+          description: node.description,
+          id: node.id
+        } end)
       {:error, _err} ->
         Logger.error("No nodes to add")
         "No thing found"

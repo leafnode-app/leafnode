@@ -8,7 +8,7 @@ export DB_PORT=5432
 
 # Open AI
 export OPEN_AI=
-export OPEN_AI_MODEL=
+export OPEN_AI_MODEL=gpt-4o-mini
 
 # phx host - make sure the PHX_HOST is the domain where it will be hosted
 export PHX_HOST=localhost

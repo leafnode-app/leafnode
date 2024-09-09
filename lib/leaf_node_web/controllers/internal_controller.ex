@@ -3,6 +3,7 @@ defmodule LeafNodeWeb.InternalController do
     Controller connecting to the internal services
   """
   use LeafNodeWeb, :controller
+  alias LeafNode.Integrations.OpenAi.Gpt
 
   import Plug.Conn
 
@@ -22,10 +23,13 @@ defmodule LeafNodeWeb.InternalController do
       "bcc" => Map.get(params, "Bcc"),
     }
 
-    #  We need to make sure we get the body in the correct format and pass that along
-    LeafNodeWeb.Api.NodeController.execute_node(conn, payload)
-
-    # TODO: take the result and pass it back to get it sent off as a response with the context
+    # Separate task to run on its own process when executing
+    result = Gpt.prompt(payload["text_body"], conn.private.user_id, :assistant)
+    IO.inspect(result, label: "AI RESPPONSE")
+    # Task.start(fn ->
+    #   LeafNodeWeb.Api.NodeController.execute_node(conn, payload)
+    # end)
+    conn
   end
 
   # clean up the conversation for a consistent format
@@ -33,6 +37,4 @@ defmodule LeafNodeWeb.InternalController do
   defp clean_conversation_data(string) do
     string |> String.split("\n") |> Enum.at(0)
   end
-
-
 end

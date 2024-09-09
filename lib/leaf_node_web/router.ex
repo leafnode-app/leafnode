@@ -114,6 +114,7 @@ defmodule LeafNodeWeb.Router do
   # Internal routes to trigger and execute nodes
   scope "/internal", LeafNodeWeb do
     # TODO: add plug to confirm keys between services
+    # TODO: We need a user generated email and not node
     pipe_through [:node_email_check, :api]
     post "/trigger/:email", InternalController, :trigger
   end

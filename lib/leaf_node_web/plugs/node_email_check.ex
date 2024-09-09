@@ -24,6 +24,7 @@ defmodule LeafNodeWeb.Plugs.NodeEmailCheck do
       _ ->
         conn
         |> put_private(:node_id, node.id)
+        |> put_private(:user_id, node.user_id)
     end
   end
 end

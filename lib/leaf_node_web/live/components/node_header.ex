@@ -13,7 +13,7 @@ defmodule LeafNodeWeb.Components.NodeHeader do
     ~H"""
       <div>
         <div phx-click="back_home" phx-target={@myself} class="text-white cursor-pointer mb-2">  &larr; Back </div>
-        <div class="bg-zinc-900 rounded-lg py-4 px-2 border border-stone-900">
+        <div class="border border-gray-700 bg-zinc-900 rounded-lg py-4 px-2">
           <div class="flex gap-3 p-2">
             <form class="flex-grow">
               <label for="node-description" class="text-sm text-white">Title</label>

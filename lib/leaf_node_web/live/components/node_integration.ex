@@ -29,7 +29,7 @@ defmodule LeafNodeWeb.Components.NodeIntegration do
 
   def render(assigns) do
     ~H"""
-    <div class="flex-1 bg-zinc-900 h-100% py-4 px-2 rounded-lg border border-stone-900">
+    <div class="border border-gray-700 bg-zinc-900 rounded-lg py-4 px-2">
       <%
         integration_action = String.split(@service_type, "_") |> Enum.at(0)
         integration_action_str = String.capitalize(integration_action) |> String.split("_") |> Enum.at(0)
@@ -37,7 +37,7 @@ defmodule LeafNodeWeb.Components.NodeIntegration do
 
       <%!-- TODO: need to have a separate things for connecting integrations that could be next to it? --%>
       <div class="flex flex-col p-4 h-full gap-1 justify-center flex-1">
-        <div class="node_block_wrapper box_input_inset_shadow cursor-pointer mb-4 hover:bg-zinc-900" phx-target={@myself} phx-click="open_modal">
+        <div class="node_block_wrapper box_input_inset_shadow cursor-pointer mb-4 bg-zinc-900 hover:bg-zinc-800" phx-target={@myself} phx-click="open_modal">
           <p class="text-gray-500">
             <%= if @service_type === "none" do %>
               Add integration

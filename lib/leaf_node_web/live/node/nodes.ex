@@ -23,26 +23,24 @@ defmodule LeafNodeWeb.NodesLive do
     ~H"""
       <!-- Header -->
       <div>
-        <div>
-          <div class="premium-border flex justify-between items-center mt-10 mb-2 gap-2 rounded px-4 py-2 bg-gray-900">
-            <div class="flex flex-col pb-1">
-              <div class="flex flex-row items-center justify-content gap-4">
-                <%= Heroicons.icon("arrow-path", type: "solid", class: "h-10 w-5 hover:cursor-pointer", phx_click: "regenerate_agent_email") %>
-                <div
-                  class="text-blue-400 text-sm rounded-lg border-stone-900 block"
-                >
-                  <%= if @agent, do: @agent.email, else: "No Agent Email" %>
-                </div>
+        <div class="premium-border flex justify-between items-center mt-5 mb-2 gap-2 rounded px-4 py-2 bg-gray-900">
+          <div class="flex flex-col pb-1">
+            <div class="flex flex-row items-center justify-content gap-4">
+              <%= Heroicons.icon("arrow-path", type: "solid", class: "h-10 w-5 hover:cursor-pointer", phx_click: "regenerate_agent_email") %>
+              <div
+                class="text-blue-400 text-sm rounded-lg border-stone-900 block"
+              >
+                <%= if @agent, do: @agent.email, else: "No Agent Email" %>
               </div>
-              <p class="text-xs text-gray-300"><%= gettext("Generate/Regenerate an email address you can use to communicate with your agent") %></p>
-              <p class="text-xs text-gray-300"><%= gettext("Agent will listen and using Notion, answer questions using relevant node") %></p>
             </div>
-            <button
-              phx-click="node_create"
-              class="bg-blue-700 hover:bg-blue-600 py-2 px-4 text-sm rounded transition duration-200 ease-in-out">
-              <%= gettext("Create node") %>
-            </button>
+            <p class="text-xs text-gray-300"><%= gettext("Generate/Regenerate an email address you can use to communicate with your agent") %></p>
+            <p class="text-xs text-gray-300"><%= gettext("Agent will listen and using Notion, answer questions using relevant node") %></p>
           </div>
+          <button
+            phx-click="node_create"
+            class="bg-blue-700 hover:bg-blue-600 py-2 px-4 text-sm rounded transition duration-200 ease-in-out">
+            <%= gettext("Create node") %>
+          </button>
         </div>
 
         <%= if is_nil(@nodes) or Kernel.length(@nodes) < 1 do %>
@@ -50,26 +48,35 @@ defmodule LeafNodeWeb.NodesLive do
         <% else %>
           <ul class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
             <%= for node <- @nodes do %>
-              <li phx-click="node_edit" phx-value-id={node.id} class="relative bg-zinc-900 transition duration-200 ease-in-out rounded-lg">
-                <button phx-click="node_delete" phx-value-id={node.id} class="absolute top-2 right-2 text-red-700 hover:text-red-400 transition duration-200 ease-in-out">
-                  <%= Heroicons.icon("x-mark", type: "solid", class: "h-6 w-6") %>
-                </button>
+              <li phx-click="node_edit" phx-value-id={node.id} class="relative border border-gray-700 bg-zinc-800 hover:bg-zinc-900 transition duration-200 ease-in-out rounded-lg">
                 <div class="block cursor-pointer p-4 h-full">
                   <div class="flex flex-col justify-between h-full">
-                    <div>
-                      <h2 class="text-lg font-semibold text-white truncate">
+                    <div class="mb-2 flex items-center gap-3 justify-between">
+                      <div class="flex items-center gap-2">
+                        <%= if node.enabled do %>
+                          <%= Heroicons.icon("play", type: "mini", class: "h-4 w-4 text-green-400") %>
+                        <% else %>
+                          <%= Heroicons.icon("pause", type: "mini", class: "h-4 w-4 text-yellow-400") %>
+                        <% end %>
+                      </div>
+                      <h2 class="text-lg flex items-center font-semibold text-white truncate text-ellipsis">
                         <%= node.title %>
                       </h2>
-                      <p class="text-gray-400 text-xs truncate">
-                        <%= node.id %>
-                      </p>
-                      <p class="text-gray-400 mt-3 truncate">
-                        <%= node.description %>
-                      </p>
+                      <button phx-click="node_delete" phx-value-id={node.id} class="ml-auto">
+                        <%= Heroicons.icon("x-mark", type: "outline", class: "h-6 w-6 text-red-700 hover:text-red-400 transition duration-200 ease-in-out") %>
+                      </button>
                     </div>
+
+                    <p class="text-gray-400 text-xs truncate text-ellipsis">
+                      <%= node.id %>
+                    </p>
+                    <p class="text-gray-400 mt-3 truncate text-ellipsis">
+                      <%= node.description %>
+                    </p>
                   </div>
                 </div>
               </li>
+
             <% end %>
           </ul>
         <% end %>

@@ -8,7 +8,7 @@ defmodule LeafNodeWeb.Components.NodeDetails do
 
   def render(assigns) do
     ~H"""
-      <div class="bg-zinc-900 py-4 px-2 h-100% rounded-lg border border-stone-900">
+      <div class="border border-gray-700 bg-zinc-900 rounded-lg py-4 px-2">
         <%!-- <div>
           <input
             type="text"

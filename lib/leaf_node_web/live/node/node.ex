@@ -46,8 +46,9 @@ defmodule LeafNodeWeb.NodeLive do
     <div>
       <.live_component module={NodeHeader} id="node_header" node={@node} />
       <div class="py-1"/>
-        <.live_component module={NodeIntegration} id="node_integrations" node={@node} current_user={@current_user} />
-        <.live_component module={NodeDetails} id="node_details" node={@node} />
+      <.live_component module={NodeIntegration} id="node_integrations" node={@node} current_user={@current_user} />
+      <div class="py-1"/>
+      <.live_component module={NodeDetails} id="node_details" node={@node} />
       <%!-- <div class="md:flex md:flex-row sm:gap-1">
         We dont need these as we will have the system decide the quesation and this is just for Notion for now
         <div class="flex flex-col gap-2 md:flex-1">

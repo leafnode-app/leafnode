@@ -30,7 +30,7 @@ defmodule LeafNodeWeb.Router do
     plug LeafNodeWeb.Plugs.ExtensionKeyAuth
   end
 
-  pipeline :node_email_check do
+  pipeline :user do
     plug LeafNodeWeb.Plugs.NodeEmailCheck
   end
 
@@ -115,7 +115,7 @@ defmodule LeafNodeWeb.Router do
   scope "/internal", LeafNodeWeb do
     # TODO: add plug to confirm keys between services
     # TODO: We need a user generated email and not node
-    pipe_through [:node_email_check, :api]
+    pipe_through [:user, :api]
     post "/trigger/:email", InternalController, :trigger
   end
 

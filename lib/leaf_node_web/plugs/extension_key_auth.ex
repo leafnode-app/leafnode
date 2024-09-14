@@ -3,7 +3,6 @@ defmodule LeafNodeWeb.Plugs.ExtensionKeyAuth do
     Check the call for the extension key used
   """
   import Plug.Conn
-  alias LeafNode.Repo.Node
 
   @doc """
     Initialize the conneciton with opts to be passed when passing the connection through the plug

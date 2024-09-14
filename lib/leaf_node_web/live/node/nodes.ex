@@ -36,7 +36,7 @@ defmodule LeafNodeWeb.NodesLive do
             </div>
 
             <%!-- Here we show the relevant extension token --%>
-            <div>
+            <%!-- <div>
               <div class="premium-border w-auto flex justify-center gap-2 p-1">
                 <input
                   type="text"
@@ -53,7 +53,8 @@ defmodule LeafNodeWeb.NodesLive do
                 </button>
               </div>
               <p class="text-xs text-zinc-600 pt-2"><%= gettext("Use with browser extention to access nodes") %></p>
-            </div>
+            </div> --%>
+            <%!-- TODO: adding the auth and connecting to integrations --%>
           </div>
         </div>
         <%= if is_nil(@nodes) or Kernel.length(@nodes) < 1 do %>

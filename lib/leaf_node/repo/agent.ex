@@ -10,8 +10,7 @@ defmodule LeafNode.Repo.Agent do
     Create a agent - genreate an id and pass payload to be persisted
   """
   def create_agent(user_id) do
-    # This generates a random email using a UUID for the agent
-    email = UUID.uuid4() <> "@" <> config(:domain)
+    email = generate_email()
     changeset =
       Schemas.Agent.changeset(
         %Schemas.Agent{},
@@ -50,17 +49,14 @@ defmodule LeafNode.Repo.Agent do
           {:error, "There was a problem trying to get the agent for user #{user_id}"}
       end
 
-    IO.inspect(agent_data)
     case agent_data do
       {:ok, %Schemas.Agent{user_id: _user_id, id: id}} ->
-        email = UUID.uuid4() <> "@" <> config(:domain)
-        updat_agent = %{
+        email = generate_email()
+        %{
           "id" => id,
           "email" => email,
           "email_hash" => email
-        }
-
-        edit_agent(updat_agent)
+        } |> edit_agent()
 
       _ ->
         {:error, "There was a problem trying to regenerate a agent email"}
@@ -134,26 +130,15 @@ defmodule LeafNode.Repo.Agent do
     Get the details of a agent by user_id
   """
   def get_agent(user_id) do
-    result =
-      try do
-        n = LeafNodeRepo.get_by!(Schemas.Agent, %{ user_id: user_id})
-
-        {:ok,
-         %{
-           id: n.id,
-           email: n.email,
-           name: n.name,
-           user_id: n.user_id
-         }}
-      rescue
-        _e ->
-          {:error, "There was an error trying to get the agent"}
-      end
-
-    case result do
-      {:ok, data} -> {:ok, data}
-      _ -> {:error, "There was an error getting the current agent"}
+    case LeafNodeRepo.get_by(Schemas.Agent, %{user_id: user_id}) do
+      nil -> {:error, "There was an error getting the current agent"}
+      agent -> {:ok, agent}
     end
+  end
+
+  # Generate a new email
+  def generate_email() do
+    UUID.uuid4() <> "@" <> config(:domain)
   end
 
   defp config() do

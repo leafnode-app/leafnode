@@ -7,15 +7,14 @@ defmodule LeafNodeWeb.NodesLive do
   require Logger
 
   def mount(_params, _session, socket) do
-
-    token_data = case resp = LeafNode.Repo.ExtensionToken.get_token_by_user(socket.assigns.current_user.id) do
-      nil -> %{ id: nil, token: nil}
-      _ -> %{ id: resp.id, token: resp.token}
+    agent = case LeafNode.Repo.Agent.get_agent(socket.assigns.current_user.id) do
+      {:ok, agent} -> %{ id: agent.id, email: agent.email}
+      _ -> false
     end
 
     socket = socket
       |> assign(:nodes, get_nodes(socket))
-      |> assign(:extension_details, token_data)
+      |> assign(:agent, agent)
     {:ok, socket}
   end
 
@@ -25,36 +24,24 @@ defmodule LeafNodeWeb.NodesLive do
       <!-- Header -->
       <div>
         <div>
-          <div class="flex justify-between items-center mt-10 mb-4">
-            <!-- Primary Button -->
-            <div class="w-full ">
-              <button
-                phx-click="node_create"
-                class="bg-blue-700 hover:bg-blue-600 py-2 px-4 text-sm rounded transition duration-200 ease-in-out">
-                <%= gettext("Create a new node") %>
-              </button>
-            </div>
-
-            <%!-- Here we show the relevant extension token --%>
-            <%!-- <div>
-              <div class="premium-border w-auto flex justify-center gap-2 p-1">
-                <input
-                  type="text"
-                  id="disabled-input"
-                  aria-label="disabled input"
-                  class="box_input_inset_shadow disabled text-zinc-800 text-sm rounded-lg border-stone-900 block dark:text-gray-400"
-                  value={@extension_details.token || "No token"}
-                  disabled
-                />
-                <button
-                  phx-click="regenerate_extension_token"
-                  class="bg-blue-700 hover:bg-blue-600 py-2 px-4 text-sm rounded transition duration-200 ease-in-out">
-                  <%= gettext("Generate") %>
-                </button>
+          <div class="flex justify-between items-center mt-10 mb-2 gap-2">
+            <div class="flex flex-col pb-1">
+              <div class="flex flex-row items-center justify-content gap-4">
+                <%= Heroicons.icon("arrow-path", type: "solid", class: "h-10 w-5 hover:cursor-pointer", phx_click: "regenerate_agent_email") %>
+                <div
+                  class="disabled text-zinc-800 text-sm rounded-lg border-stone-900 block dark:text-gray-400"
+                >
+                  <%= if @agent, do: @agent.email, else: "No Agent Email" %>
+                </div>
               </div>
-              <p class="text-xs text-zinc-600 pt-2"><%= gettext("Use with browser extention to access nodes") %></p>
-            </div> --%>
-            <%!-- TODO: adding the auth and connecting to integrations --%>
+              <p class="text-xs text-zinc-600"><%= gettext("Generate user agent email address that you can email") %></p>
+              <p class="text-xs text-zinc-600"><%= gettext("Agent will query each node connected data") %></p>
+            </div>
+            <button
+              phx-click="node_create"
+              class="bg-blue-700 hover:bg-blue-600 py-2 px-4 text-sm rounded transition duration-200 ease-in-out">
+              <%= gettext("Create node") %>
+            </button>
           </div>
         </div>
         <%= if is_nil(@nodes) or Kernel.length(@nodes) < 1 do %>
@@ -109,17 +96,23 @@ defmodule LeafNodeWeb.NodesLive do
     {:noreply, socket}
   end
 
-  def handle_event("regenerate_extension_token", _, socket) do
-    # user = socket.assigns.current_user
-    %{id: extension_id} = socket.assigns.extension_details
+  def handle_event("regenerate_agent_email", _, socket) do
+    user_id = socket.assigns.current_user.id
     socket =
-      case LeafNode.Repo.ExtensionToken.regenerate_token(extension_id) do
+      case LeafNode.Repo.Agent.regenerate_email(user_id) do
         {:ok, _} ->
-          updated_token = LeafNode.Repo.ExtensionToken.get_token_by_user(socket.assigns.current_user.id)
-          socket |> assign(:extension_details, %{ id: updated_token.id, token: updated_token.token})
+          {_, agent} = LeafNode.Repo.Agent.get_agent(user_id)
+          socket |> assign(:agent, %{ id: agent.id, email: agent.email})
         {:error, _err} ->
-          token = LeafNode.Repo.ExtensionToken.generate_token(socket.assigns.current_user.id, UUID.uuid4())
-          socket |> assign(:extension_details, %{ id: token.id, token: token.token})
+          {status, _} = LeafNode.Repo.Agent.create_agent(user_id)
+          # TODO: move this to be better, maybe generate if not found?
+          # Here we get the newely made SUCCESSFUL agent
+          if status == :ok do
+            {_, agent} = LeafNode.Repo.Agent.get_agent(user_id)
+            socket |> assign(:agent, %{ id: agent.id, email: agent.email})
+          else
+            socket |> assign(:agent, false)
+          end
       end
 
     {:noreply, socket}

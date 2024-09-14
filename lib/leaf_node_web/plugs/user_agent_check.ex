@@ -1,4 +1,4 @@
-defmodule LeafNodeWeb.Plugs.NodeEmailCheck do
+defmodule LeafNodeWeb.Plugs.UserAgentCheck do
   @moduledoc """
     Check if the email is relevant on the system
   """
@@ -13,18 +13,19 @@ defmodule LeafNodeWeb.Plugs.NodeEmailCheck do
     The call function that gets called after init setup. We check the header and the access token
   """
   def call(%Plug.Conn{params: params} = conn, _opts) do
-    # get node to execute
-    node_email = params["To"]
-    node = LeafNode.Repo.get_by(LeafNode.Schemas.Node, email_hash: node_email)
-    case node do
+    # get agent to execute
+    agent_email = params["To"]
+    agent = LeafNode.Repo.get_by(LeafNode.Schemas.Agent, email_hash: agent_email)
+
+    case agent do
       nil ->
         conn
         |> send_resp(403, "Forbidden")
         |> halt()
       _ ->
         conn
-        |> put_private(:node_id, node.id)
-        |> put_private(:user_id, node.user_id)
+        |> put_private(:agent_id, agent.id)
+        |> put_private(:user_id, agent.user_id)
     end
   end
 end

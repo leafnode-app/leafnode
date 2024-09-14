@@ -25,7 +25,6 @@ defmodule LeafNodeWeb.InternalController do
 
     # Separate task to run on its own process when executing
     result = Gpt.prompt(payload["text_body"], conn.private.user_id, :assistant)
-    IO.inspect(result, label: "AI RESPPONSE")
     # Task.start(fn ->
     #   LeafNodeWeb.Api.NodeController.execute_node(conn, payload)
     # end)

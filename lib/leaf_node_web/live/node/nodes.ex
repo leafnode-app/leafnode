@@ -24,7 +24,7 @@ defmodule LeafNodeWeb.NodesLive do
       <!-- Header -->
       <div>
         <div>
-          <div class="flex justify-between items-center mt-10 mb-2 gap-2">
+          <div class="premium-border flex justify-between items-center mt-10 mb-2 gap-2 rounded px-4 py-2 bg-gray-900">
             <div class="flex flex-col pb-1">
               <div class="flex flex-row items-center justify-content gap-4">
                 <%= Heroicons.icon("arrow-path", type: "solid", class: "h-10 w-5 hover:cursor-pointer", phx_click: "regenerate_agent_email") %>
@@ -34,8 +34,8 @@ defmodule LeafNodeWeb.NodesLive do
                   <%= if @agent, do: @agent.email, else: "No Agent Email" %>
                 </div>
               </div>
-              <p class="text-xs text-zinc-600"><%= gettext("Generate user agent email address that you can email") %></p>
-              <p class="text-xs text-zinc-600"><%= gettext("Agent will query each node connected data") %></p>
+              <p class="text-xs text-gray-500"><%= gettext("Generate user agent email address that you can email") %></p>
+              <p class="text-xs text-gray-500"><%= gettext("Agent will query each node connected data") %></p>
             </div>
             <button
               phx-click="node_create"
@@ -44,33 +44,31 @@ defmodule LeafNodeWeb.NodesLive do
             </button>
           </div>
         </div>
+
         <%= if is_nil(@nodes) or Kernel.length(@nodes) < 1 do %>
-          <p class="text-gray-500"> <%= gettext("There are no nodes, create a new one to get started") %></p>
+          <p class="text-gray-500 px-4 py-4"> <%= gettext("There are no nodes, create a new one to get started") %></p>
         <% else %>
-          <ul class="space-y-4">
+          <ul class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
             <%= for node <- @nodes do %>
-              <li phx-click="node_edit" class="cursor-pointer" phx-value-id={node.id} >
-                <a class="cursor:pointer block bg-zinc-900 hover:bg-zinc-800 transition duration-200 ease-in-out p-4 rounded-lg">
-                  <div class="flex justify-between items-center">
+              <li phx-click="node_edit" phx-value-id={node.id} class="relative bg-zinc-900 transition duration-200 ease-in-out rounded-lg">
+                <button phx-click="node_delete" phx-value-id={node.id} class="absolute top-2 right-2 text-red-700 hover:text-red-400 transition duration-200 ease-in-out">
+                  <%= Heroicons.icon("x-mark", type: "solid", class: "h-6 w-6") %>
+                </button>
+                <div class="block cursor-pointer p-4 h-full">
+                  <div class="flex flex-col justify-between h-full">
                     <div>
-                      <h2 class="text-lg font-semibold text-white">
+                      <h2 class="text-lg font-semibold text-white truncate">
                         <%= node.title %>
                       </h2>
-                      <p class="text-gray-400">
-                        <%= node.description %>
-                      </p>
-                      <p class="text-gray-400 text-sm">
+                      <p class="text-gray-400 text-xs truncate">
                         <%= node.id %>
                       </p>
-                    </div>
-                    <div class="space-x-2">
-                      <!-- Destructive Button -->
-                      <button phx-click="node_delete" phx-value-id={node.id} class="bg-red-700 hover:bg-red-600 text-white py-1 px-3 rounded text-sm transition duration-200 ease-in-out">
-                        <%= gettext("Delete") %>
-                      </button>
+                      <p class="text-gray-400 mt-3 truncate">
+                        <%= node.description %>
+                      </p>
                     </div>
                   </div>
-                </a>
+                </div>
               </li>
             <% end %>
           </ul>
@@ -119,6 +117,7 @@ defmodule LeafNodeWeb.NodesLive do
   end
 
   def handle_event("node_edit", %{"id" => id, "value" => _}, socket) do
+    IO.inspect(id)
     socket = push_navigate(socket, to: "/dashboard/node/#{id}")
     {:noreply, socket}
   end

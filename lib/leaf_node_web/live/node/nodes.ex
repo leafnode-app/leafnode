@@ -29,13 +29,13 @@ defmodule LeafNodeWeb.NodesLive do
               <div class="flex flex-row items-center justify-content gap-4">
                 <%= Heroicons.icon("arrow-path", type: "solid", class: "h-10 w-5 hover:cursor-pointer", phx_click: "regenerate_agent_email") %>
                 <div
-                  class="disabled text-zinc-800 text-sm rounded-lg border-stone-900 block dark:text-gray-400"
+                  class="text-blue-400 text-sm rounded-lg border-stone-900 block"
                 >
                   <%= if @agent, do: @agent.email, else: "No Agent Email" %>
                 </div>
               </div>
-              <p class="text-xs text-gray-500"><%= gettext("Generate user agent email address that you can email") %></p>
-              <p class="text-xs text-gray-500"><%= gettext("Agent will query each node connected data") %></p>
+              <p class="text-xs text-gray-300"><%= gettext("Generate/Regenerate an email address you can use to communicate with your agent") %></p>
+              <p class="text-xs text-gray-300"><%= gettext("Agent will listen and using Notion, answer questions using relevant node") %></p>
             </div>
             <button
               phx-click="node_create"

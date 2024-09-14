@@ -3,6 +3,7 @@ defmodule LeafNodeWeb.Components.NodeHeader do
     The base component to manage the node header seciton
   """
   use Phoenix.LiveComponent
+  import LeafNodeWeb.Gettext
   require Logger
   alias LeafNodeWeb.Router.Helpers, as: Routes
 
@@ -39,9 +40,15 @@ defmodule LeafNodeWeb.Components.NodeHeader do
                 value={@node.description || "Untitled Document"}
               />
             </form>
-            <div class="px-1 cursor-pointer">
-              <i class="fa-solid fa-gear"></i>
-            </div>
+          </div>
+        </div>
+        <div class="premium-border flex items-center mt-2 gap-2 rounded p-3 bg-gray-900">
+          <div>
+          <%= Heroicons.icon("light-bulb", type: "outline", class: "h-8 w-8 text-yellow-200") %>
+          </div>
+          <div>
+            <p class="text-sm text-gray-300"><%= gettext("Make sure that your title and description is associated with what this node will be connected to.") %></p>
+            <p class="text-sm text-gray-300"><%= gettext("Feel free to be as detailed as possible as this determines the relevance of this node to the email context request.") %></p>
           </div>
         </div>
       </div>

@@ -52,9 +52,23 @@ defmodule LeafNodeWeb.InternalController do
       LeafNodeWeb.Api.NodeController.execute_node(ai_req, payload)
     end)
     # wait for server response result
-    resp = Task.await(task, @timeout)
+    %{ data: data, status: _} = Task.await(task, @timeout)
     # We send a email back with the response?
-    IO.inspect(resp, label: "PROCESS RESP")
+    Task.start(fn ->
+
+      # Struct for mail payload, this is when responding back to the original sender
+      # TODO: we can or need to look at making sure threaded messages are responded too as well
+      mail_payload =%{
+        "bcc" => payload["bcc"],
+        "cc" => payload["cc"],
+        "from" => payload["to"],
+        "subject" => "LeafNode AI",
+        "text" => data["message"],
+        "to" => payload["from"]
+      }
+
+      LeafNode.Client.MsgServer.post("/email/send", Jason.encode!(mail_payload))
+    end)
   end
   defp handle_response(%{ "message" => false }, _) do
     # We do nothing? The assistant does nothing

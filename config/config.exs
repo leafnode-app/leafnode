@@ -92,6 +92,14 @@ config :leaf_node, :cors_plug,
 config :leaf_node, :node_mail,
   domain: "leafnode.xyz"
 
+config :leaf_node, :internal_services,
+  msg_service: %{
+    host: "",
+    key: ""
+  }
+
+config :leaf_node, :app_key, ""
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"

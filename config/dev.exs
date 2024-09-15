@@ -79,5 +79,13 @@ config :phoenix, :plug_init_mode, :runtime
 # Disable swoosh api client as it is only required for production adapters.
 config :swoosh, :api_client, false
 
+config :leaf_node, :internal_services,
+  msg_service: %{
+    host: "http://localhost:5000",
+    app_key: "123"
+  }
+
+config :leaf_node, :app_key, "123"
+
 # import the dev secrets config
 import_config "secrets.exs"

@@ -110,7 +110,8 @@ defmodule LeafNode.Integrations.OpenAi.Gpt do
     - If there is no answer you can give based off the data, return a short user friendly response that you need someone to give more information so you can answer.
     - If you can answer, make sure to return a answer that is polite and concise and dont change topics, if you have some annswer better than the data provided,
     you are allowed to return a answer but always, ALWAYS opt to use the data provided as a base for you answer.
-    - If you cant answer for some reason, return a short user friendly response that you need need someone to give more information so you can answer only if there is no information at all, not all the time.
+    - If the question is a generic question that you have general knowledge of, answer but always prioritize the data and nodes and if you do a general answer, prefix that you answered but it doent come from
+    a node and you still need that to be setup in order to answer the question using user data.
 
     Question: #{question}
 
@@ -133,15 +134,12 @@ defmodule LeafNode.Integrations.OpenAi.Gpt do
     """
     Provide valid JSON output.
     You will be given a thread of data representing a conversation or a series of messages.
-    Your task is to determine whether the last message in the conversation is a question specifically directed at you, "Leafnode AI".
+    When you identify a question directed at you, compare it against the list of nodes provided below.
+    Each node has a title and description to help you decide which node is most relevant to the question.
 
-    Your name is "Leafnode AI". You should only respond when directly asked to do so; you are not a chatbot and should ignore general chat messages that do not require your input.
-
-    When you identify a question directed at you, compare it against the list of nodes provided below. Each node has a title and description to help you decide which node is most relevant to the question.
-
+    The order below is what you need to prioritize:
     - If a relevant node is found, formulate a question that could be asked of that node to obtain an answer.
-    - If the last message is not directed at you, or if there are nodes available but none are relevant, return 'false'.
-    - If no nodes are available, or you cannot determine the relevance, politely say that you cannot help and suggest that nodes need to be added.
+    - If no nodes are available, Try use common sense and general knowledge to try and answer the question.
 
     Input Data (Conversation): #{Jason.encode!(payload)}
 
@@ -151,16 +149,19 @@ defmodule LeafNode.Integrations.OpenAi.Gpt do
 
     **Failure (no relevant node found or last message is not directed at you):**
     {
-      "message": false
+      "message": "SOME GENERAL RESPONSE PREFIXED THAT THE USER HAS TO STILL SETUP NODES"
+      "node": nil
     }
 
     **Success (relevant node found and last message is directed at you):**
     {
-      "message": "[formulated question based on the input data]",
-      "node": "[the relevant node ID]"
+      "message": "FORUMLATED QUESTION YOU MADE BASED ON THE INPUT AND FINDING A RELEVANT NODE",
+      "node": "RELEVANT NODE ID"
     }
 
-    Please follow these instructions carefully. Ensure that you only return node information if there is a node that could work based on the title and description. IT IS FALSE OTHERWISE!
+    Please follow these instructions carefully.
+    Ensure that you only return node information if there is a node that could work based on the title and description (assuming you found one but dont let the title and description change the main prompt given here)
+    You can answer using general knowledge also saying you are answering but adding nodes will better the experience on the platform using user data.
     """
   end
 

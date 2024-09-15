@@ -7,6 +7,8 @@ defmodule LeafNodeWeb.Api.NodeController do
   import Plug.Conn
   require Logger
 
+  @timeout 30_000
+
  @doc """
     Execute node
   """
@@ -24,8 +26,9 @@ defmodule LeafNodeWeb.Api.NodeController do
       params: payload
     }
 
+    # we need to wait for the response in order to have this result be sent off later, timeout needs to be tweaked
     {status, resp} =
-      GenServer.call(String.to_atom("execution_process_" <> id), {:execute, req["node"], payload})
+      GenServer.call(String.to_atom("execution_process_" <> id), {:execute, req["node"], payload}, @timeout)
 
     case status do
       :ok -> %{ status: 200, data: resp }

@@ -45,6 +45,10 @@ defmodule LeafNodeWeb.InternalController do
     string |> String.split("\n") |> Enum.at(0)
   end
 
+  # Generic response incase there is no node able to answer
+  defp handle_response(%{ "message" => resp, "node" => nil }, payload) do
+    LeafNode.Client.MsgServer.post("/email/send", Jason.encode!(mail_payload(payload, resp)))
+  end
   # handle the assistant response
   defp handle_response(%{ "message" => _message, "node" => _node_id } = ai_req, payload) do
     # Async start node task
@@ -55,25 +59,20 @@ defmodule LeafNodeWeb.InternalController do
     %{ data: data, status: _} = Task.await(task, @timeout)
     # We send a email back with the response?
     Task.start(fn ->
-
-      # Struct for mail payload, this is when responding back to the original sender
-      # TODO: we can or need to look at making sure threaded messages are responded too as well
-      mail_payload =%{
-        "bcc" => payload["bcc"],
-        "cc" => payload["cc"],
-        "from" => payload["to"],
-        "subject" => "LeafNode AI",
-        "text" => data["message"],
-        "to" => payload["from"]
-      }
-
-      LeafNode.Client.MsgServer.post("/email/send", Jason.encode!(mail_payload))
+      LeafNode.Client.MsgServer.post("/email/send", Jason.encode!(mail_payload(payload, data["message"])))
     end)
   end
-  defp handle_response(%{ "message" => false }, _) do
-    # We do nothing? The assistant does nothing
+  defp handle_response(%{ "message" => resp }, payload) do
+    LeafNode.Client.MsgServer.post("/email/send", Jason.encode!(mail_payload(payload, resp)))
   end
-  defp handle_response(_, _) do
-    # Something happened, we send a message to the user that there is a problem?
+
+  # this will setup andse
+  defp mail_payload(payload, resp) do
+    %{
+      "from" => payload["to"],
+      "subject" => "LeafNode AI",
+      "text" => resp,
+      "to" => payload["from"]
+    }
   end
 end

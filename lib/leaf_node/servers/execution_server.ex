@@ -4,7 +4,6 @@ defmodule LeafNode.Servers.ExecutionServer do
   """
   use GenServer
   require Logger
-  alias LeafNode.Repo.Expression
 
   @error_execution "There was an error executing the node"
 
@@ -34,18 +33,12 @@ defmodule LeafNode.Servers.ExecutionServer do
     Here we listen for the execution of the node
   """
   def handle_call({:execute, node_id, payload}, _form, state) do
-    # get the node
     {status, node} = LeafNode.Repo.Node.get_node(node_id)
-
     if node.enabled do
       # check node fetch data
       case status do
         :ok ->
-          {status, result} = start_execution(node, payload)
-          # TODO: change this so its better, we can return the AI processed data
-
-          {:stop, :normal, {status, result}, state}
-
+          {:stop, :normal, execute(node, payload), state}
         _ ->
           {:stop, :normal, {:error, @error_execution}, state}
       end
@@ -54,120 +47,19 @@ defmodule LeafNode.Servers.ExecutionServer do
     end
   end
 
-  @doc """
-    Executing the node itself
-  """
-  defp start_execution(node, payload) do
-    {status, resp} = Expression.get_expression_by_node(node.id)
-
-    case status do
-      :ok ->
-        execute(node, payload, resp)
-
-      _ ->
-        # failed to execute node
-        error_result = "Missing node expression"
-
-        LeafNode.log_result(
-          node,
-          payload,
-          LeafNode.Utils.Helpers.http_resp(404, false, error_result),
-          false
-        )
-
-        {:error, error_result}
-    end
-  end
-
   # The execution of the node expression against the payload
-  # TODO: clean up
-  defp execute(node, payload, expression) do
-    compute_expression_check(node, payload, expression)
+  defp execute(node, payload) do
+    case execute_integration(node) do
+      {:ok, data} ->
+        # We add okay response for the logs to run in the backgorund
+        LeafNode.Servers.TriggerInputProcess.query_ai(payload, data)
+      _ ->
+        {:error, "There was an error executing the integration"}
+    end
   end
 
   # Here we do the integration if the node has and the relevant result and conditions are met
-  defp execute_integration(node, payload) do
-      LeafNode.Servers.TriggerIntegration.integration_action(node.integration_settings["type"], node, payload)
-  end
-
-  # Process the input with input processed data
-  defp process_input(node, payload, input_process_data, input_process_status, enabled) when enabled == true do
-    # TODO: here we do checks if the user is doing processing for the input
-      {_status, processed_resp} =
-        LeafNode.Servers.TriggerInputProcess.query_ai(input_process_status, payload, input_process_data, node)
-
-      # We do a copy and join to payload if the user enabled AI so we can have the user select from the data
-      # TODO: this can or needs to change in future
-      Map.put(payload, "input_process_resp", processed_resp)
-  end
-  defp process_input(_, payload, _, _, _) do
-    Map.put(payload, "input_process_resp", %{})
-  end
-
-  # Check the expression and execute if if enabled
-  defp compute_expression_check(node, payload, expression) when expression.enabled do
-    {_, result} = LeafNode.Core.Code.execute(payload, expression)
-    {input_process_status, %{ async: async,  enabled: process_enabled} = input_process} = LeafNode.Repo.InputProcess.get_input_process_by_node(node.id)
-    LeafNode.log_result(node, payload, LeafNode.Utils.Helpers.http_resp(200, true, result), result)
-
-    base_resp = %{
-      cond: result,
-    }
-
-    data = if result do
-      if async do
-        # TODO: do we want to wait? we just let it run when it can
-        Task.start(fn ->
-          processed_data = process_input(node, payload, input_process, input_process_status, process_enabled)
-          execute_integration(node, processed_data)
-        end)
-
-        base_resp
-      else
-        processed_data = process_input(node, payload, input_process, input_process_status, process_enabled)
-
-        Task.start(fn ->
-          execute_integration(node, processed_data)
-        end)
-        %{
-          cond: result,
-          input_process_resp: processed_data["input_process_resp"]
-        }
-      end
-    else
-      base_resp
-    end
-
-
-    # Always return the result, the other work will run when it can
-    {:ok, data}
-  end
-  # We just attempt to run the processing and integrations if the expressions should be ignored
-  defp compute_expression_check(node, payload, expression) do
-    {input_process_status, %{ async: async,  enabled: process_enabled} = input_process} = LeafNode.Repo.InputProcess.get_input_process_by_node(node.id)
-    base_resp = %{}
-    LeafNode.log_result(node, payload, LeafNode.Utils.Helpers.http_resp(200, true, base_resp), true)
-
-    data = if async do
-      # TODO: do we want to wait? we just let it run when it can
-      Task.start(fn ->
-        processed_data = process_input(node, payload, input_process, input_process_status, process_enabled)
-        execute_integration(node, processed_data)
-      end)
-
-      base_resp
-    else
-      processed_data = process_input(node, payload, input_process, input_process_status, process_enabled)
-      Task.start(fn ->
-        execute_integration(node, processed_data)
-      end)
-      %{
-        input_process_resp: processed_data["input_process_resp"]
-      }
-    end
-
-
-    # Always return the result, the other work will run when it can
-    {:ok, data}
-  end
+  defp execute_integration(%{ integration_settings: settings } = node) do
+    LeafNode.Servers.TriggerIntegration.integration_action(settings["type"], node)
+end
 end

@@ -8,7 +8,7 @@ defmodule LeafNode.Integrations.OpenAi.Gpt do
   @doc """
     Send through the payload and a string of process or what you want to process against the payload
   """
-  def prompt(payload, process, :node) do
+  def prompt(question, data, :node) do
     if !is_nil(config(:token)) do
       body_payload =
         Map.put(
@@ -17,7 +17,7 @@ defmodule LeafNode.Integrations.OpenAi.Gpt do
           [
             %{
               "role" => "system",
-              "content" => query_node(payload, process)
+              "content" => query_node(question, data)
             }
           ]
         )
@@ -101,7 +101,7 @@ defmodule LeafNode.Integrations.OpenAi.Gpt do
   @doc """
     The prompt function that we can call to get teh prompt
   """
-  defp query_node(question, database) do
+  defp query_node(question, data) do
     """
     Provide valid JSON output.
     You will be posed a question, the question will be very specific and while this happens, you will also be given data associated with the topic.
@@ -114,7 +114,7 @@ defmodule LeafNode.Integrations.OpenAi.Gpt do
 
     Question: #{question}
 
-    Database for you to try provide an answer: #{Jason.encode!(database)}
+    Database for you to try provide an answer: #{Jason.encode!(data)}
 
     Response format:
     {

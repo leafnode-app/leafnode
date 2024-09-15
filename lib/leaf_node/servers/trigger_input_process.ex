@@ -7,21 +7,14 @@ defmodule LeafNode.Servers.TriggerInputProcess do
   @doc """
     Query AI with the
   """
-  def query_ai(status, payload, %{value: input_process_value, enabled: enabled} = _, node) when status === :ok do
-    # Check if enabled to run
-    if enabled do
-      {status, resp} = LeafNode.Integrations.OpenAi.Gpt.prompt(payload, input_process_value)
+  def query_ai(payload, data)do
+    {status, resp} = LeafNode.Integrations.OpenAi.Gpt.prompt(payload.req["message"], data, :node)
 
-      decoded_resp = Jason.decode!(resp)
-      case status do
-        :ok ->
-          {:ok, add_log_to_resp(decoded_resp, LeafNode.log_result(node, payload, decoded_resp, true))}
-        _ ->
-          {:error, add_log_to_resp(decoded_resp, LeafNode.log_result(node, payload, decoded_resp, false))}
-      end
-    else
-      # TODO: change this if not enabled
-      {:error, %{}}
+    case status do
+      :ok ->
+        {:ok, resp}
+      _ ->
+        {:error, "There was an error, unable to query AI - Unable to get a valid response"}
     end
   end
   def query_ai(_status, _payload, _, _node) do

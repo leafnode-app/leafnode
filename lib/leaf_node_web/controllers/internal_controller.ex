@@ -7,12 +7,13 @@ defmodule LeafNodeWeb.InternalController do
 
   import Plug.Conn
 
+  @timeout 30_000
   @doc """
     Trigger the node based on the email address
   """
   def trigger(conn, params) do
     payload = %{
-      "id" => conn.private.node_id,
+      "user_id" => conn.private.user_id,
       "subject" => Map.get(params, "Subject"),
       # The message will only be the last sent message in the conversation or thread
       "text_body" => clean_conversation_data(Map.get(params, "TextBody")),
@@ -23,17 +24,42 @@ defmodule LeafNodeWeb.InternalController do
       "bcc" => Map.get(params, "Bcc"),
     }
 
-    # Separate task to run on its own process when executing
-    result = Gpt.prompt(payload["text_body"], conn.private.user_id, :assistant)
-    # Task.start(fn ->
-    #   LeafNodeWeb.Api.NodeController.execute_node(conn, payload)
-    # end)
-    conn
+    # NOTE: make sure no crashing and managing different responses
+    {_status, resp} = try do
+      Gpt.prompt(payload["text_body"], conn.private.user_id, :assistant)
+    rescue
+      _ ->
+        {:error, %{ "message" => false}}
+    end
+
+    # manage handing the response
+    handle_response(resp, payload)
+
+    # Always return some response back to the caller
+    conn |> send_resp(200, Jason.encode!(%{}))
   end
 
   # clean up the conversation for a consistent format
   # We only care about latest message and not the whole conversation
   defp clean_conversation_data(string) do
     string |> String.split("\n") |> Enum.at(0)
+  end
+
+  # handle the assistant response
+  defp handle_response(%{ "message" => _message, "node" => _node_id } = ai_req, payload) do
+    # Async start node task
+    task = Task.async(fn ->
+      LeafNodeWeb.Api.NodeController.execute_node(ai_req, payload)
+    end)
+    # wait for server response result
+    resp = Task.await(task, @timeout)
+    # We send a email back with the response?
+    IO.inspect(resp, label: "PROCESS RESP")
+  end
+  defp handle_response(%{ "message" => false }, _) do
+    # We do nothing? The assistant does nothing
+  end
+  defp handle_response(_, _) do
+    # Something happened, we send a message to the user that there is a problem?
   end
 end

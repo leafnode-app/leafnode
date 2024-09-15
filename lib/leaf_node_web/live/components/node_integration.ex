@@ -52,15 +52,22 @@ defmodule LeafNodeWeb.Components.NodeIntegration do
           <div class="flex align-items justify-center gap-2">
             <%= if @has_oauth do %>
               <button
+                phx-click="oauth_access"
+                phx-value-oauth-type={integration_action}
+                phx-target={@myself}
+                class={"bg-yellow-700 hover:bg-yellow-600 py-2 px-4 text-sm rounded transition duration-200 ease-in-out w-auto self-center"}
+              >
+                Connect Pages
+              </button>
+              <button
                 phx-click="oauth_disconnect"
                 phx-value-oauth-type={integration_action}
                 phx-target={@myself}
-                class={"bg-blue-700 hover:bg-blue-600 py-2 px-4 text-sm rounded transition duration-200 ease-in-out w-auto self-center"}
+                class={"bg-red-700 hover:bg-red-600 py-2 px-4 text-sm rounded transition duration-200 ease-in-out w-auto self-center"}
               >
                 Disconnect <%= integration_action_str %>
               </button>
-
-            <%= else %>
+            <% else %>
               <button
                 phx-click="oauth_access"
                 phx-value-oauth-type={integration_action}

@@ -3,6 +3,7 @@ defmodule LeafNodeWeb.Components.NodeIntegration do
     General node side effect that would be expected to run
   """
   use Phoenix.LiveComponent
+  import LeafNodeWeb.Gettext
   import LeafNode.Repo.Node, only: [integrations_list: 0]
   require Logger
 
@@ -81,6 +82,19 @@ defmodule LeafNodeWeb.Components.NodeIntegration do
           </div>
         <% end %>
       </div>
+      <%= if @has_oauth do %>
+        <div class="premium-border flex items-center mt-2 gap-2 rounded p-3 bg-zinc-800">
+          <div>
+            <p class="text-sm text-gray-300"><%= gettext("Disconnect or connect more pages - make sure page id links to a page that the app has access to.") %></p>
+          </div>
+        </div>
+      <% else %>
+      <div class="premium-border flex items-center mt-2 gap-2 rounded p-3 bg-zinc-800">
+        <div>
+          <p class="text-sm text-gray-300"><%= gettext("Connect Notion Pages and then open modal to add the id of the page of an linked page.") %></p>
+        </div>
+      </div>
+      <% end %>
 
       <%= if @show_modal do %>
         <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">

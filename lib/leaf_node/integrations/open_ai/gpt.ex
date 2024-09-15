@@ -140,6 +140,8 @@ defmodule LeafNode.Integrations.OpenAi.Gpt do
     The order below is what you need to prioritize:
     - If a relevant node is found, formulate a question that could be asked of that node to obtain an answer.
     - If no nodes are available, Try use common sense and general knowledge to try and answer the question.
+    - Make sure your response does not use a lot of tokens, limit response maybe to 150 words if it is a general knowledge answer,
+    make sure to let the user know they need to add nodes and integration data in order to use their data.
 
     Input Data (Conversation): #{Jason.encode!(payload)}
 

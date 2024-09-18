@@ -22,9 +22,10 @@ defmodule LeafNodeWeb.InternalController do
       "to" => Map.get(params, "To"),
       "cc" => Map.get(params, "Cc"),
       "bcc" => Map.get(params, "Bcc"),
+      "in_reply_to" => get_message_id(params["Headers"]),
+      "references" => get_message_id(params["Headers"]),
     }
 
-    # NOTE: make sure no crashing and managing different responses
     {_status, resp} = try do
       Gpt.prompt(payload["text_body"], conn.private.user_id, :assistant)
     rescue
@@ -41,8 +42,20 @@ defmodule LeafNodeWeb.InternalController do
 
   # clean up the conversation for a consistent format
   # We only care about latest message and not the whole conversation
+  # TODO: Potentially limit the context here?
   defp clean_conversation_data(string) do
-    string |> String.split("\n") |> Enum.at(0)
+    # Unescape newlines
+    unescaped_data = String.replace(string, "\\n", "\n")
+
+    # Split the string into sections based on double newlines
+    sections = String.split(unescaped_data, ~r/\n{2,}/)
+
+    # Reduce the sections into a threaded format string
+    Enum.reduce(sections, "", fn section, acc ->
+      # Clean up leading/trailing whitespaces and join sections with a separator
+      cleaned_section = String.trim(section)
+      acc <> "\n\n" <> cleaned_section
+    end)
   end
 
   # Generic response incase there is no node able to answer
@@ -66,13 +79,24 @@ defmodule LeafNodeWeb.InternalController do
     LeafNode.Client.MsgServer.post("/email/send", Jason.encode!(mail_payload(payload, resp)))
   end
 
+  # Get the message id value
+  defp get_message_id(headers) do
+    %{ "Name" => _, "Value" => value } = headers
+      |> Enum.find(fn %{ "Name" => id, "Value" => _} -> id === "Message-ID"  end)
+
+    # The message id to use as reference and in reply to
+    value
+  end
+
   # this will setup andse
-  defp mail_payload(payload, resp) do
+  def mail_payload(payload, resp) do
     %{
       "from" => payload["to"],
-      "subject" => "LeafNode AI",
+      "subject" => payload["subject"],
       "text" => resp,
-      "to" => payload["from"]
+      "to" => payload["from"],
+      "in_reply_to" => payload["in_reply_to"],
+      "references" => payload["references"],
     }
   end
 end

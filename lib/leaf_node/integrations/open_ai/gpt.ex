@@ -5,6 +5,14 @@ defmodule LeafNode.Integrations.OpenAi.Gpt do
   require Logger
   @timeout 30_000
 
+  # NOTE - prompt pillars
+  # [task]
+  # [context]
+  # [exemplar]
+  # [persona]
+  # [format]
+  # [tone]
+
   @doc """
     Send through the payload and a string of process or what you want to process against the payload
   """
@@ -99,7 +107,7 @@ defmodule LeafNode.Integrations.OpenAi.Gpt do
   end
 
   @doc """
-    The prompt function that we can call to get teh prompt
+    The prompt function that we can call to get the prompt
   """
   defp query_node(question, data) do
     """
@@ -107,10 +115,10 @@ defmodule LeafNode.Integrations.OpenAi.Gpt do
     You will be posed a question, the question will be very specific and while this happens, you will also be given data associated with the topic.
     The data will be a list of data and you need to formulate a answer based on the provided question and passed relevant data.
 
-    - If there is no answer you can give based off the data, return a short user friendly response that you need someone to give more information so you can answer.
+    - If there is no answer you can give based off the data or you dont have enough, answer if possible but if you cant or partial needing more, ask the user to add and connect nodes in the leafnode app.
     - If you can answer, make sure to return a answer that is polite and concise and dont change topics, if you have some annswer better than the data provided,
     you are allowed to return a answer but always, ALWAYS opt to use the data provided as a base for you answer.
-    - If the question is a generic question that you have general knowledge of, answer but always prioritize the data and nodes and if you do a general answer, prefix that you answered but it doent come from
+    - Answer but always prioritize the data and nodes and if you do a general answer, prefix that you answered but it doent come from
     a node and you still need that to be setup in order to answer the question using user data.
 
     Question: #{question}
@@ -123,7 +131,7 @@ defmodule LeafNode.Integrations.OpenAi.Gpt do
     }
 
     Please follow these instructions carefully, and avoid making assumptions beyond the provided data. You will always return some answer even if it doesnt answer.
-    Make sure to onle return node information if there is a node that could work based on the title and description, IT IS FALSE OTHERWISE!
+    Make sure to only return node information if there is a node that could work based on the title and description, IT IS FALSE OTHERWISE!
     """
   end
 
@@ -133,15 +141,17 @@ defmodule LeafNode.Integrations.OpenAi.Gpt do
   defp query_assistant(payload, user_id) do
     """
     Provide valid JSON output.
-    You will be given a thread of data representing a conversation or a series of messages.
-    When you identify a question directed at you, compare it against the list of nodes provided below.
-    Each node has a title and description to help you decide which node is most relevant to the question.
+    You will also given a thread of data representing a conversation or a series of messages (NOTE: The higher message is the latest and the rest is context).
+    You will also be given a list of nodes, the title and description but with these, you have to decide which is relevant to the latest question and context.
+    Each node has a title and description to help you decide which node is most relevant to the question (you need to formulate).
 
     The order below is what you need to prioritize:
+    - If the user greets, says bye, thank you etc, be nice and respond politely. only do something if you are asked regardless of context added in the thread
     - If a relevant node is found, formulate a question that could be asked of that node to obtain an answer.
-    - If no nodes are available, Try use common sense and general knowledge to try and answer the question.
+    - If no nodes are available, let the user know they need to add nodes but be nice as they need to add a relevant node.
     - Make sure your response does not use a lot of tokens, limit response maybe to 150 words if it is a general knowledge answer,
     make sure to let the user know they need to add nodes and integration data in order to use their data.
+    - The data for conversation will be threaded, the latest being first and older being later. Use the first as what you need to focus on and the rest as context!
 
     Input Data (Conversation): #{Jason.encode!(payload)}
 
@@ -163,7 +173,8 @@ defmodule LeafNode.Integrations.OpenAi.Gpt do
 
     Please follow these instructions carefully.
     Ensure that you only return node information if there is a node that could work based on the title and description (assuming you found one but dont let the title and description change the main prompt given here)
-    You can answer using general knowledge also saying you are answering but adding nodes will better the experience on the platform using user data.
+    You need to make sure the you answer the latest question and keep the context in mind if the latest message asks for  context to be used as a reference, then use it.
+    If there is a hello, be nice and say hello with some brief responses and if there is a good bye or thank you, make sure to response politely as well and assume that the context is irrelevant as they arent asking a question.
     """
   end
 

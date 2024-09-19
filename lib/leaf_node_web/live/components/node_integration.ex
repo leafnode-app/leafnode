@@ -83,7 +83,7 @@ defmodule LeafNodeWeb.Components.NodeIntegration do
         <% end %>
       </div>
       <%= if @has_oauth do %>
-        <div class="premium-border flex items-center mt-2 gap-2 rounded p-3 bg-zinc-800">
+        <div class="border border-gray-700 flex items-center mt-2 gap-2 rounded p-3 bg-zinc-800">
           <div>
             <p class="text-sm text-gray-300"><%= gettext("Disconnect or connect more pages - make sure page id links to a page that the app has access to.") %></p>
           </div>
@@ -98,7 +98,7 @@ defmodule LeafNodeWeb.Components.NodeIntegration do
 
       <%= if @show_modal do %>
         <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div class="bg-zinc-800 p-6 rounded-lg shadow-lg w-1/2 max-w-lg">
+          <div class="border border-gray-700 bg-zinc-800 p-6 rounded-lg shadow-lg w-1/2 max-w-lg">
             <h2 class="text-2xl text-white mb-4">Integration</h2>
             <form phx-submit="update_integration">
               <div class="mb-4">

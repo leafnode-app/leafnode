@@ -13,6 +13,11 @@ defmodule LeafNode.Integrations.OpenAi.Gpt do
   # [format]
   # [tone]
 
+  # Context needs to be sumarized? beginning and end is higher prio to LLM
+  # Bring in a third person? Name so that its you doing things for a user (So that the system, the assistant and me are helping user X)
+  # Maybe add the context as messages and not add it to the body of the pompt? (Email threaded data)
+  # Make sure to bring the LLM back to main question, after context says something like "Now that we have context, help me answer the question" etc
+
   @doc """
     Send through the payload and a string of process or what you want to process against the payload
   """

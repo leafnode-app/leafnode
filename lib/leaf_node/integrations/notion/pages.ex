@@ -49,6 +49,23 @@ defmodule LeafNode.Integrations.Notion.Pages do
     end
   end
 
+  # Fetch children blocks and return their processed text recursively
+  defp fetch_children(block_id, token) do
+    url = "https://api.notion.com/v1/blocks/#{block_id}/children"
+
+    headers = [
+      {"Authorization", "Bearer #{token}"},
+      {"Notion-Version", @notion_version}
+    ]
+
+    case HTTPoison.get(url, headers) do
+      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
+        data = drop_keys(Jason.decode!(body)["results"], token)
+        {:ok, data}
+      _ -> {:error, "There was an error"}
+    end
+  end
+
   # Drop keys we don't need and fetch nested text
   defp drop_keys([], _token), do: %{}
   defp drop_keys(data, token) do
@@ -83,22 +100,5 @@ defmodule LeafNode.Integrations.Notion.Pages do
   end
   defp extract_plain_text(data, "text") do
     Enum.at(data, 0)["text"]
-  end
-
-  # Fetch children blocks and return their processed text recursively
-  defp fetch_children(block_id, token) do
-    url = "https://api.notion.com/v1/blocks/#{block_id}/children"
-
-    headers = [
-      {"Authorization", "Bearer #{token}"},
-      {"Notion-Version", @notion_version}
-    ]
-
-    case HTTPoison.get(url, headers) do
-      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
-        data = drop_keys(Jason.decode!(body)["results"], token)
-        {:ok, data}
-      _ -> {:error, "There was an error"}
-    end
   end
 end

@@ -5,7 +5,7 @@ defmodule LeafNode.Integrations.Notion.Pages do
   require Logger
   @notion_version "2021-05-13"
   @block_limit 100
-  @block_text_str_limit 500
+  @block_text_str_limit 1500
 
   @keys_to_remove [
     "archived",
